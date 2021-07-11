@@ -9984,30 +9984,30 @@ namespace Network
             var output_writer = new StreamWriter(outputfile, true);
 
             //6
-            string[] labels_1 = new string[] { "networkid", "i", "j", "positive_1", "negative_1", "imbal_1" };
+            string[] labels_1 = new string[] { "Network ID", "i", "j", "positive_1", "negative_1", "imbal_1" };
 
 
             //11
-            string[] labels_2 = new string[] {"networkid","i","j","positive_1","negative_1","imbal_1",
+            string[] labels_2 = new string[] {"Network ID","i","j","positive_1","negative_1","imbal_1",
                                 "positive_2","negative_2","total_positive_2","total_negative_2","imbal_2"};
 
             //16
-            string[] labels_3 = new string[] {"networkid","i","j","positive_1","negative_1","imbal_1",
+            string[] labels_3 = new string[] {"Network ID","i","j","positive_1","negative_1","imbal_1",
                                 "positive_2","negative_2","total_positive_2","total_negative_2","imbal_2",
                                 "positive_3","negative_3","total_positive_3","total_negative_3","imbal_3"};
 
 
             if (Null)
             {
-                labels_1 = new string[] { "networkid", "i", "j", "positive_1", "negative_1", "imbal_1", "p_r_1", "n_r_1", "rand_imbal_1" };
+                labels_1 = new string[] { "Network ID", "i", "j", "positive_1", "negative_1", "imbal_1", "p_r_1", "n_r_1", "rand_imbal_1" };
                 //9
 
 
-                labels_2 = new string[] {"networkid","i","j","positive_1","negative_1","imbal_1","p_r_1","n_r_1","rand_imbal_1",
+                labels_2 = new string[] {"Network ID","i","j","positive_1","negative_1","imbal_1","p_r_1","n_r_1","rand_imbal_1",
                                 "positive_2","negative_2","total_positive_2","total_negative_2","imbal_2","p_r_2","n_r_2","rand_imbal_2"};
                 //17
 
-                labels_3 = new string[] {"networkid","i","j","positive_1","negative_1","imbal_1","p_r_1","n_r_1","rand_imbal_1",
+                labels_3 = new string[] {"Network ID","i","j","positive_1","negative_1","imbal_1","p_r_1","n_r_1","rand_imbal_1",
                                 "positive_2","negative_2","total_positive_2","total_negative_2","imbal_2","p_r_2","n_r_2","rand_imbal_2",
                                 "positive_3","negative_3","total_positive_3","total_negative_3","imbal_3","p_r_3","n_r_3","rand_imbal_3"};
             }//25
@@ -10016,23 +10016,23 @@ namespace Network
             if (order == 3)
             {
                 if (Null)
-                    output_writer.WriteLine("networkid,i,j,positive_1,negative_1,imbal_1,p_r_1,n_r_1,rand_imbal_1,positive_2,negative_2,total_positive_2,total_negative_2,imbal_2,p_r_2,n_r_2,rand_imbal_2,positive_3,negative_3,total_positive_3,total_negative_3,imbal_3,p_r_3,n_r_3,rand_imbal_3");
+                    output_writer.WriteLine("Network ID,i,j,positive_1,negative_1,imbal_1,p_r_1,n_r_1,rand_imbal_1,positive_2,negative_2,total_positive_2,total_negative_2,imbal_2,p_r_2,n_r_2,rand_imbal_2,positive_3,negative_3,total_positive_3,total_negative_3,imbal_3,p_r_3,n_r_3,rand_imbal_3");
                 else
-                    output_writer.WriteLine("networkid,i,j,positive_1,negative_1,imbal_1,positive_2,negative_2,total_positive_2,total_negative_2,imbal_2,positive_3,negative_3,total_positive_3,total_negative_3,imbal_3,");
+                    output_writer.WriteLine("Network ID,i,j,positive_1,negative_1,imbal_1,positive_2,negative_2,total_positive_2,total_negative_2,imbal_2,positive_3,negative_3,total_positive_3,total_negative_3,imbal_3,");
             }
             else if (order == 2)
             {
                 if (Null)
-                    output_writer.WriteLine("networkid,i,j,positive_1,negative_1,imbal_1,p_r_1,n_r_1,rand_imbal_1,positive_2,negative_2,total_positive_2,total_negative_2,imbal_2,p_r_2,n_r_2,rand_imbal_2");
+                    output_writer.WriteLine("Network ID,i,j,positive_1,negative_1,imbal_1,p_r_1,n_r_1,rand_imbal_1,positive_2,negative_2,total_positive_2,total_negative_2,imbal_2,p_r_2,n_r_2,rand_imbal_2");
                 else
-                    output_writer.WriteLine("networkid,i,j,positive_1,negative_1,imbal_1,positive_2,negative_2,total_positive_2,total_negative_2,imbal_2");
+                    output_writer.WriteLine("Network ID,i,j,positive_1,negative_1,imbal_1,positive_2,negative_2,total_positive_2,total_negative_2,imbal_2");
             }
             else if (order == 1)
             {
                 if (Null)
-                    output_writer.WriteLine("networkid,i,j,positive_1,negative_1,imbal_1,p_r_1,n_r_1,rand_imbal_1");
+                    output_writer.WriteLine("Network ID,i,j,positive_1,negative_1,imbal_1,p_r_1,n_r_1,rand_imbal_1");
                 else
-                    output_writer.WriteLine("networkid,i,j,positive_1,negative_1,imbal_1");
+                    output_writer.WriteLine("Network ID,i,j,positive_1,negative_1,imbal_1");
 
             }
 
@@ -10052,7 +10052,11 @@ namespace Network
                     string[] dataRow = new string[totalCols];
                     for (int j = 0; j < totalCols; j++)
                     {
-                        dataRow[j] = matrix[i, j].ToString();//>= 0? mTable[i, j].ToString() : "#N/A";
+                        if (j == 0)
+                            //dataRow[0] = mTable["Data"].NetworkIdStr;
+                            dataRow[j] = matrix[i, j].ToString();
+                        else
+                            dataRow[j] = matrix[i, j].ToString();//>= 0? mTable[i, j].ToString() : "#N/A";
                     }
                     output_writer_data.WriteLine(String.Join(",", dataRow));
                     output_writer_data.Flush();
@@ -12995,49 +12999,53 @@ namespace Network
             int totalCols = matrix.GetLength(1);   
             
             Matrix output = null;
-            string[] labels_1 = new string[] {"networkid","i","j","positive_1","negative_1","imbal_1"};
+            string[] labels_1 = new string[] {"Network ID","i","j","positive_1","negative_1","imbal_1"};
   
             
 
-            string[] labels_2 = new string[] {"networkid","i","j","positive_1","negative_1","imbal_1",
+            string[] labels_2 = new string[] {"Network ID","i","j","positive_1","negative_1","imbal_1",
                                 "positive_2","negative_2","total_positive_2","total_negative_2","imbal_2"};
   
 
-            string[] labels_3 = new string[] {"networkid","i","j","positive_1","negative_1","imbal_1",
+            string[] labels_3 = new string[] {"Network ID","i","j","positive_1","negative_1","imbal_1",
                                 "positive_2","negative_2","total_positive_2","total_negative_2","imbal_2",
                                 "positive_3","negative_3","total_positive_3","total_negative_3","imbal_3"};
                 
             
             if(Null){
-            labels_1 = new string[] {"networkid","i","j","positive_1","negative_1","imbal_1","p_r_1","n_r_1","rand_imbal_1"};
+            labels_1 = new string[] {"Network ID","i","j","positive_1","negative_1","imbal_1","p_r_1","n_r_1","rand_imbal_1"};
   
             
 
-            labels_2 = new string[] {"networkid","i","j","positive_1","negative_1","imbal_1","p_r_1","n_r_1","rand_imbal_1",
+            labels_2 = new string[] {"Network ID","i","j","positive_1","negative_1","imbal_1","p_r_1","n_r_1","rand_imbal_1",
                                 "positive_2","negative_2","total_positive_2","total_negative_2","imbal_2","p_r_2","n_r_2","rand_imbal_2"};
   
 
-            labels_3 = new string[] {"networkid","i","j","positive_1","negative_1","imbal_1","p_r_1","n_r_1","rand_imbal_1",
+            labels_3 = new string[] {"Network ID","i","j","positive_1","negative_1","imbal_1","p_r_1","n_r_1","rand_imbal_1",
                                 "positive_2","negative_2","total_positive_2","total_negative_2","imbal_2","p_r_2","n_r_2","rand_imbal_2",
                                 "positive_3","negative_3","total_positive_3","total_negative_3","imbal_3","p_r_3","n_r_3","rand_imbal_3"};
                 }
 
-  
-            if(order == 1){
-            
-            output = mTable.AddMatrix("PathBased", totalRows, labels_1.Length);
-            for(int i = 0; i<labels_1.Length; i++){
-        
+
+            if (order == 1)
+            {
+
+                output = mTable.AddMatrix("PathBased", totalRows, labels_1.Length);
+                for (int i = 0; i < labels_1.Length; i++)
+                {
+
                     data.Columns.Add(labels_1[i], labels_1[i]);
+                }
             }
-            }
-            else if(order == 2){
-            
-            output = mTable.AddMatrix("PathBased", totalRows, labels_2.Length);
-            for(int i = 0; i<labels_2.Length; i++){
-        
+            else if (order == 2)
+            {
+
+                output = mTable.AddMatrix("PathBased", totalRows, labels_2.Length);
+                for (int i = 0; i < labels_2.Length; i++)
+                {
+
                     data.Columns.Add(labels_2[i], labels_2[i]);
-            }
+                }
             }
             if(order == 3){
             
@@ -13051,8 +13059,9 @@ namespace Network
 
             for (int i = 0; i < output.ColLabels.Length; i++)
                 data.Columns.Add(output.ColLabels[i], output.ColLabels[i]);
-                
-
+            // Yushan
+            mTable["PathBased"].NetworkIdStr = mTable["Data"].NetworkIdStr;
+            mTable["PathBased"].NetworkId = mTable["Data"].NetworkId;
             //rows
             //output.Rows =  mTable["Data"].Rows;
             for (int i = 0; i < totalRows; i++)
@@ -13060,8 +13069,8 @@ namespace Network
                 string[] dataRow = new string[totalCols];
                 for (int j = 0; j < totalCols; j++)
                 {
-                    mTable[displayMatrix][i,j] = matrix[i,j];   
-                    dataRow[j] = matrix[i,j].ToString() ;//>= 0? mTable[i, j].ToString() : "#N/A";
+                    mTable[displayMatrix][i,j] = matrix[i,j];  
+                    dataRow[j] = j == 0? mTable["PathBased"].NetworkIdStr : matrix[i,j].ToString() ;//>= 0? mTable[i, j].ToString() : "#N/A";
                 }
                 data.Rows.Add(dataRow);
             }
@@ -13119,6 +13128,8 @@ namespace Network
                 {
                     if (col == 1)
                         newRow[col] = mTable["Data"].RowLabels[row];
+                    else if (col == 0)
+                        newRow[col] = mTable["Data"].NetworkIdStr;
                     else
                         newRow[col] = lt[row, col].ToString();
                 }
@@ -14149,8 +14160,9 @@ namespace Network
                         string line = sr.ReadLine();
                         var split = line.Split(',');
 
-                        if (int.Parse(split[0]) == year)
+                        if (split[0] == mTable["Data"].NetworkIdStr)
                         {
+                            //Console.WriteLine("split[0]: {0:s}", split[0]);
                             networkLines.Add(line);
 
                             if (!tags.Contains(split[2]))
@@ -14161,7 +14173,6 @@ namespace Network
                     } //end of while
 
                     //using values assuming they are in order
-
                     int l = 0; //helps iterates list
                     for (int i = 0; i < numNodes; i++)
                     {
@@ -14247,19 +14258,19 @@ namespace Network
 
             if (order)
             {
-                output = mTable.AddMatrix("Multiplex", numCells, 7);               
+                output = mTable.AddMatrix("Multiplex", numCells, 7);
+                mTable["Multiplex"].NetworkIdStr = mTable["Data"].NetworkIdStr;
+                mTable["Multiplex"].NetworkId = year;
             }
 
             else
             {
                 output = mTable.AddMatrix("Multiplex", numCells, 9);
+                mTable["Multiplex"].NetworkIdStr = mTable["Data"].NetworkIdStr;
+                mTable["Multiplex"].NetworkId = year;
                 output.ColLabels[7] = "b^2";
                 output.ColLabels[8] = "imb^2";
             }
-
-
-            mTable["Multiplex"].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable["Multiplex"].NetworkId = year;
 
             output.ColLabels[0] = "Network ID";
             output.ColLabels[1] = "i";
@@ -14275,7 +14286,12 @@ namespace Network
                 output[i, 0] = year;
             } //filling out ID
 
-
+            // Yushan
+            //int h = 0;
+            //foreach (string tg in tags)
+            //{
+            //    Console.WriteLine("tag[{0:d}]: {1:s}", h, tags[h++]);
+            //}
             //filling out tags
             int dummy = 0;
             for (int i = 0; i < numNodes; i++)

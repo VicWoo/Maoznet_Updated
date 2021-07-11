@@ -226,7 +226,7 @@ namespace NetworkGUI.Forms
                 e.iterate_rand(100, order, this.size, this.pos_target, this.neg_target, this.pos_max, this.neg_max);
             }
             //Initialize table columns
-            this.table.Columns.Add("networkid");
+            this.table.Columns.Add("Network ID");
             this.table.Columns.Add("i");
             this.table.Columns.Add("j");
             this.table.Columns.Add("positive_1");
@@ -282,7 +282,7 @@ namespace NetworkGUI.Forms
                     //if(i != j)
                     {
                         //file_writer.Write("{0}\t{1}\t{2}\t",this.NetID, states_hash.FirstOrDefault(x => x.Value == i).Key,states_hash.FirstOrDefault(x => x.Value == j).Key);
-                        row_["networkid"] = this.NetID;
+                        row_["Network ID"] = this.NetID;
                         row_["i"] = states_hash.FirstOrDefault(x => x.Value == i).Key;
                         row_["j"] = states_hash.FirstOrDefault(x => x.Value == j).Key;
 
