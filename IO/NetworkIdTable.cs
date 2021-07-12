@@ -60,9 +60,9 @@ namespace Network.IO
 
         public int GetNextNetworkId(int networkId)
         {
-            if (networkId >= _maxNetworkId || !ContainsNetworkId(++networkId))
+            if (networkId > _maxNetworkId || !ContainsNetworkId(++networkId))
                 return -1;
-            if (networkId < _minNetworkId)
+            if (networkId < _minNetworkId || networkId == (_maxNetworkId + 1))
                 return _minNetworkId;
 
             return networkId;
@@ -70,9 +70,9 @@ namespace Network.IO
 
         public int GetPreviousNetworkId(int networkId)
         {
-            if (networkId <= _minNetworkId || !ContainsNetworkId(--networkId))
+            if (networkId < _minNetworkId || !ContainsNetworkId(--networkId))
                 return -1;
-            if (networkId > _maxNetworkId)
+            if (networkId > _maxNetworkId || networkId == -1)
                 return _maxNetworkId;
 
             return networkId;

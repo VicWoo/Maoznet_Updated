@@ -9971,7 +9971,7 @@ namespace Network
         //Angela
 
 
-        public void SavePathBased(string inputfile, string outputfile, bool overwrite, int order, bool Null, int startYear, int endYear)
+        public void SavePathBased(string inputfile, string outputfile, bool overwrite, int order, bool Null, int startYear, int endYear, List<string> networkRealIdList)
         {
             PathBasedImbalance PIF = new PathBasedImbalance();
 
@@ -10042,7 +10042,7 @@ namespace Network
 
                 var output_writer_data = new StreamWriter(outputfile, true);
 
-                double[,] matrix = PIF.supportScript(inputfile, order, Null, startYear + saveLoop);
+                double[,] matrix = PIF.supportScript(inputfile, order, Null, startYear + saveLoop, networkRealIdList);
 
                 int totalRows = matrix.GetLength(0);
                 int totalCols = matrix.GetLength(1);

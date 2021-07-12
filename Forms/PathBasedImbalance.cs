@@ -439,7 +439,7 @@ namespace NetworkGUI.Forms
 
                 
         //new
-        public double[,] supportScript(string inputFile, int order, bool Null, int startYear)
+        public double[,] supportScript(string inputFile, int order, bool Null, int startYear, List<string> networkRealIdList)
         {
             string file_name = inputFile.Replace(@"\\", @"\");
             
@@ -462,106 +462,107 @@ namespace NetworkGUI.Forms
             while (!main_reader.EndOfStream)
             {
                 //if(Int32.Parse(current_year)<startYear){
-                
-                  //var skip = main_reader.ReadLine();
+
+                //var skip = main_reader.ReadLine();
                 //continue;}
                 //if(Int32.Parse(current_year)>endYear)break;
-              
+
                 var main_line = main_reader.ReadLine();
                 //logger.WriteLine("In first while while main_reader at :{0}",main_line);
-               
+
                 var cols = main_line.Split(',');
 
                 // /Console.WriteLine("The num_cols : {0}",num_cols);
 
-                if (!int.TryParse(cols[0],out val)) continue;
-                if(Int32.Parse(cols[0]) ==startYear){
-                HashSet<string> states_set = new HashSet<string>();
-                
-                string NetID = cols[0];
-                //Building set of distinct nodes for matrix size & indices
-                //logger.WriteLine("Building HashSet for : {0}", current_year);
-
-                while (current_year != "" && NetID == cols[0])
+                //if (!int.TryParse(cols[0],out val)) continue;
+                if (cols[0] == networkRealIdList[startYear])
                 {
-                    if (main_reader.EndOfStream)
+                    HashSet<string> states_set = new HashSet<string>();
+
+
+                    string NetID = cols[0];
+                    //Building set of distinct nodes for matrix size & indices
+                    //logger.WriteLine("Building HashSet for : {0}", current_year);
+
+                    while (current_year != "" && NetID == cols[0])
                     {
-                        cols[0] = "end"; break;
-                    }
-                    states_set.Add(cols[1]);
-                    states_set.Add(cols[2]);
-                            
-                    string line = main_reader.ReadLine();
-                    //Console.WriteLine(line);
+                        if (main_reader.EndOfStream)
+                        {
+                            cols[0] = "end"; break;
+                        }
+                        states_set.Add(cols[1]);
+                        states_set.Add(cols[2]);
+
+                        string line = main_reader.ReadLine();
+                        //Console.WriteLine(line);
 
 
-                    cols = line.Split(',');
+                        cols = line.Split(',');
 
-                }//main_reader aka cols is at next year.
+                    }//main_reader aka cols is at next year.
 
-                //Graph to be called using current_year as NetID
-                
-
-                Dictionary<string, int> states_hash = new Dictionary<string, int>();
-
-                //Building HashMap
-                //logger.WriteLine("Building HashMap for year : {0}", current_year);
-                int idx = 0;
-                //Printing hashMap gathered for current year
-                foreach (var element in states_set)
-                {
-                    states_hash.Add(element, idx);
-                    //logger.WriteLine("{0}-->{1}", element, states_hash[element]);
-                    idx++;
-                }
+                    //Graph to be called using current_year as NetID
 
 
-                int n_nodes = states_set.Count;
-                int[,] x_plus_ref = new int[n_nodes, n_nodes];
-                int[,] x_minus_ref = new int[n_nodes, n_nodes];
+                    Dictionary<string, int> states_hash = new Dictionary<string, int>();
 
-
-
-                while (!local_reader.EndOfStream && current_year != cols[0])
-                {
-
-                    var local_line = local_reader.ReadLine();
-                    //logger.WriteLine("local:{0}", local_line);
-                    var row_in_year = local_line.Split(',');
-                    
-                    
-                    if (!int.TryParse(row_in_year[0],out val)) continue;
-                    current_year = row_in_year[0];
-                    if (row_in_year[1] == row_in_year[2]) continue;
-                    if(Int32.Parse(row_in_year[0]) ==startYear){
-                    
-
-                    for (int i = 3; i < num_cols; i++)
+                    //Building HashMap
+                    //logger.WriteLine("Building HashMap for year : {0}", current_year);
+                    int idx = 0;
+                    //Printing hashMap gathered for current year
+                    foreach (var element in states_set)
                     {
-                       //logger.WriteLine("key_i = {0}, key_j = {1}",row_in_year[1], row_in_year[2]);
-                        if (int.Parse(row_in_year[i]) > 0)
-                        {
-                            //logger.WriteLine("pos: {0},{1}-->{2},{3}", states_hash[row_in_year[1]], states_hash[row_in_year[2]], row_in_year[1], row_in_year[2]);
-                            x_plus_ref[states_hash[row_in_year[1]], states_hash[row_in_year[2]]]++;
-                        }
-                        if (int.Parse(row_in_year[i]) < 0)
-                        {
-                            //logger.WriteLine("neg: {0},{1}-->{2},{3}", states_hash[row_in_year[1]], states_hash[row_in_year[2]], row_in_year[1], row_in_year[2]);
-                            x_minus_ref[states_hash[row_in_year[1]], states_hash[row_in_year[2]]]++;
-                        }
+                        states_hash.Add(element, idx);
+                        //logger.WriteLine("{0}-->{1}", element, states_hash[element]);
+                        idx++;
                     }
-                }
+
+
+                    int n_nodes = states_set.Count;
+                    int[,] x_plus_ref = new int[n_nodes, n_nodes];
+                    int[,] x_minus_ref = new int[n_nodes, n_nodes];
+
+
+
+                    while (!local_reader.EndOfStream && current_year != cols[0])
+                    {
+
+                        var local_line = local_reader.ReadLine();
+                        //logger.WriteLine("local:{0}", local_line);
+                        var row_in_year = local_line.Split(',');
+
+
+                        //if (!int.TryParse(row_in_year[0],out val)) continue;
+                        current_year = row_in_year[0];
+                        if (row_in_year[1] == row_in_year[2]) continue;
+                        if (row_in_year[0] == networkRealIdList[startYear])
+                        {
+                            for (int i = 3; i < num_cols; i++)
+                            {
+                                //logger.WriteLine("key_i = {0}, key_j = {1}",row_in_year[1], row_in_year[2]);
+                                if (int.Parse(row_in_year[i]) > 0)
+                                {
+                                    //logger.WriteLine("pos: {0},{1}-->{2},{3}", states_hash[row_in_year[1]], states_hash[row_in_year[2]], row_in_year[1], row_in_year[2]);
+                                    x_plus_ref[states_hash[row_in_year[1]], states_hash[row_in_year[2]]]++;
+                                }
+                                if (int.Parse(row_in_year[i]) < 0)
+                                {
+                                    //logger.WriteLine("neg: {0},{1}-->{2},{3}", states_hash[row_in_year[1]], states_hash[row_in_year[2]], row_in_year[1], row_in_year[2]);
+                                    x_minus_ref[states_hash[row_in_year[1]], states_hash[row_in_year[2]]]++;
+                                }
+                            }
+                        }
                     }//current_year now is cols[0] of exit i.e next year
 
-                PathBasedImbalance g_ref = new PathBasedImbalance(NetID, x_plus_ref, x_minus_ref);
-                g_ref.infoTable(states_hash, order, Null);
-                output = g_ref.ConvertDataTableToMatrix();
-                
-                Array.Clear(x_plus_ref, 0, x_plus_ref.Length);
-                Array.Clear(x_minus_ref, 0, x_minus_ref.Length);
-                states_hash.Clear();
-                states_set.Clear();
-            }
+                    PathBasedImbalance g_ref = new PathBasedImbalance(NetID, x_plus_ref, x_minus_ref);
+                    g_ref.infoTable(states_hash, order, Null);
+                    output = g_ref.ConvertDataTableToMatrix();
+
+                    Array.Clear(x_plus_ref, 0, x_plus_ref.Length);
+                    Array.Clear(x_minus_ref, 0, x_minus_ref.Length);
+                    states_hash.Clear();
+                    states_set.Clear();
+                }
             }
             main_reader.Close();
             local_reader.Close();
