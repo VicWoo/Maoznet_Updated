@@ -348,8 +348,8 @@ namespace NetworkGUI
                     break;
                 //by Angela
                 case "PathBased":
-                  // net.LoadPathBasedIntoDataGridView(dataGrid, displayMatrix);
-                   break;
+                    // net.LoadPathBasedIntoDataGridView(dataGrid, displayMatrix);
+                    break;
                 //-Angela    
                 case "SingleNetworkExpectations":
                     break;
@@ -577,6 +577,18 @@ namespace NetworkGUI
                 case "LocalBalance":
                     net.LoadLocalBalanceMatrix(dataGrid, currentYear);
                     break;
+                // Yushan
+                case "PathBased":
+                    {
+                        PathBasedImbalance PIF = new PathBasedImbalance();
+                        double[,] output = PIF.displayScript(openFileDialog.FileName, 3, false);
+                        SetNewDisplayMatrix("PathBased");
+                        net.ClearPreviousData(displayMatrix, "Dyadic");
+                        SetChecked();
+                        net.LoadPathBasedIntoDataGridView(output, dataGrid, displayMatrix, 3, false);
+                        break;
+                    }
+
                 case "SignedNetwork":
                     net.LoadSignedNetworkCharacteristics(dataGrid, _optionsForm.ReachNumMatrices, _optionsForm.reachSum, _optionsForm.reachZero, prevDisplayMatrix, currentYear, reachBinary);
                     break;
@@ -1006,6 +1018,7 @@ namespace NetworkGUI
                 return;
 
             ++currentYear;
+            Console.WriteLine("Display Matrx: {0:s}", displayMatrix);
             try
             {
                 if (loadFrom == "Matrix")
