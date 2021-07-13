@@ -61,6 +61,9 @@ namespace NetworkGUI
 
         // Yushan
         List<string> networkRealIdList = new List<string>();
+        // Path Based Imbalance
+        int pathBasedOrder;
+        bool pathBasedNull;
         // Global Randomization
         bool _globalDirected;
         bool selfTies;
@@ -153,7 +156,9 @@ namespace NetworkGUI
             // Yushan
             _globalRandomForm.NumRandNet = 1;
             _configModelForm.NumRandNet = 1;
-            
+            // Path Based Imbalance Order
+            pathBasedOrder = 1;
+            pathBasedNull = true;
             //
 
             Text = "Maoz Social Networks Program V. " + versionString;
@@ -354,8 +359,8 @@ namespace NetworkGUI
                     break;
                 //by Angela
                 case "PathBased":
-                  // net.LoadPathBasedIntoDataGridView(dataGrid, displayMatrix);
-                   break;
+                    // net.LoadPathBasedIntoDataGridView(dataGrid, displayMatrix);
+                    break;
                 //-Angela    
                 case "SingleNetworkExpectations":
                     break;
@@ -583,6 +588,18 @@ namespace NetworkGUI
                 case "LocalBalance":
                     net.LoadLocalBalanceMatrix(dataGrid, currentYear);
                     break;
+                // Yushan
+                case "PathBased":
+                    {
+                        PathBasedImbalance PIF = new PathBasedImbalance();
+                        double[,] output = PIF.displayScript(openFileDialog.FileName, pathBasedOrder, pathBasedNull);
+                        SetNewDisplayMatrix("PathBased");
+                        net.ClearPreviousData(displayMatrix, "Dyadic");
+                        SetChecked();
+                        net.LoadPathBasedIntoDataGridView(output, dataGrid, displayMatrix, pathBasedOrder, pathBasedNull);
+                        break;
+                    }
+
                 case "SignedNetwork":
                     net.LoadSignedNetworkCharacteristics(dataGrid, _optionsForm.ReachNumMatrices, _optionsForm.reachSum, _optionsForm.reachZero, prevDisplayMatrix, currentYear, reachBinary);
                     break;
@@ -981,7 +998,7 @@ namespace NetworkGUI
                     // Yushan
                     for (int i = 0; i < networkRealIdList.Count; i++)
                     {
-                        Console.WriteLine("network[{0:d}] real ID: {1:s}", i, networkRealIdList[i]);
+                        //Console.WriteLine("network[{0:d}] real ID: {1:s}", i, networkRealIdList[i]);
                     }
                     //loadFrom = "Matrix";
                     SetFormTitle();
@@ -1012,6 +1029,7 @@ namespace NetworkGUI
                 return;
 
             ++currentYear;
+            //Console.WriteLine("Display Matrx: {0:s}", displayMatrix);
             try
             {
                 if (loadFrom == "Matrix")
@@ -1108,7 +1126,6 @@ namespace NetworkGUI
 
             --currentYear;
 
-
             try
             {
                 if (loadFrom == "Matrix")
@@ -1116,33 +1133,33 @@ namespace NetworkGUI
                     if (openFileDialog.Multiselect)
                     {
                         
-                        currentYear = net.LoadFromMultipleFiles(fileNames, net.GetPreviousYear(fileNames[0], currentYear));
+                        currentYear = net.LoadFromMultipleFiles(fileNames, net.GetPreviousYear(fileNames[0], ++currentYear));
                     }
                     else
                     {
-                        currentYear = net.LoadFromMatrixFile(openFileDialog.FileName, net.GetPreviousYear(openFileDialog.FileName, currentYear));
+                        currentYear = net.LoadFromMatrixFile(openFileDialog.FileName, net.GetPreviousYear(openFileDialog.FileName, ++currentYear));
                     }
                 }
                 else if (loadFrom == "Dyadic")
                 {
                     if (openFileDialog.Multiselect)
                     {
-                        currentYear = net.LoadFromMultivariableDyadicFile(openFileDialog.FileName, net.GetPreviousYear(openFileDialog.FileName, currentYear));
+                        currentYear = net.LoadFromMultivariableDyadicFile(openFileDialog.FileName, net.GetPreviousYear(openFileDialog.FileName, ++currentYear));
                     }
                     else
                     {
 
-                        currentYear = net.LoadFromDyadicFile(openFileDialog.FileName, net.GetPreviousYear(openFileDialog.FileName, currentYear));
+                        currentYear = net.LoadFromDyadicFile(openFileDialog.FileName, net.GetPreviousYear(openFileDialog.FileName, ++currentYear));
                     }
 
                 }
                 else if (loadFrom == "Affil")
                 {
-                    currentYear = net.LoadFromAffiliationFile(openFileDialog.FileName, net.GetPreviousYear(openFileDialog.FileName, currentYear));
+                    currentYear = net.LoadFromAffiliationFile(openFileDialog.FileName, net.GetPreviousYear(openFileDialog.FileName, ++currentYear));
                 }
                 else if (loadFrom == "Monadic")
                 {
-                    currentYear = net.LoadFromMonadicFile(openFileDialog.FileName, net.GetPreviousYear(openFileDialog.FileName, currentYear));
+                    currentYear = net.LoadFromMonadicFile(openFileDialog.FileName, net.GetPreviousYear(openFileDialog.FileName, ++currentYear));
                 }
                 else if (loadFrom == "Random")
                 {
@@ -2067,7 +2084,7 @@ namespace NetworkGUI
                     // Yushan
                     for (int i = 0; i < networkRealIdList.Count; i++)
                     {
-                        Console.WriteLine("network[{0:d}] real ID: {1:s}", i, networkRealIdList[i]);
+                        //Console.WriteLine("network[{0:d}] real ID: {1:s}", i, networkRealIdList[i]);
                     }
                     //loadFrom = "Dyadic";
                     //loadFrom = type;
@@ -2794,7 +2811,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                     networkRealIdList = BufferedFileTable.GetFile(openFileDialog.FileName).NetworkRealIdList;
                     for (int i = 0; i < networkRealIdList.Count; i++)
                     {
-                        Console.WriteLine("network[{0:d}] real ID: {1:s}", i, networkRealIdList[i]);
+                        //Console.WriteLine("network[{0:d}] real ID: {1:s}", i, networkRealIdList[i]);
                     }
                     SetFormTitle();
 
@@ -2831,7 +2848,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                     networkRealIdList = BufferedFileTable.GetFile(openFileDialog.FileName).NetworkRealIdList;
                     for (int i = 0; i < networkRealIdList.Count; i++)
                     {
-                        Console.WriteLine("network[{0:d}] real ID: {1:s}", i, networkRealIdList[i]);
+                        //Console.WriteLine("network[{0:d}] real ID: {1:s}", i, networkRealIdList[i]);
                     }
                     SetFormTitle();
                     if (displayMatrix == "Affil")
@@ -3887,7 +3904,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                         // Yushan
                         for (int k = 0; k < networkRealIdList.Count; k++)
                         {
-                            Console.WriteLine("network[{0:d}] real ID: {1:s}", k, networkRealIdList[k]);
+                            //Console.WriteLine("network[{0:d}] real ID: {1:s}", k, networkRealIdList[k]);
                         }
                         net.cet = files[i].option;
                         temp = clique.convertClique(net.FindCliques(files[i].cutOff, false, 0.0, 0xFFFF, 0, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag));
@@ -4178,13 +4195,14 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
 
 
             PathBasedImbalance PIF = new PathBasedImbalance();
-            
-            double[,] output = PIF.displayScript(openFileDialog.FileName, 1, true);
+            pathBasedOrder = 1;
+            pathBasedNull = true;
+            double[,] output = PIF.displayScript(openFileDialog.FileName, pathBasedOrder, pathBasedNull);
             SetNewDisplayMatrix("PathBased");
             net.ClearPreviousData(displayMatrix, "Dyadic");
             SetChecked();
             
-            net.LoadPathBasedIntoDataGridView(output, dataGrid, displayMatrix, 1, true);
+            net.LoadPathBasedIntoDataGridView(output, dataGrid, displayMatrix, pathBasedOrder, pathBasedNull);
 
         }
                 
@@ -4198,13 +4216,14 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
 
 
             PathBasedImbalance PIF = new PathBasedImbalance();
-            
-            double[,] output = PIF.displayScript(openFileDialog.FileName, 1, false);
+            pathBasedOrder = 1;
+            pathBasedNull = false;
+            double[,] output = PIF.displayScript(openFileDialog.FileName, pathBasedOrder, pathBasedNull);
             SetNewDisplayMatrix("PathBased");
             net.ClearPreviousData(displayMatrix, "Dyadic");
             SetChecked();
             
-            net.LoadPathBasedIntoDataGridView(output, dataGrid, displayMatrix, 1, false);
+            net.LoadPathBasedIntoDataGridView(output, dataGrid, displayMatrix, pathBasedOrder, pathBasedNull);
 
         }
         
@@ -4218,13 +4237,14 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
             }
             
             PathBasedImbalance PIF = new PathBasedImbalance();
-            
-            double[,] output = PIF.displayScript(openFileDialog.FileName, 2, true);
+            pathBasedOrder = 2;
+            pathBasedNull = true;
+            double[,] output = PIF.displayScript(openFileDialog.FileName, pathBasedOrder, pathBasedNull);
             SetNewDisplayMatrix("PathBased");
             net.ClearPreviousData(displayMatrix, "Dyadic");
             SetChecked();
             
-            net.LoadPathBasedIntoDataGridView(output, dataGrid, displayMatrix, 2, true);
+            net.LoadPathBasedIntoDataGridView(output, dataGrid, displayMatrix, pathBasedOrder, pathBasedNull);
         }
         private void secondOrderPathBasedToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -4236,13 +4256,14 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
             }
 
             PathBasedImbalance PIF = new PathBasedImbalance();
-            
-            double[,] output = PIF.displayScript(openFileDialog.FileName, 2, false);
+            pathBasedOrder = 2;
+            pathBasedNull = false;
+            double[,] output = PIF.displayScript(openFileDialog.FileName, pathBasedOrder, pathBasedNull);
             SetNewDisplayMatrix("PathBased");
             net.ClearPreviousData(displayMatrix, "Dyadic");
             SetChecked();
             
-            net.LoadPathBasedIntoDataGridView(output, dataGrid, displayMatrix, 2, false);
+            net.LoadPathBasedIntoDataGridView(output, dataGrid, displayMatrix, pathBasedOrder, pathBasedNull);
         }
 
         private void thirdOrderPathBasedNullToolStripMenuItem_Click(object sender, EventArgs e)
@@ -4254,13 +4275,14 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
             }
 
             PathBasedImbalance PIF = new PathBasedImbalance();
-            
-            double[,] output = PIF.displayScript(openFileDialog.FileName, 3, true);
+            pathBasedOrder = 3;
+            pathBasedNull = true;
+            double[,] output = PIF.displayScript(openFileDialog.FileName, pathBasedOrder, pathBasedNull);
             SetNewDisplayMatrix("PathBased");
             net.ClearPreviousData(displayMatrix, "Dyadic");
             SetChecked();
             
-            net.LoadPathBasedIntoDataGridView(output, dataGrid, displayMatrix, 3, true);
+            net.LoadPathBasedIntoDataGridView(output, dataGrid, displayMatrix, pathBasedOrder, pathBasedNull);
         }
 
         private void thirdOrderPathBasedToolStripMenuItem_Click(object sender, EventArgs e)
@@ -4273,13 +4295,14 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
             }
 
             PathBasedImbalance PIF = new PathBasedImbalance();
-            
-            double[,] output = PIF.displayScript(openFileDialog.FileName, 3, false);
+            pathBasedOrder = 3;
+            pathBasedNull = false;
+            double[,] output = PIF.displayScript(openFileDialog.FileName, pathBasedOrder, pathBasedNull);
             SetNewDisplayMatrix("PathBased");
             net.ClearPreviousData(displayMatrix, "Dyadic");
             SetChecked();
             
-            net.LoadPathBasedIntoDataGridView(output, dataGrid, displayMatrix, 3, false);
+            net.LoadPathBasedIntoDataGridView(output, dataGrid, displayMatrix, pathBasedOrder, pathBasedNull);
 
         }
 
@@ -4982,17 +5005,17 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                     {
 
                         currentYear = endYear;
-                        int order = 1;
-                        bool Null = false;
-                        int displayedCols = net.mTable["PathBased"].Cols;
-                        if(displayedCols == 6 || displayedCols == 9)order = 1;
-                        if(displayedCols == 11 || displayedCols == 17)order = 2;
-                        if(displayedCols == 16 || displayedCols == 25)order = 3;
-                        if(displayedCols == 6 || displayedCols == 11 || displayedCols == 16) Null = false;
-                        if(displayedCols == 9 || displayedCols == 17 || displayedCols == 25) Null = true;
+                        //int order = 1;
+                        //bool Null = false;
+                        //int displayedCols = net.mTable["PathBased"].Cols;
+                        //if(displayedCols == 6 || displayedCols == 9)order = 1;
+                        //if(displayedCols == 11 || displayedCols == 17)order = 2;
+                        //if(displayedCols == 16 || displayedCols == 25)order = 3;
+                        //if(displayedCols == 6 || displayedCols == 11 || displayedCols == 16) Null = false;
+                        //if(displayedCols == 9 || displayedCols == 17 || displayedCols == 25) Null = true;
 
 
-                        net.SavePathBased(openFileDialog.FileName, saveFileDialog.FileName,  _optionsForm.SaveOverwrite, order, Null, startYear, endYear);
+                        net.SavePathBased(openFileDialog.FileName, saveFileDialog.FileName,  _optionsForm.SaveOverwrite, pathBasedOrder, pathBasedNull, startYear, endYear, networkRealIdList);
                        progress.Close();
                         // net.SaveAsTableToFile(saveFileDialog.FileName, year == startYear, _optionsForm.SaveOverwrite && year == startYear, displayMatrix,year, endYear);
                         return;
