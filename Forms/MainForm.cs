@@ -38,6 +38,12 @@ namespace NetworkGUI
         NDStatsForm _ndstatsForm = new NDStatsForm();
         //
 
+        // Baadal
+        RemoveIsolatesForm _rmvIsolatesForm = new RemoveIsolatesForm();
+        bool _rmvdIsolates = false;
+        bool _changedOptionsFormCMinMembers = false;
+        int _ogOptionsFormCMinMembers = 1;
+        //
 
         public OptionsForm _optionsForm = new OptionsForm();
         MultiplicationForm _multiplicationForm = new MultiplicationForm();
@@ -5047,6 +5053,33 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
             return list;
         }
 
+        private void CheckRemoveIsolates()
+        {
+            if(_rmvIsolatesForm.Popup)
+                _rmvIsolatesForm.ShowDialog();
+            if(_rmvIsolatesForm.RemoveIsolates)
+            {
+                if(!_rmvdIsolates)
+                    _ogOptionsFormCMinMembers = _optionsForm.CMinMembers;
+                _optionsForm.CMinMembers = _rmvIsolatesForm.MinGroupSize;
+                net.RemoveIsolates(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _rmvIsolatesForm.MinGroupSize, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                _rmvdIsolates = true;
+            }
+            else if (_rmvdIsolates)
+            {
+                net.RestoreIsolates();
+                _rmvdIsolates = false;
+                if (_optionsForm.CMinMembers != _rmvIsolatesForm.MinGroupSize)
+                {
+                    _changedOptionsFormCMinMembers = true;
+                }
+                if(!_changedOptionsFormCMinMembers)
+                {
+                    _optionsForm.CMinMembers = _ogOptionsFormCMinMembers;
+                }
+            }
+        }
+
         /**************************************************************************
          **************************************************************************
          ************************* Moved Subgroups Menu ***************************
@@ -5056,6 +5089,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void cliqueAffiliationMatrixToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             displayMatrix = "Affiliation";
+            CheckRemoveIsolates();
             DisableStandardizedChecks();
             LoadData();
             SetChecked();
@@ -5064,33 +5098,37 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void cliqueSizeToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             cliqueSizeToolStripMenuItem1.Checked = !cliqueSizeToolStripMenuItem1.Checked;
-            displayMatrix = "Affiliation";
-            DisableStandardizedChecks();
-            LoadData();
-            SetChecked();
+            cliqueAffiliationMatrixToolStripMenuItem1_Click(sender, e);
+            //displayMatrix = "Affiliation";
+            //DisableStandardizedChecks();
+            //LoadData();
+            //SetChecked();
         }
 
         private void cliqueCohesionToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             cliqueCohesionToolStripMenuItem1.Checked = !cliqueCohesionToolStripMenuItem1.Checked;
-            displayMatrix = "Affiliation";
-            DisableStandardizedChecks();
-            LoadData();
-            SetChecked();
+            cliqueAffiliationMatrixToolStripMenuItem1_Click(sender, e);
+            //displayMatrix = "Affiliation";
+            //DisableStandardizedChecks();
+            //LoadData();
+            //SetChecked();
         }
 
         private void estebanRayIndexToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             estebanRayIndexToolStripMenuItem1.Checked = !estebanRayIndexToolStripMenuItem1.Checked;
-            displayMatrix = "Affiliation";
-            DisableStandardizedChecks();
-            LoadData();
-            SetChecked();
+            cliqueAffiliationMatrixToolStripMenuItem1_Click(sender, e);
+            //displayMatrix = "Affiliation";
+            //DisableStandardizedChecks();
+            //LoadData();
+            //SetChecked();
         }
 
         private void cliqueMembershipOverlapMatrixToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("Overlap");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5098,6 +5136,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void diagonallyStandardizedToolStripMenuItem2_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("OverlapDiag");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5105,6 +5144,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void cliqueOverlapMatrixToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("CBCO");
+            CheckRemoveIsolates();
             diag = false;
             LoadData();
             SetChecked();
@@ -5113,6 +5153,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void diagonallyStandardizedToolStripMenuItem3_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("CBCODiag");
+            CheckRemoveIsolates();
             diag = true;
             LoadData();
             SetChecked();
@@ -5120,6 +5161,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
 
         private void cliqueCharacteristicsMatrixToolStripMenuItem1_Click(object sender, EventArgs e)
         {
+            CheckRemoveIsolates();
             _cliqueForm.ShowDialog();
             displayMatrix = "Characteristics";
             LoadData();
@@ -5129,6 +5171,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void interCliqueDistanceToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("ICD");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5136,6 +5179,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void jointCliqueAffiliationMatrixToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("JointCliqueAffiliation");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5143,6 +5187,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void cliqueMembershipOverlapMatrixToolStripMenuItem2_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("CliqueMembershipOverlap");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5150,6 +5195,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void jointCliqueOverlapMatrixToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("CliqueByCliqueOverlap");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5157,6 +5203,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void cliqueDensityMatrixToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("CliqueDensity");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5164,6 +5211,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void relativeDensityToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("CliqueRelativeDensity");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5171,6 +5219,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
 
         private void cONCORBlockAffiliationToolStripMenuItem1_Click(object sender, EventArgs e)
         {
+            CheckRemoveIsolates();
             _blocForm.ShowDialog();
             SetNewDisplayMatrix("CONCOR");
             LoadData();
@@ -5196,6 +5245,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void sociomatrixEntriesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("BlockPartitionS");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5203,6 +5253,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void blockIdentityEntriesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("BlockPartitionI");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5210,6 +5261,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void blockDensityMatrixToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("DensityBlockMatrix");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5217,6 +5269,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void relativeDensityToolStripMenuItem2_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("RelativeDensityBlockMatrix");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5226,6 +5279,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void blockCohesionToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("BlockCohesionMatrix");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5233,6 +5287,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
 
         private void blockCharacteristicsToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            CheckRemoveIsolates();
             _blockForm.ShowDialog();
             if (_blockForm.SVC.Count + _blockForm.DVC.Count >= 0)
             {
@@ -5246,6 +5301,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
 
         private void clusterAffiliationMatrixToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            CheckRemoveIsolates();
             _clusterForm.ShowDialog();
             SetNewDisplayMatrix("Clustering");
             LoadData();
@@ -5255,6 +5311,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void clusterPartitionMatrixToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("ClusterPartition");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked(); 
         }
@@ -5262,6 +5319,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void clusterDensityMatrixToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("DensityClusterMatrix");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5270,6 +5328,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void relativeDensityToolStripMenuItem3_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("RelativeDensityClusterMatrix");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked(); 
         }
@@ -5277,12 +5336,14 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void clusterCohesionToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("ClusterCohesivenessMatrix");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
 
         private void clusterCharacteristicsToolStripMenuItem1_Click(object sender, EventArgs e)
         {
+            CheckRemoveIsolates();
             _blockForm.ShowDialog();
             if (_blockForm.SVC.Count + _blockForm.DVC.Count >= 0)
             {
@@ -5296,6 +5357,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         {
             communityType = CommunityType.Affil;
             SetNewDisplayMatrix("Community");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5304,6 +5366,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         {
             communityType = CommunityType.Density;
             SetNewDisplayMatrix("Community");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5312,6 +5375,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         {
             communityType = CommunityType.RelativeDensity;
             SetNewDisplayMatrix("Community");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5320,12 +5384,14 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         {
             communityType = CommunityType.Cohesion;
             SetNewDisplayMatrix("Community");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
 
         private void communityCharacteristicsToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            CheckRemoveIsolates();
             _comForm.ShowDialog();
             if (_comForm.SVC.Count + _comForm.DVC.Count /*+ _comForm.attrMatrix.Count*/ >= 0)
             {
@@ -5340,6 +5406,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         {
             communityType = CommunityType.Cluster;
             SetNewDisplayMatrix("Community");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5347,6 +5414,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void overlappingCommunityAffiliationMatrixToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("OverlappingCommunity");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5354,6 +5422,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void overlappingCommunityDensityMatrixToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("OverlapCommDensity");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5361,6 +5430,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void relativeDensityToolStripMenuItem5_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("OverlapCommRelativeDensity");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5368,12 +5438,14 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void overlappingCommunityCohesionToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("OverlapCommCohesiveMatrix");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
 
         private void overlappingCommunityCharacteristicsToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            CheckRemoveIsolates();
             _overlapCommForm.ShowDialog();
             if (_overlapCommForm.SVC.Count + _overlapCommForm.DVC.Count >= 0)
             {
@@ -5386,6 +5458,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void overlappingCommunityToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("OverlapCommModularityEQ");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5395,6 +5468,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void cliqueCohesionToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("CliqueCohesionMatrix");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5404,6 +5478,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void cliqueCoefficientsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("CliqueCoefficients");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5411,6 +5486,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void blockCoefficientsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("BlockCoefficients");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5418,6 +5494,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void clusterCoefficientsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("ClusterCoefficients");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5426,6 +5503,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         {
             communityType = CommunityType.Coefficients;
             SetNewDisplayMatrix("Community");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5433,6 +5511,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void overlappingCommunityCoefficientsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SetNewDisplayMatrix("OverlapCommCoefficients");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5611,6 +5690,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         {
             communityType = CommunityType.newAffil;
             SetNewDisplayMatrix("Community");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5619,6 +5699,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         {
             communityType = CommunityType.newDensity;
             SetNewDisplayMatrix("Community");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5627,6 +5708,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         {
             communityType = CommunityType.newCohesion;
             SetNewDisplayMatrix("Community");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5635,12 +5717,14 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         {
             communityType = CommunityType.newRelativeDensity;
             SetNewDisplayMatrix("Community");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
 
         private void communityCharacteristicsToolStripMenuItem1_Click(object sender, EventArgs e)
         {
+            CheckRemoveIsolates();
             _comForm.ShowDialog();
             if (_comForm.SVC.Count + _comForm.DVC.Count /*+ _comForm.attrMatrix.Count*/ >= 0)
             {
@@ -5655,6 +5739,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         {
             communityType = CommunityType.Separation;
             SetNewDisplayMatrix("Community");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5663,6 +5748,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         {
             communityType = CommunityType.newCoefficients;
             SetNewDisplayMatrix("Community");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5676,6 +5762,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         {
             communityType = CommunityType.ovAffil;
             SetNewDisplayMatrix("Community");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5684,6 +5771,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         {
             communityType = CommunityType.ovCoefficients;
             SetNewDisplayMatrix("Community");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5692,12 +5780,14 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         {
             communityType = CommunityType.ovCohesion;
             SetNewDisplayMatrix("Community");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
 
         private void newOverlappingCommunityCharacteristicsToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            CheckRemoveIsolates();
             _comForm.ShowDialog();
             if (_comForm.SVC.Count + _comForm.DVC.Count /*+ _comForm.attrMatrix.Count*/ >= 0)
             {
@@ -5712,6 +5802,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         {
             communityType = CommunityType.ovDensity;
             SetNewDisplayMatrix("Community");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5720,6 +5811,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         {
             communityType = CommunityType.ovRelativeDensity;
             SetNewDisplayMatrix("Community");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -5728,6 +5820,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         {
             communityType = CommunityType.ovCluster;
             SetNewDisplayMatrix("Community");
+            CheckRemoveIsolates();
             LoadData();
             SetChecked();
         }
@@ -6236,6 +6329,49 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         private void multipleStructuralEquivalenceToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void blockmodelsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void multipleCliqueOperationsToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            CheckRemoveIsolates();
+        }
+
+        private void dichotomizedMatrixToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //CheckRemoveIsolates();
+        }
+
+        private void blockPartitionMatrixToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            //CheckRemoveIsolates();
+        }
+
+        private void removeIsolatesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _rmvIsolatesForm.ShowDialog();
+            if (_rmvIsolatesForm.RemoveIsolates)
+            {
+                if(!_rmvdIsolates)
+                    _ogOptionsFormCMinMembers = _optionsForm.CMinMembers;
+                _optionsForm.CMinMembers = _rmvIsolatesForm.MinGroupSize;
+                net.RemoveIsolates(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _rmvIsolatesForm.MinGroupSize, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                _rmvdIsolates = true;
+            }
+            else if (_rmvdIsolates)
+            {
+                net.RestoreIsolates();
+                _rmvdIsolates = false;
+                if (_optionsForm.CMinMembers != _rmvIsolatesForm.MinGroupSize)
+                    _changedOptionsFormCMinMembers = true;
+                if (!_changedOptionsFormCMinMembers)
+                    _optionsForm.CMinMembers = _ogOptionsFormCMinMembers;
+            }
+            //bbcloud
         }
 
         /*private void testToolStripMenuItem_Click(object sender, EventArgs e)
