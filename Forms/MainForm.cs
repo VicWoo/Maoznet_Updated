@@ -1123,7 +1123,6 @@ namespace NetworkGUI
         {
             if (currentYear == -1)
                 return;
-
             --currentYear;
 
             try
