@@ -146,6 +146,12 @@
     <Compile Include="Forms\ABMProgressForm.Designer.cs">
       <DependentUpon>ABMProgressForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\RemoveIsolatesForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\RemoveIsolatesForm.Designer.cs">
+      <DependentUpon>RemoveIsolatesForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\GlobalRandomization.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -575,6 +581,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ABMProgressForm.resx">
       <DependentUpon>ABMProgressForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\RemoveIsolatesForm.resx">
+      <DependentUpon>RemoveIsolatesForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\GlobalRandomization.resx">
       <DependentUpon>GlobalRandomization.cs</DependentUpon>

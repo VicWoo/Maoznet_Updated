@@ -175,6 +175,11 @@ namespace Network
         public Dictionary<string, List<Matrix>> mRandTable = null;
         //
 
+        //Baadal
+        private Matrix ogMatrixData = null;
+        //bool firstTimeRemoveIsolates = true;
+        //
+
         public Random RNGen = null;
 
         protected Dictionary<int, double> densityVector;
@@ -3156,7 +3161,48 @@ namespace Network
         }
 
 
+        public void RemoveIsolates(double cutoff, bool calcSE, double maxik, int year, int cmin, bool loadCOC, int cliqueOrder, bool kCliqueDiag)
+        {
+            FindCliques(cutoff, calcSE, maxik, year, cmin, loadCOC, cliqueOrder, kCliqueDiag);
+            List<int> isolates = new List<int>();
+            // Now check the rows
+            for (int row = 0; row < mTable["Data"].Rows; row++)
+            {
+                // Generate an array to hold this row
+                string[] newRow = new string[_cliques.Count];
+                bool all0 = true;
+                for (int col = 0; col < _cliques.Count; col++)
+                {
+                    if (_cliques[col].IntContains(row) != 0)
+                    {
+                        all0 = false;
+                        break;
+                    }
+                    //newRow[col] = _cliques[col].IntContains(row).ToString();
+                }
+                if(all0)
+                {
+                    isolates.Add(row);
+                }
+            }
+            
+            //Remember original matrix
+            //if(firstTimeRemoveIsolates)
+            //{
+                ogMatrixData = new Matrix(mTable["Data"]);
+                //firstTimeRemoveIsolates = false;
+            //}
+            mTable["Data"] = new Matrix(mTable["Data"].SubmatrixWithRemovedRows(isolates));
+            mTable["Data"].NetworkIdStr = ogMatrixData.NetworkIdStr;
+        }
 
+        public void RestoreIsolates()
+        {
+            if (ogMatrixData != null)
+            {
+                mTable["Data"] = new Matrix(ogMatrixData);
+            }
+        }
 
         //    public delegate CliqueCollection ParameterizedThreadStart(object obj, object obj);
         public CliqueCollection FindCliques(double cutoff, bool calcSE, double maxik, int year, int cmin, bool loadCOC, int cliqueOrder, bool kCliqueDiag)
@@ -12743,12 +12789,12 @@ namespace Network
                     data.Columns.Add("Modularity Coefficient", "Modularity Coefficient");
                 //}
 
-
                 for (int row = 0; row < mTable[m_name].Rows; row++)
                 {
                     string[] newRow = new string[mTable[m_name].Cols];
                     for (int col = 0; col < mTable[m_name].Cols; col++)
                     {
+                        //Change year column from index value to actual year
                         if (col == 0)
                             newRow[col] = mTable[m_name].NetworkIdStr;
                         else

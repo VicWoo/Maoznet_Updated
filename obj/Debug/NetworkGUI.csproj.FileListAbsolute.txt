@@ -300,51 +300,52 @@ D:\MaozNet_Randomization_compare\bin\Debug\NetworkGUI.pdb
 D:\MaozNet_Randomization_compare\obj\Debug\NetworkGUI.Forms.NDStatsForm.resources
 D:\MaozNet_Randomization_compare\obj\Debug\NetworkGUI.exe.manifest
 D:\MaozNet_Randomization_compare\obj\Debug\NetworkGUI.application
-D:\Maoznet_Updated_1\bin\Debug\NetworkGUI.exe.config
-D:\Maoznet_Updated_1\bin\Debug\NetworkGUI.exe.manifest
-D:\Maoznet_Updated_1\bin\Debug\NetworkGUI.application
-D:\Maoznet_Updated_1\bin\Debug\NetworkGUI.exe
-D:\Maoznet_Updated_1\bin\Debug\NetworkGUI.pdb
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.csprojAssemblyReference.cache
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.BlocForm.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.BlocForm2.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.Forms.CentralityForm.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.CliqueForm.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.Forms.CliqueOptionForm.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.Forms.ClusteringForm.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.ConfigModelForm.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.Forms.DichotomizeForm.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.Forms.ABMForm.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.Forms.ABMConfirmForm.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.Forms.ABMProgressForm.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.GlobalRandomForm.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.Forms.MatMultForm.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.Forms.MatMultProg.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.McaNCoptions.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.Forms.MultiplexImbalanceForm.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.Forms.MultiplexProgress.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.Forms.Multiple_Clique_Analysis.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.Forms.NDStatsForm.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.NetworkFormationSimulationForm.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.Forms.NetworkPowerForm.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.Forms.NetworkSpilloverForm.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.OptionsForm.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.JumpToForm.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.MainForm.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.MultiplicationForm.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.ProgressForm.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.Forms.RecodeForm.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.Forms.t.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.ValuedRandomForm.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.Properties.Resources.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.RandomForm.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.YearRangeForm.resources
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.csproj.GenerateResource.cache
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.csproj.CoreCompileInputs.cache
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.exe.manifest
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.application
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.exe
-D:\Maoznet_Updated_1\obj\Debug\NetworkGUI.pdb
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\bin\Debug\NetworkGUI.exe.config
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\bin\Debug\NetworkGUI.exe.manifest
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\bin\Debug\NetworkGUI.application
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\bin\Debug\NetworkGUI.exe
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\bin\Debug\NetworkGUI.pdb
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.csproj.AssemblyReference.cache
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.BlocForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.BlocForm2.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.Forms.CentralityForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.CliqueForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.Forms.CliqueOptionForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.Forms.ClusteringForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.ConfigModelForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.Forms.DichotomizeForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.Forms.ABMForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.Forms.ABMConfirmForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.Forms.ABMProgressForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.Forms.RemoveIsolatesForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.GlobalRandomForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.Forms.MatMultForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.Forms.MatMultProg.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.McaNCoptions.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.Forms.MultiplexImbalanceForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.Forms.MultiplexProgress.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.Forms.Multiple_Clique_Analysis.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.Forms.NDStatsForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.NetworkFormationSimulationForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.Forms.NetworkPowerForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.Forms.NetworkSpilloverForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.OptionsForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.JumpToForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.MainForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.MultiplicationForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.ProgressForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.Forms.RecodeForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.Forms.t.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.ValuedRandomForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.Properties.Resources.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.RandomForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.YearRangeForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.csproj.GenerateResource.cache
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.csproj.CoreCompileInputs.cache
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.exe.manifest
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.application
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.exe
+C:\D Drive\UC Davis\On Campus\MaozNet\Main Work\obj\Debug\NetworkGUI.pdb
 C:\D Drive\UC Davis\On Campus\MaozNet\Bug Fixed\bin\Debug\NetworkGUI.exe.config
 C:\D Drive\UC Davis\On Campus\MaozNet\Bug Fixed\bin\Debug\NetworkGUI.exe.manifest
 C:\D Drive\UC Davis\On Campus\MaozNet\Bug Fixed\bin\Debug\NetworkGUI.application
@@ -362,6 +363,7 @@ C:\D Drive\UC Davis\On Campus\MaozNet\Bug Fixed\obj\Debug\NetworkGUI.Forms.Dicho
 C:\D Drive\UC Davis\On Campus\MaozNet\Bug Fixed\obj\Debug\NetworkGUI.Forms.ABMForm.resources
 C:\D Drive\UC Davis\On Campus\MaozNet\Bug Fixed\obj\Debug\NetworkGUI.Forms.ABMConfirmForm.resources
 C:\D Drive\UC Davis\On Campus\MaozNet\Bug Fixed\obj\Debug\NetworkGUI.Forms.ABMProgressForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Bug Fixed\obj\Debug\NetworkGUI.Forms.RemoveIsolatesForm.resources
 C:\D Drive\UC Davis\On Campus\MaozNet\Bug Fixed\obj\Debug\NetworkGUI.GlobalRandomForm.resources
 C:\D Drive\UC Davis\On Campus\MaozNet\Bug Fixed\obj\Debug\NetworkGUI.Forms.MatMultForm.resources
 C:\D Drive\UC Davis\On Campus\MaozNet\Bug Fixed\obj\Debug\NetworkGUI.Forms.MatMultProg.resources
@@ -390,3 +392,49 @@ C:\D Drive\UC Davis\On Campus\MaozNet\Bug Fixed\obj\Debug\NetworkGUI.exe.manifes
 C:\D Drive\UC Davis\On Campus\MaozNet\Bug Fixed\obj\Debug\NetworkGUI.application
 C:\D Drive\UC Davis\On Campus\MaozNet\Bug Fixed\obj\Debug\NetworkGUI.exe
 C:\D Drive\UC Davis\On Campus\MaozNet\Bug Fixed\obj\Debug\NetworkGUI.pdb
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\bin\Debug\NetworkGUI.exe.config
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\bin\Debug\NetworkGUI.exe.manifest
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\bin\Debug\NetworkGUI.application
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\bin\Debug\NetworkGUI.exe
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\bin\Debug\NetworkGUI.pdb
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.csproj.AssemblyReference.cache
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.BlocForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.BlocForm2.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.Forms.CentralityForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.CliqueForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.Forms.CliqueOptionForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.Forms.ClusteringForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.ConfigModelForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.Forms.DichotomizeForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.Forms.ABMForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.Forms.ABMConfirmForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.Forms.ABMProgressForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.Forms.RemoveIsolatesForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.GlobalRandomForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.Forms.MatMultForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.Forms.MatMultProg.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.McaNCoptions.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.Forms.MultiplexImbalanceForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.Forms.MultiplexProgress.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.Forms.Multiple_Clique_Analysis.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.Forms.NDStatsForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.NetworkFormationSimulationForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.Forms.NetworkPowerForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.Forms.NetworkSpilloverForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.OptionsForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.JumpToForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.MainForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.MultiplicationForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.ProgressForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.Forms.RecodeForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.Forms.t.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.ValuedRandomForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.Properties.Resources.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.RandomForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.YearRangeForm.resources
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.csproj.GenerateResource.cache
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.csproj.CoreCompileInputs.cache
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.exe.manifest
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.application
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.exe
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.pdb
