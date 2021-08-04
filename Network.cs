@@ -177,7 +177,7 @@ namespace Network
 
         //Baadal
         private Matrix ogMatrixData = null;
-        bool firstTimeRemoveIsolates = true;
+        //bool firstTimeRemoveIsolates = true;
         //
 
         public Random RNGen = null;
@@ -3176,6 +3176,7 @@ namespace Network
                     if (_cliques[col].IntContains(row) != 0)
                     {
                         all0 = false;
+                        break;
                     }
                     //newRow[col] = _cliques[col].IntContains(row).ToString();
                 }
@@ -3186,12 +3187,13 @@ namespace Network
             }
             
             //Remember original matrix
-            if(firstTimeRemoveIsolates)
-            {
+            //if(firstTimeRemoveIsolates)
+            //{
                 ogMatrixData = new Matrix(mTable["Data"]);
-                firstTimeRemoveIsolates = false;
-            }
+                //firstTimeRemoveIsolates = false;
+            //}
             mTable["Data"] = new Matrix(mTable["Data"].SubmatrixWithRemovedRows(isolates));
+            mTable["Data"].NetworkIdStr = ogMatrixData.NetworkIdStr;
         }
 
         public void RestoreIsolates()
@@ -12787,12 +12789,12 @@ namespace Network
                     data.Columns.Add("Modularity Coefficient", "Modularity Coefficient");
                 //}
 
-
                 for (int row = 0; row < mTable[m_name].Rows; row++)
                 {
                     string[] newRow = new string[mTable[m_name].Cols];
                     for (int col = 0; col < mTable[m_name].Cols; col++)
                     {
+                        //Change year column from index value to actual year
                         if (col == 0)
                             newRow[col] = mTable[m_name].NetworkIdStr;
                         else

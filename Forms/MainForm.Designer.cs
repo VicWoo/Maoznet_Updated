@@ -200,6 +200,7 @@ namespace NetworkGUI
             this.newOverlappingCommunityCharacteristicsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.modularityCoefficientToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.newOverlappingCommunityCoefficientsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.removeIsolatesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.signedNetworkOperationsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dataMatrixToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.reachabilityMatrixToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -240,7 +241,6 @@ namespace NetworkGUI
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openFileDialog2 = new System.Windows.Forms.OpenFileDialog();
             this.helpProvider = new System.Windows.Forms.HelpProvider();
-            this.removeIsolatesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGrid)).BeginInit();
             this.SuspendLayout();
@@ -263,7 +263,7 @@ namespace NetworkGUI
             this.helpToolStripMenuItem});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
-            this.menuStrip.Size = new System.Drawing.Size(1673, 28);
+            this.menuStrip.Size = new System.Drawing.Size(1582, 28);
             this.menuStrip.TabIndex = 0;
             this.menuStrip.Text = "menuStrip1";
             // 
@@ -387,6 +387,7 @@ namespace NetworkGUI
             this.globalRandomMatrixToolStripMenuItem.Name = "globalRandomMatrixToolStripMenuItem";
             this.globalRandomMatrixToolStripMenuItem.Size = new System.Drawing.Size(262, 26);
             this.globalRandomMatrixToolStripMenuItem.Text = "Global Randomization";
+            this.globalRandomMatrixToolStripMenuItem.Click += new System.EventHandler(this.globalRandomMatrixToolStripMenuItem_Click);
             // 
             // directedGlobalRandomToolStripMenuItem
             // 
@@ -1618,6 +1619,7 @@ namespace NetworkGUI
             this.newOverlappingCommunitiesToolStripMenuItem.Name = "newOverlappingCommunitiesToolStripMenuItem";
             this.newOverlappingCommunitiesToolStripMenuItem.Size = new System.Drawing.Size(299, 26);
             this.newOverlappingCommunitiesToolStripMenuItem.Text = "New Overlapping Communities";
+            this.newOverlappingCommunitiesToolStripMenuItem.Click += new System.EventHandler(this.newOverlappingCommunitiesToolStripMenuItem_Click);
             // 
             // overlappingCommunityAffiliationMatrixToolStripMenuItem1
             // 
@@ -1669,6 +1671,13 @@ namespace NetworkGUI
             this.newOverlappingCommunityCoefficientsToolStripMenuItem.Size = new System.Drawing.Size(404, 26);
             this.newOverlappingCommunityCoefficientsToolStripMenuItem.Text = "New Overlapping Community Coefficients";
             this.newOverlappingCommunityCoefficientsToolStripMenuItem.Click += new System.EventHandler(this.newOverlappingCommunityCoefficientsToolStripMenuItem_Click);
+            // 
+            // removeIsolatesToolStripMenuItem
+            // 
+            this.removeIsolatesToolStripMenuItem.Name = "removeIsolatesToolStripMenuItem";
+            this.removeIsolatesToolStripMenuItem.Size = new System.Drawing.Size(299, 26);
+            this.removeIsolatesToolStripMenuItem.Text = "Remove Isolates";
+            this.removeIsolatesToolStripMenuItem.Click += new System.EventHandler(this.removeIsolatesToolStripMenuItem_Click);
             // 
             // signedNetworkOperationsToolStripMenuItem
             // 
@@ -1964,7 +1973,7 @@ namespace NetworkGUI
             this.dataGrid.Name = "dataGrid";
             this.dataGrid.ReadOnly = true;
             this.dataGrid.RowHeadersWidth = 80;
-            this.dataGrid.Size = new System.Drawing.Size(1673, 493);
+            this.dataGrid.Size = new System.Drawing.Size(1582, 495);
             this.dataGrid.TabIndex = 1;
             this.dataGrid.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGrid_CellContentClick);
             // 
@@ -1981,22 +1990,16 @@ namespace NetworkGUI
             this.openFileDialog2.Filter = "CSV Files|*.csv|Text Files|*.txt|All Files|*.*";
             this.openFileDialog2.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog2_FileOk);
             // 
-            // removeIsolatesToolStripMenuItem
-            // 
-            this.removeIsolatesToolStripMenuItem.Name = "removeIsolatesToolStripMenuItem";
-            this.removeIsolatesToolStripMenuItem.Size = new System.Drawing.Size(299, 26);
-            this.removeIsolatesToolStripMenuItem.Text = "Remove Isolates";
-            this.removeIsolatesToolStripMenuItem.Click += new System.EventHandler(this.removeIsolatesToolStripMenuItem_Click);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1673, 521);
+            this.ClientSize = new System.Drawing.Size(1582, 523);
             this.Controls.Add(this.dataGrid);
             this.Controls.Add(this.menuStrip);
             this.MainMenuStrip = this.menuStrip;
             this.Margin = new System.Windows.Forms.Padding(4);
+            this.MinimumSize = new System.Drawing.Size(1600, 570);
             this.Name = "MainForm";
             this.Text = "Matrix Manipulator";
             this.Load += new System.EventHandler(this.MainForm_Load);
