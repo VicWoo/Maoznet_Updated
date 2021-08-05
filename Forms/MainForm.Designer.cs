@@ -292,7 +292,7 @@ namespace NetworkGUI
             this.globalRandomMatrixToolStripMenuItem,
             this.configureModelMatrixToolStripMenuItem});
             this.loadFromToolStripMenuItem.Name = "loadFromToolStripMenuItem";
-            this.loadFromToolStripMenuItem.Size = new System.Drawing.Size(189, 26);
+            this.loadFromToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.loadFromToolStripMenuItem.Text = "Load From";
             this.loadFromToolStripMenuItem.Click += new System.EventHandler(this.loadFromToolStripMenuItem_Click);
             // 
@@ -339,19 +339,20 @@ namespace NetworkGUI
             this.randomMatrixToolStripMenuItem.Name = "randomMatrixToolStripMenuItem";
             this.randomMatrixToolStripMenuItem.Size = new System.Drawing.Size(262, 26);
             this.randomMatrixToolStripMenuItem.Text = "Binary Random Matrix";
+            this.randomMatrixToolStripMenuItem.Click += new System.EventHandler(this.randomMatrixToolStripMenuItem_Click);
             // 
             // bsymmetricToolStripMenuItem
             // 
             this.bsymmetricToolStripMenuItem.Name = "bsymmetricToolStripMenuItem";
             this.bsymmetricToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.B)));
-            this.bsymmetricToolStripMenuItem.Size = new System.Drawing.Size(213, 26);
+            this.bsymmetricToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.bsymmetricToolStripMenuItem.Text = "Symmetric";
             this.bsymmetricToolStripMenuItem.Click += new System.EventHandler(this.symmetricToolStripMenuItem_Click);
             // 
             // bnonsymmetricToolStripMenuItem
             // 
             this.bnonsymmetricToolStripMenuItem.Name = "bnonsymmetricToolStripMenuItem";
-            this.bnonsymmetricToolStripMenuItem.Size = new System.Drawing.Size(213, 26);
+            this.bnonsymmetricToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.bnonsymmetricToolStripMenuItem.Text = "Non-symmetric";
             this.bnonsymmetricToolStripMenuItem.Click += new System.EventHandler(this.bnonsymmetricToolStripMenuItem_Click);
             // 
@@ -363,6 +364,7 @@ namespace NetworkGUI
             this.valuedRandomMatrixToolStripMenuItem.Name = "valuedRandomMatrixToolStripMenuItem";
             this.valuedRandomMatrixToolStripMenuItem.Size = new System.Drawing.Size(262, 26);
             this.valuedRandomMatrixToolStripMenuItem.Text = "Valued Random Matrix";
+            this.valuedRandomMatrixToolStripMenuItem.Click += new System.EventHandler(this.valuedRandomMatrixToolStripMenuItem_Click);
             // 
             // vsymmetricToolStripMenuItem
             // 
@@ -411,6 +413,7 @@ namespace NetworkGUI
             this.configureModelMatrixToolStripMenuItem.Name = "configureModelMatrixToolStripMenuItem";
             this.configureModelMatrixToolStripMenuItem.Size = new System.Drawing.Size(262, 26);
             this.configureModelMatrixToolStripMenuItem.Text = "Configuration Models";
+            this.configureModelMatrixToolStripMenuItem.Click += new System.EventHandler(this.configureModelMatrixToolStripMenuItem_Click);
             // 
             // directedConfigureModelToolStripMenuItem
             // 
@@ -438,7 +441,7 @@ namespace NetworkGUI
             this.affiliationFileToolStripMenuItem1,
             this.tableToolStripMenuItem});
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(189, 26);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.saveAsToolStripMenuItem.Text = "Save As";
             // 
             // dyadicFileToolStripMenuItem1
@@ -500,21 +503,21 @@ namespace NetworkGUI
             // closeFileToolStripMenuItem
             // 
             this.closeFileToolStripMenuItem.Name = "closeFileToolStripMenuItem";
-            this.closeFileToolStripMenuItem.Size = new System.Drawing.Size(189, 26);
+            this.closeFileToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.closeFileToolStripMenuItem.Text = "Close File";
             this.closeFileToolStripMenuItem.Click += new System.EventHandler(this.closeFileToolStripMenuItem_Click);
             // 
             // resetToolStripMenuItem
             // 
             this.resetToolStripMenuItem.Name = "resetToolStripMenuItem";
-            this.resetToolStripMenuItem.Size = new System.Drawing.Size(189, 26);
+            this.resetToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.resetToolStripMenuItem.Text = "Reset Program";
             this.resetToolStripMenuItem.Click += new System.EventHandler(this.resetToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(189, 26);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 

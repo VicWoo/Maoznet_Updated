@@ -9658,7 +9658,7 @@ namespace Network
                         //string line = year.ToString() + "," + mTable[m].RowLabels[row].ToString() + ",";
                         // Yushan
                         string line = mTable[m].NetworkIdStr + "," + mTable[m].RowLabels[row].ToString() + ",";
-                        line += mTable[m].RowLabels[col].ToString() + "," + mTable[m][row, col].ToString();
+                        line += mTable[m].RowLabels[row].ToString() + "," + mTable[m][row, col].ToString();
                         sw.WriteLine(line);
                     }
 
@@ -10089,7 +10089,7 @@ namespace Network
                 var output_writer_data = new StreamWriter(outputfile, true);
 
                 double[,] matrix = PIF.supportScript(inputfile, order, Null, startYear + saveLoop, networkRealIdList);
-
+                
                 int totalRows = matrix.GetLength(0);
                 int totalCols = matrix.GetLength(1);
 
@@ -10464,29 +10464,40 @@ namespace Network
 
 
         // The multiple/multivar saving routines
-        public void SaveToMultipleMatrixFiles(string fromFile, string[] toFiles, int year, bool Overwrite)
+        public void SaveToMultipleMatrixFiles(string fromFile, string[] toFiles, int year, bool Overwrite, bool rmvIsolates, double cutoff, bool calcSE, double maxik, int cmin, bool loadCOC, int cliqueOrder, bool kCliqueDiag)
         {
+            mTable["TempSave"] = new Matrix(mTable["Data"]);
             // Convert the multivar dyadic into several matrix files
             for (int skip = 0; skip < toFiles.Length; ++skip)
             {
                 // Load the file
-                mTable["Temp"] = MatrixReader.ReadMatrixFromFile(fromFile, year, skip);
-                year = mTable["Temp"].NetworkId;
-
+                mTable["Data"] = MatrixReader.ReadMatrixFromFile(fromFile, year, skip);
+                year = mTable["Data"].NetworkId;
+                if(rmvIsolates)
+                    RemoveIsolates(cutoff, calcSE, maxik, year, cmin, loadCOC, cliqueOrder, kCliqueDiag);
                 // And save it
-                SaveMatrixToMatrixFile(toFiles[skip], year, "Temp", true, true, Overwrite);
+                SaveMatrixToMatrixFile(toFiles[skip], year, "Data", true, true, Overwrite);
             }
+            mTable["Data"] = new Matrix(mTable["TempSave"]);
         }
 
-        public int SaveToMultivariableDyadicFile(string[] fromFiles, string fileName, int year, int prevYear, bool Overwrite)
+        public int SaveToMultivariableDyadicFile(string[] fromFiles, string fileName, int year, int prevYear, bool Overwrite, bool rmvIsolates, double cutoff, bool calcSE, double maxik, int cmin, bool loadCOC, int cliqueOrder, bool kCliqueDiag)
         {
+            mTable["TempSave"] = new Matrix(mTable["Data"]);
             // Load the first one
-            year = LoadFromMatrixFileIntoMatrix(fromFiles[0], year, "Temp");
+            string tableName = "Data";
+            year = LoadFromMatrixFileIntoMatrix(fromFiles[0], year, tableName);
 
             if (year == prevYear)
+            {
+                mTable["Data"] = new Matrix(mTable["TempSave"]);
                 return year;
+            }
 
-            Matrix M = mTable["Temp"];
+            if(rmvIsolates)
+                RemoveIsolates(cutoff, calcSE, maxik, year, cmin, loadCOC, cliqueOrder, kCliqueDiag);
+
+            Matrix M = mTable[tableName];
 
             // Now setup a matrix to store the dyadic values
             Matrix m = new Matrix(M.Rows * M.Cols, fromFiles.Length);
@@ -10496,9 +10507,13 @@ namespace Network
                 for (int i = 0; i < fromFiles.Length; ++i)
                 {
                     if (i > 0)
-                        LoadFromMatrixFileIntoMatrix(fromFiles[i], year, "Temp");
+                    {
+                        LoadFromMatrixFileIntoMatrix(fromFiles[i], year, tableName);
+                        if (rmvIsolates)
+                            RemoveIsolates(cutoff, calcSE, maxik, year, cmin, loadCOC, cliqueOrder, kCliqueDiag);
+                    }
 
-                    M = mTable["Temp"];
+                    M = mTable[tableName];
 
                     // Add to our matrix
                     for (int r = 0; r < M.Rows; ++r)
@@ -10540,7 +10555,7 @@ namespace Network
                 else
                     sw.WriteLine("var" + (i + 1));
 
-            M = mTable["Temp"];
+            M = mTable[tableName];
             for (int i = 0; i < m.Rows; ++i)
             {
                 sw.Write(year + ",");
@@ -10565,7 +10580,7 @@ namespace Network
 
             sw.Flush();
             sw.Close();
-
+            mTable["Data"] = new Matrix(mTable["TempSave"]);
             return year;
         }
 
