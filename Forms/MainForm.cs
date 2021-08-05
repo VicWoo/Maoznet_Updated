@@ -3859,6 +3859,85 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
 
         //==================================================================
 
+        //===========================STANDARDIZE===========================
+
+        //--------------------NONE--------------------
+        private void noneToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ClearStandardizedChecks();
+            net.Unstandardize(displayMatrix);
+            LoadData();
+        }
+
+        //-------------------BY ROW-------------------
+        private void byRowToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ClearStandardizedChecks();
+            byRowToolStripMenuItem.Checked = true;
+            DoStandardize();
+
+            LoadData();
+        }
+
+        //-----------------BY COLUMN-----------------
+        private void byColumnToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ClearStandardizedChecks();
+            byColumnToolStripMenuItem.Checked = true;
+            DoStandardize();
+
+            LoadData();
+        }
+
+        //---------------BY DIAGONAL---------------
+        //Main
+        private void byDiagonalToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        //Row
+        private void rowToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ClearStandardizedChecks();
+            rowToolStripMenuItem.Checked = true;
+            DoStandardize();
+
+            LoadData();
+        }
+
+        //Column
+        private void columnToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ClearStandardizedChecks();
+            columnToolStripMenuItem.Checked = true;
+            DoStandardize();
+
+            LoadData();
+        }
+
+        //Minimum
+        private void minimumToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ClearStandardizedChecks();
+            minimumToolStripMenuItem.Checked = true;
+            DoStandardize();
+
+            LoadData();
+        }
+
+        //Maximum
+        private void maximumToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ClearStandardizedChecks();
+            maximumToolStripMenuItem.Checked = true;
+            DoStandardize();
+
+            LoadData();
+        }
+
+        //==================================================================
+
         // This function does the actual file loading
         // It is called by the fileForm
         public void loadFromMultipleFiles(MultipleFileForm fileForm)
@@ -3975,37 +4054,6 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
             byRowToolStripMenuItem.Enabled = true;
             byColumnToolStripMenuItem.Enabled = true;
             byDiagonalToolStripMenuItem.Enabled = true;
-        }
-
-
-        private void noneToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            ClearStandardizedChecks();
-            net.Unstandardize(displayMatrix);
-            LoadData();
-        }
-
-
-        private void byRowToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            ClearStandardizedChecks();
-            byRowToolStripMenuItem.Checked = true;
-            DoStandardize();
-
-            LoadData();
-        }
-
-        private void byColumnToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            ClearStandardizedChecks();
-            byColumnToolStripMenuItem.Checked = true;
-            DoStandardize();
-
-            LoadData();
-        }
-
-        private void byDiagonalToolStripMenuItem_Click(object sender, EventArgs e)
-        {
         }
 
         private void matrixToolStripMenuItem_Click(object sender, EventArgs e)
@@ -4243,42 +4291,6 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
             SetNewDisplayMatrix("CoalitionStructure");
             LoadData();
             SetChecked();
-        }
-
-        private void rowToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            ClearStandardizedChecks();
-            rowToolStripMenuItem.Checked = true;
-            DoStandardize();
-
-            LoadData();
-        }
-
-        private void columnToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            ClearStandardizedChecks();
-            columnToolStripMenuItem.Checked = true;
-            DoStandardize();
-
-            LoadData();
-        }
-
-        private void minimumToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            ClearStandardizedChecks();
-            minimumToolStripMenuItem.Checked = true;
-            DoStandardize();
-
-            LoadData();
-        }
-
-        private void maximumToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            ClearStandardizedChecks();
-            maximumToolStripMenuItem.Checked = true;
-            DoStandardize();
-
-            LoadData();
         }
 
         private void networkFormationSimulationToolStripMenuItem_Click(object sender, EventArgs e)
