@@ -1027,12 +1027,6 @@ namespace NetworkGUI
 
         }
 
-        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Application.Exit();
-
-        }
-
         private void matrixFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             openFileDialog.Multiselect = false;
@@ -1070,604 +1064,7 @@ namespace NetworkGUI
                 SetFormTitle();
             }
         }
-
-        private void nextYearToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            net.Reset(); 
-
-            if (currentYear == -1)
-                return;
-
-            ++currentYear;
-            //Console.WriteLine("Display Matrx: {0:s}", displayMatrix);
-            try
-            {
-                if (loadFrom == "Matrix")
-                {
-                    if (openFileDialog.Multiselect)
-                    {
-                        currentYear = net.LoadFromMultipleFiles(fileNames, currentYear);
-                    }
-                    else
-                    {
-                        // Yushan
-                         currentYear = net.LoadFromMatrixFile(openFileDialog.FileName, currentYear);
-                    }
-                }
-                else if (loadFrom == "Dyadic")
-                {
-                    if (openFileDialog.Multiselect)
-                    {
-                        currentYear = net.LoadFromMultivariableDyadicFile(openFileDialog.FileName, currentYear);
-                    }
-                    else
-                    {
-                        currentYear = net.LoadFromDyadicFile(openFileDialog.FileName, currentYear);
-                    }
-                }
-                else if (loadFrom == "Affil")
-                {
-                    currentYear = net.LoadFromAffiliationFile(openFileDialog.FileName, currentYear);
-                }
-                else if (loadFrom == "Monadic")
-                {
-                    currentYear = net.LoadFromMonadicFile(openFileDialog.FileName, currentYear);
-                }
-                else if (loadFrom == "Random")
-                {
-                    net.LoadRandom(_randomForm.N, "Data", _randomSymmetric, _randomForm.ProbRange, _randomForm.MinProb, _randomForm.MaxProb, _randomForm.RandomN, _randomForm.RandomMinN, _randomForm.RandomMaxN, _randomForm.RandomIntN);
-                    --currentYear;
-                }
-                else if (loadFrom == "ValuedRandom")
-                {
-                    net.LoadValuedRandom(_vrandomForm.N, "Data", _randomSymmetric, _vrandomForm.vmin, _vrandomForm.vmax, _vrandomForm.datatype, _vrandomForm.zerodiagonalized, _vrandomForm.ProbRange, _vrandomForm.MinProb, _vrandomForm.MaxProb, _vrandomForm.RandomN, _vrandomForm.RandomMinN, _vrandomForm.RandomMaxN, _vrandomForm.RandomIntN);
-                    --currentYear;
-                }
-                else if (loadFrom == "ABMModel")
-                {
-                    net.mTable["Data"] = net.mList[currentYear - _ABMForm.netID];
-                }
-
-                // Yushan
-                else if (loadFrom == "GlobalRandom")
-                {
-                    if (currentYear == netID.Count)
-                    {
-                        currentYear = 0;
-                    }
-                    net.LoadGlobalRandom(dataGrid, mRandList, displayMatrix, netID[currentYear]);
-                }
-                else if (loadFrom == "ConfigModel")
-                {
-                    if (currentYear == netID.Count)
-                    {
-                        currentYear = 0;
-                    }
-                    net.LoadConfigModel(dataGrid, mRandList, displayMatrix, netID[currentYear], nodeLabels[netID[currentYear]]);                 
-                }
-                else if (loadFrom == "NetworkDependenceStatistics")
-                {
-                    if (currentYear == orderedNetIds.Length)
-                    {
-                        currentYear = 0;
-                    }
-                    net.LoadNetworkDependenceStatistics(dataGrid, displayMatrix, ndsOutput, orderedNetIds, currentYear);
-                }
-                //
-            }
-            catch (Exception E)
-            {
-                --currentYear;
-                MessageBox.Show("Unable to advance to next year: " + E.Message, "Error!");
-                return;
-            }
-            if (net.CohesionFilename != null)
-                net.CohesionMatrix = MatrixReader.ReadMatrixFromFile(net.CohesionFilename, currentYear);
-
-            if (_rmvIsolatesForm.RemoveIsolates)
-            {
-                if (!_rmvdIsolates)
-                    _ogOptionsFormCMinMembers = _optionsForm.CMinMembers;
-                _optionsForm.CMinMembers = _rmvIsolatesForm.MinGroupSize;
-                net.RemoveIsolates(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _rmvIsolatesForm.MinGroupSize, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
-                _rmvdIsolates = true;
-            }
-            DoStandardize();
-            LoadData();
-            SetFormTitle();
-        }
-
-        private void previousYearToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (currentYear == -1)
-                return;
-            --currentYear;
-
-            try
-            {
-                if (loadFrom == "Matrix")
-                {
-                    if (openFileDialog.Multiselect)
-                    {
-                        
-                        currentYear = net.LoadFromMultipleFiles(fileNames, net.GetPreviousYear(fileNames[0], ++currentYear));
-                    }
-                    else
-                    {
-                        currentYear = net.LoadFromMatrixFile(openFileDialog.FileName, net.GetPreviousYear(openFileDialog.FileName, ++currentYear));
-                    }
-                }
-                else if (loadFrom == "Dyadic")
-                {
-                    if (openFileDialog.Multiselect)
-                    {
-                        currentYear = net.LoadFromMultivariableDyadicFile(openFileDialog.FileName, net.GetPreviousYear(openFileDialog.FileName, ++currentYear));
-                    }
-                    else
-                    {
-
-                        currentYear = net.LoadFromDyadicFile(openFileDialog.FileName, net.GetPreviousYear(openFileDialog.FileName, ++currentYear));
-                    }
-
-                }
-                else if (loadFrom == "Affil")
-                {
-                    currentYear = net.LoadFromAffiliationFile(openFileDialog.FileName, net.GetPreviousYear(openFileDialog.FileName, ++currentYear));
-                }
-                else if (loadFrom == "Monadic")
-                {
-                    currentYear = net.LoadFromMonadicFile(openFileDialog.FileName, net.GetPreviousYear(openFileDialog.FileName, ++currentYear));
-                }
-                else if (loadFrom == "Random")
-                {
-                    net.LoadRandom(_randomForm.N, "Data", _randomSymmetric, _randomForm.ProbRange, _randomForm.MinProb, _randomForm.MaxProb, _randomForm.RandomN, _randomForm.RandomMinN, _randomForm.RandomMaxN, _randomForm.RandomIntN);
-                    ++currentYear;
-                }
-                else if (loadFrom == "ValuedRandom")
-                {
-                    net.LoadValuedRandom(_vrandomForm.N, "Data", _randomSymmetric, _vrandomForm.vmin, _vrandomForm.vmax, _vrandomForm.datatype, _vrandomForm.zerodiagonalized, _vrandomForm.ProbRange, _vrandomForm.MinProb, _vrandomForm.MaxProb, _vrandomForm.RandomN, _vrandomForm.RandomMinN, _vrandomForm.RandomMaxN, _vrandomForm.RandomIntN);
-                    ++currentYear;
-                }
-                else if (loadFrom == "ABMModel")
-                {
-                    net.mTable["Data"] = net.mList[currentYear - _ABMForm.netID];
-                }
-                // Yushan
-                else if (loadFrom == "GlobalRandom")
-                {
-                    if (currentYear == -1)
-                    {
-                        currentYear = netID.Count - 1;
-                    }
-                    net.LoadGlobalRandom(dataGrid, mRandList, displayMatrix, netID[currentYear]);
-                }
-                else if (loadFrom == "ConfigModel")
-                {
-                    if (currentYear == -1)
-                    {
-                        currentYear = netID.Count - 1;
-                    }
-                    net.LoadConfigModel(dataGrid, mRandList, displayMatrix, netID[currentYear], nodeLabels[netID[currentYear]]);
-                }
-                else if (loadFrom == "NetworkDependenceStatistics")
-                {
-                    if (currentYear == -1)
-                    {
-                        currentYear = orderedNetIds.Length - 1;
-                    }
-                    net.LoadNetworkDependenceStatistics(dataGrid, displayMatrix, ndsOutput, orderedNetIds, currentYear);
-                }
-                //
-            }
-            catch (Exception E)
-            {
-                ++currentYear;
-                MessageBox.Show("Unable to advance to previous year: " + E.Message, "Error!");
-                return;
-            }
-
-            if (net.CohesionFilename != null)
-                net.CohesionMatrix = MatrixReader.ReadMatrixFromFile(net.CohesionFilename, currentYear);
-
-            if (_rmvIsolatesForm.RemoveIsolates)
-            {
-                if (!_rmvdIsolates)
-                    _ogOptionsFormCMinMembers = _optionsForm.CMinMembers;
-                _optionsForm.CMinMembers = _rmvIsolatesForm.MinGroupSize;
-                net.RemoveIsolates(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _rmvIsolatesForm.MinGroupSize, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
-                _rmvdIsolates = true;
-            }
-            DoStandardize();
-            LoadData();
-            SetFormTitle();
-        }
-
-        private void jumpToYearToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (loadFrom == "Random")
-            {
-                MessageBox.Show("Cannot jump to specific year with random data!", "Error!");
-                return;
-            }
-            if (loadFrom == "ValuedRandom")
-            {
-                MessageBox.Show("Cannot jump to specific year with random data!", "Error!");
-                return;
-            }
-
-            int newYear = 0;
-            if (currentYear == -1)
-                return;
-
-            JumpToForm jump = new JumpToForm();
-
-            // Yushan
-            /* - Need to further generalize input year to string so that "jumpYr" can be dumped. 
-  - Other functions whose input network IDs are still defaulted to integer will need this integer variable "jumpYr" */
-
-            int jumpYear = -1;
-
-            //if (loadFrom == "GlobalRandom" || loadFrom == "ConfigModel")
-            //    jump.year = netID[currentYear];
-            //else
-            //{
-            //    jump.year = currentYear.ToString();
-            //    jumpYear = currentYear;
-            //}
-            jump.year = currentYear.ToString();
-            jumpYear = currentYear;
-            jump.ShowDialog();
-
-            //if (loadFrom == "GlobalRandom" || loadFrom == "ConfigModel")
-            //{
-            //    try
-            //    {
-            //        jumpYear = netID.FindIndex(x => x == jump.year);
-            //    }
-            //    catch (Exception)
-            //    {
-            //        MessageBox.Show("The network ID entered is invalid!", "Error!");
-            //        return;
-            //    }
-            //}
-            //else
-            //{
-            //    try
-            //    {
-            //        jumpYear = int.Parse(jump.year);
-            //    }
-            //    catch (Exception)
-            //    {
-            //        MessageBox.Show("The year entered is invalid!", "Error!");
-            //        return;
-            //    }
-            //}
-            ////
-            try
-            {
-                jumpYear = int.Parse(jump.year);
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("The year entered is invalid!", "Error!");
-                return;
-            }
-
-            try
-            {
-                if (jumpYear != currentYear) // No need to be wasteful and reload unnecessarily
-                {
-
-                    if (loadFrom == "Matrix")
-                    {
-                        if (openFileDialog.Multiselect)
-                        {
-                            newYear = net.LoadFromMultipleFiles(fileNames, jumpYear);
-                        }
-                        else
-                        {
-                            newYear = net.LoadFromMatrixFile(openFileDialog.FileName, jumpYear);
-                        }
-                    }
-                    else if (loadFrom == "Dyadic")
-                    {
-                        if (openFileDialog.Multiselect)
-                        {
-                            newYear = net.LoadFromMultivariableDyadicFile(openFileDialog.FileName, jumpYear);
-                        }
-                        else
-                        {
-                            newYear = net.LoadFromDyadicFile(openFileDialog.FileName, jumpYear);
-                        }
-                    }
-                    else if (loadFrom == "Affil")
-                    {
-                        newYear = net.LoadFromAffiliationFile(openFileDialog.FileName, jumpYear);
-                    }
-                    else if (loadFrom == "Monadic")
-                    {
-                        newYear = net.LoadFromMonadicFile(openFileDialog.FileName, jumpYear);
-                    }
-                    else if (loadFrom == "ABMModel")
-                    {
-                        newYear = jumpYear;
-                        net.mTable["Data"] = net.mList[jumpYear - _ABMForm.netID];
-                    }
-                    // Yushan
-                    else if (loadFrom == "GlobalRandom")
-                    {
-                        net.LoadGlobalRandom(dataGrid, mRandList, displayMatrix, netID[jumpYear]);
-                        newYear = jumpYear;
-                    }
-                    else if (loadFrom == "ConfigModel")
-                    {
-                        net.LoadConfigModel(dataGrid, mRandList, displayMatrix, netID[jumpYear], nodeLabels[netID[jumpYear]]);
-                        newYear = jumpYear;
-                    }
-                    else if (loadFrom == "NetworkDependenceStatistics")
-                    {
-                        net.LoadNetworkDependenceStatistics(dataGrid, displayMatrix, ndsOutput, orderedNetIds, jumpYear);
-                        newYear = jumpYear;
-                    }
-                    //
-                }
-            }
-            catch (Exception E)
-            {
-                MessageBox.Show("Unable to jump to year: " + E.Message, "Error!");
-                return;
-            }
-
-            if (newYear != -1)
-            {
-                if (net.CohesionFilename != null)
-                    net.CohesionMatrix = MatrixReader.ReadMatrixFromFile(net.CohesionFilename, currentYear);
-                
-                currentYear = newYear;
-                DoStandardize();
-                LoadData();
-                SetFormTitle();
-            }
-            else
-            {
-                if (loadFrom == "Matrix")
-                {
-                    if (openFileDialog.Multiselect)
-                    {
-                        net.LoadFromMultipleFiles(fileNames, currentYear);
-                    }
-                    else
-                    {
-                        net.LoadFromMatrixFile(openFileDialog.FileName, currentYear);
-                    }
-                }
-                else if (loadFrom == "Dyadic")
-                {
-                    if (openFileDialog.Multiselect)
-                    {
-                        net.LoadFromMultivariableDyadicFile(openFileDialog.FileName, currentYear);
-                    }
-                    else
-                    {
-                        net.LoadFromDyadicFile(openFileDialog.FileName, currentYear);
-                    }
-                }
-                else if (loadFrom == "Affil")
-                {
-                    currentYear = net.LoadFromAffiliationFile(openFileDialog.FileName, currentYear);
-                }
-                else if (loadFrom == "Monadic")
-                {
-                    currentYear = net.LoadFromMonadicFile(openFileDialog.FileName, currentYear);
-                }
-                else if (loadFrom == "ABMModel")
-                {
-                    currentYear = _ABMForm.netID;
-                    net.mTable["Data"] = net.mList[0];
-                }
-                // Yushan
-                else if (loadFrom == "GlobalRandom")
-                {
-                    net.LoadGlobalRandom(dataGrid, mRandList, displayMatrix, netID[currentYear]);
-                }
-                else if (loadFrom == "ConfigModel")
-                {
-                    net.LoadConfigModel(dataGrid, mRandList, displayMatrix, netID[currentYear], nodeLabels[netID[currentYear]]);
-                }
-                else if (loadFrom == "NetworkDependenceStatistics")
-                {
-                    net.LoadNetworkDependenceStatistics(dataGrid, displayMatrix, ndsOutput, orderedNetIds, currentYear);
-                }
-                //
-                MessageBox.Show("That year is not present in this file!", "Error!");
-                return;
-            }
-            if (_rmvIsolatesForm.RemoveIsolates)
-            {
-                if (!_rmvdIsolates)
-                    _ogOptionsFormCMinMembers = _optionsForm.CMinMembers;
-                _optionsForm.CMinMembers = _rmvIsolatesForm.MinGroupSize;
-                net.RemoveIsolates(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _rmvIsolatesForm.MinGroupSize, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
-                _rmvdIsolates = true;
-            }
-        }
-
-        private void lastToolStripMenuItem_Click(object sender, EventArgs e)
-        { 
-            if (loadFrom == "Random")
-            {
-                MessageBox.Show("Cannot go to last year with random data!", "Error!");
-                return;
-            }
-            if (loadFrom == "ValuedRandom")
-            {
-                MessageBox.Show("Cannot go to last year with random data!", "Error!");
-                return;
-            }
-
-            if (loadFrom == "Matrix")
-            {
-                if (openFileDialog.Multiselect)
-                {
-                    currentYear = net.GetLastYear(fileNames[0]);
-                    currentYear = net.LoadFromMultipleFiles(fileNames, currentYear);  
-                }
-                else
-                {
-                    currentYear = net.GetLastYear(openFileDialog.FileName); 
-                    currentYear = net.LoadFromMatrixFile(openFileDialog.FileName, currentYear);
-                }
-            }
-            else if (loadFrom == "Dyadic")
-            {
-                if (openFileDialog.Multiselect)
-                {
-                    currentYear = net.GetLastYear(openFileDialog.FileName);
-                    currentYear = net.LoadFromMultivariableDyadicFile(openFileDialog.FileName, currentYear); 
-                }
-                else
-                {
-                    currentYear = net.GetLastYear(openFileDialog.FileName); 
-                    currentYear = net.LoadFromDyadicFile(openFileDialog.FileName, currentYear);
-                }
-            }
-            else if (loadFrom == "Affil")
-            {
-                currentYear = net.GetLastYear(openFileDialog.FileName); 
-                currentYear = net.LoadFromAffiliationFile(openFileDialog.FileName, currentYear);
-            }
-            else if (loadFrom == "Monadic")
-            {
-                currentYear = net.GetLastYear(openFileDialog.FileName); 
-                currentYear = net.LoadFromMonadicFile(openFileDialog.FileName, currentYear);
-            }
-            else if (loadFrom == "ABMModel")
-            {
-                currentYear = _ABMForm.netID + _ABMForm.networks - 1;
-                net.mTable["Data"] = net.mList[currentYear - _ABMForm.netID];
-            }
-            // Yushan
-            else if (loadFrom == "GlobalRandom")
-            {
-                currentYear = netID.Count - 1;
-                net.LoadGlobalRandom(dataGrid, mRandList, displayMatrix, netID[currentYear]);
-            }
-            else if (loadFrom == "ConfigModel")
-            {
-                currentYear = netID.Count - 1;
-                net.LoadConfigModel(dataGrid, mRandList, displayMatrix, netID[currentYear], nodeLabels[netID[currentYear]]);
-            }
-            else if (loadFrom == "NetworkDependenceStatistics")
-            {
-                currentYear = orderedNetIds.Length - 1;
-                net.LoadNetworkDependenceStatistics(dataGrid, displayMatrix, ndsOutput, orderedNetIds, currentYear);
-            }
-            //
-
-            if (net.CohesionFilename != null)
-                net.CohesionMatrix = MatrixReader.ReadMatrixFromFile(net.CohesionFilename, currentYear);
-
-            if (_rmvIsolatesForm.RemoveIsolates)
-            {
-                if (!_rmvdIsolates)
-                    _ogOptionsFormCMinMembers = _optionsForm.CMinMembers;
-                _optionsForm.CMinMembers = _rmvIsolatesForm.MinGroupSize;
-                net.RemoveIsolates(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _rmvIsolatesForm.MinGroupSize, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
-                _rmvdIsolates = true;
-            }
-            DoStandardize();
-            LoadData();
-            SetFormTitle();
-        }
-
-        private void firstToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (loadFrom == "Random")
-            {
-                MessageBox.Show("Cannot go to first year with random data!", "Error!");
-                return;
-            }
-            if (loadFrom == "ValuedRandom")
-            {
-                MessageBox.Show("Cannot go to first year with random data!", "Error!");
-                return;
-            }
-
-            if (loadFrom == "Matrix")
-            {
-                if (openFileDialog.Multiselect)
-                {
-                    currentYear = net.GetFirstYear(fileNames[0]);
-                    currentYear = net.LoadFromMultipleFiles(fileNames, currentYear);  
-                }
-                else
-                {
-                    currentYear = net.GetFirstYear(openFileDialog.FileName);
-                    currentYear = net.LoadFromMatrixFile(openFileDialog.FileName, currentYear);
-                }
-            }
-            else if (loadFrom == "Dyadic")
-            {
-                if (openFileDialog.Multiselect)
-                {
-                    currentYear = net.GetFirstYear(openFileDialog.FileName);
-                    currentYear = net.LoadFromMultivariableDyadicFile(openFileDialog.FileName, currentYear); 
-                }
-                else
-                {
-                    currentYear = net.GetFirstYear(openFileDialog.FileName);
-                    currentYear = net.LoadFromDyadicFile(openFileDialog.FileName, currentYear);
-                }
-            }
-            else if (loadFrom == "Affil")
-            {
-                currentYear = net.GetFirstYear(openFileDialog.FileName);
-                currentYear = net.LoadFromAffiliationFile(openFileDialog.FileName, currentYear);
-            }
-            else if (loadFrom == "Monadic")
-            {
-                currentYear = net.GetFirstYear(openFileDialog.FileName);
-                currentYear = net.LoadFromMonadicFile(openFileDialog.FileName, currentYear);
-            }
-            else if (loadFrom == "ABMModel")
-            {
-                currentYear = _ABMForm.netID;
-                net.mTable["Data"] = net.mList[0];
-            }
-
-            // Yushan
-            else if (loadFrom == "GlobalRandom")
-            {
-                currentYear = 0;
-                net.LoadGlobalRandom(dataGrid, mRandList, displayMatrix, netID[currentYear]);
-            }
-            else if (loadFrom == "ConfigModel")
-            {
-                currentYear = 0;
-                net.LoadConfigModel(dataGrid, mRandList, displayMatrix, netID[currentYear], nodeLabels[netID[currentYear]]);
-            }
-            else if (loadFrom == "NetworkDependenceStatistics")
-            {
-                currentYear = 0;
-                net.LoadNetworkDependenceStatistics(dataGrid, displayMatrix, ndsOutput, orderedNetIds, currentYear);
-            }
-
-            if (net.CohesionFilename != null)
-                net.CohesionMatrix = MatrixReader.ReadMatrixFromFile(net.CohesionFilename, currentYear);
-
-            if (_rmvIsolatesForm.RemoveIsolates)
-            {
-                if (!_rmvdIsolates)
-                    _ogOptionsFormCMinMembers = _optionsForm.CMinMembers;
-                _optionsForm.CMinMembers = _rmvIsolatesForm.MinGroupSize;
-                net.RemoveIsolates(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _rmvIsolatesForm.MinGroupSize, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
-                _rmvdIsolates = true;
-            }
-            DoStandardize();
-            LoadData();
-            SetFormTitle();
-        }
-
+        
         private void fileToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
@@ -1904,7 +1301,7 @@ namespace NetworkGUI
 
         //==============================FILE==============================
 
-        //-----------------LOAD FROM-----------------
+        //----------------------LOAD FROM----------------------
 
         //Matrix/Dyadic File
         private void dyadicFileToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2333,7 +1730,7 @@ namespace NetworkGUI
 
         
         
-        //-----------------SAVE AS-----------------
+        //-----------------------SAVE AS-----------------------
 
         private void RemoveIsolatesLoadData()
         {
@@ -3578,7 +2975,889 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
             }
         }
 
+        //--------------------CLOSE FILE--------------------
+        private void closeFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            BufferedFileTable.RemoveFile(openFileDialog.FileName);
+        }
 
+        //--------------------RESET PROGRAM--------------------
+        private void resetToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            net = new Network.NetworkGUI();
+            startYear = -1;
+            currentYear = -1;
+            loadFrom = "";
+            displayMatrix = "Data";
+            SetChecked();
+            _centralityForm = new CentralityForm();
+            _cliqueForm = new CliqueForm();
+            _optionsForm.ReachNumMatrices = -1;
+            _optionsForm.CMinMembers = 1;
+            _optionsForm.Alpha = 0.0;
+            _randomForm = new RandomForm();
+            _vrandomForm = new ValuedRandomForm();
+            _optionsForm = new OptionsForm();
+            _randomForm.N = 3;
+            _vrandomForm.N = 3;
+            _blocForm = new BlocForm();
+
+            useMultipleFiles = false;
+            multipleMatrixFilesToolStripMenuItem.Enabled = true;
+            _multiplicationForm = new MultiplicationForm();
+            dataGrid.Columns.Clear();
+            _nfsForm = new NetworkFormationSimulationForm(this);
+
+            BufferedFileTable.Clear();
+        }
+
+        //------------------------EXIT------------------------
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        //=========================================================================
+
+
+
+        //============================DATA MANAGEMENT============================
+
+        //--------------------DICHOTOMIZE--------------------
+        private void dichotomizeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_dichotomizeForm.ShowDialog() == DialogResult.OK)
+                {
+                    if (_dichotomizeForm.CutoffText == "")
+                        throw new FormException("No Cutoff value has been defined");
+
+                    if (_dichotomizeForm.CutoffValue != -1.0)
+                        net.setDictomoization(true, _dichotomizeForm.CutoffValue);
+                    else if (_dichotomizeForm.CutoffValue == -1.0)
+                        net.setDictomoization(true, _dichotomizeForm.Cutoff[currentYear]);
+
+                    _dichotomizeForm.CutoffText = "";
+                    SetNewDisplayMatrix("Data");
+                    LoadData();
+                    SetChecked();
+                }
+            }
+            catch (Exception E)
+            {
+                MessageBox.Show(E.Message);
+            }
+        }
+
+        //----------------------RECODE----------------------
+        private void recodeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DialogResult result = _recodeForm.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                try
+                {
+                    if (_recodeForm.isValid())
+                        net.setRecode(true, _recodeForm.ValidRows);
+                    else
+                    {
+                        //net.setRecode(false, null);
+                        throw new Exception("Invalid format for recoding");
+                    }
+                    _recodeForm.ClearTextBoxes();
+                    SetNewDisplayMatrix("Data");
+                    LoadData();
+                    SetChecked();
+                }
+                catch (Exception E)
+                {
+                    MessageBox.Show(E.Message);
+                }
+            }
+            else if (result == DialogResult.Cancel)
+            {
+                // do nothing for now
+            }
+
+
+        }
+
+        //------AFFILIATION TO SOCIOMATRIX CONVERSION------
+        //Main
+        private void affiliationToSociomatrixConversionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // need this to created an instance of the ToolStripMenuItem
+        }
+        
+        //Sociomatrix
+        private void sociomatrixToolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        //Sociomatrix Unit Based
+        private void unitBasedConversionToolStripMenuItem3_Click(object sender, EventArgs e)
+        {
+            SetNewDisplayMatrix("Data");
+            LoadData();
+            SetChecked();
+        }
+
+        //Sociomatrix Event Based
+        private void eventBasedConversionToolStripMenuItem3_Click(object sender, EventArgs e)
+        {
+            SetNewDisplayMatrix("DataEvent");
+            LoadData();
+            SetChecked();
+        }
+
+        //Correlation
+        private void correlationToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        //Correlation Unit Based
+        private void unitBasedConversionToolStripMenuItem4_Click(object sender, EventArgs e)
+        {
+            SetNewDisplayMatrix("AffilCorrelation");
+            LoadData();
+            SetChecked();
+        }
+
+        //Correlation Event Based
+        private void eventBasedConversionToolStripMenuItem4_Click(object sender, EventArgs e)
+        {
+            SetNewDisplayMatrix("AffilCorrelationEvent");
+            LoadData();
+            SetChecked();
+        }
+
+        //Euclidean
+        private void euclideanToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        //Euclidean Unit Based
+        private void unitBasedConversionToolStripMenuItem5_Click(object sender, EventArgs e)
+        {
+            SetNewDisplayMatrix("AffilEuclidean");
+            LoadData();
+            SetChecked();
+        }
+
+        //Euclidean Event Based
+        private void eventBasedConversionToolStripMenuItem5_Click(object sender, EventArgs e)
+        {
+            SetNewDisplayMatrix("AffilEuclideanEvent");
+            LoadData();
+            SetChecked();
+        }
+
+        //-----------------MATRIX MULTIPLICATION-----------------
+        private void matrixMultiplicationToolStripMenuItem1_Click(object sender, EventArgs e) //Alvin
+        {
+            SetNewDisplayMatrix("Multiplication");
+            _multiplicationForm.ShowDialog();
+            //if the x button is used to cancel form
+            if (!_multiplicationForm.isValid)
+                return;
+
+            LoadData();
+            SetChecked();
+        }
+
+        //--------------ELEMENTWISE MULTIPLICATION--------------
+        //Main
+        private void elementwiseMultiplicationToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            // need this to created an instance of the ToolStripMenuItem
+        }
+
+        //Matrix File
+        private void matrixFileToolStripMenuItem_Click_1(object sender, EventArgs e)
+        {
+            matrixToolStripMenuItem.Checked = true;
+            dyadicFileToolStripMenuItem2.Checked = false;
+            monadicFileToolStripMenuItem1.Checked = false;
+            ef = Network.ElementwiseFormat.Matrix;
+            if (openFileDialog2.ShowDialog() == DialogResult.OK)
+            {
+                SetNewDisplayMatrix("Elementwise");
+                LoadData();
+                SetChecked();
+            }
+        }
+
+        //Dyadic File
+        private void dyadicFileToolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            matrixToolStripMenuItem.Checked = false;
+            dyadicFileToolStripMenuItem2.Checked = true;
+            monadicFileToolStripMenuItem1.Checked = false;
+            ef = Network.ElementwiseFormat.Matrix;
+            if (openFileDialog2.ShowDialog() == DialogResult.OK)
+            {
+                SetNewDisplayMatrix("Elementwise");
+                LoadData();
+                SetChecked();
+            }
+        }
+
+        //Monadic File
+        private void monadicFileToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            matrixToolStripMenuItem.Checked = false;
+            dyadicFileToolStripMenuItem2.Checked = false;
+            monadicFileToolStripMenuItem1.Checked = true;
+            ef = Network.ElementwiseFormat.Matrix;
+            if (openFileDialog2.ShowDialog() == DialogResult.OK)
+            {
+                SetNewDisplayMatrix("Elementwise");
+                LoadData();
+                SetChecked();
+            }
+        }
+
+        //----------------MATRIX MULT SAVE----------------
+        private void matrixMultSaveToolStripMenuItem_Click(object sender, EventArgs e) //bug december
+        {
+            matMult.ShowDialog();
+            //if the x button is used to cancel form
+            if (!matMult.isValid)
+                return;
+
+
+            //obtaining data from form
+            int start = matMult.InitialYear;
+            int end = matMult.FinalYear;
+            string file1 = matMult.File1;
+            string file2 = matMult.File2;
+            string curDirectory = getCurrentDirectory(file1);
+            string saveFileName = matMult.SaveFile;
+
+            //creating file 
+            using (StreamWriter sw = new System.IO.StreamWriter(curDirectory + saveFileName + ".csv"))
+            {
+                sw.WriteLine("Year,row,col,edge");
+            }
+
+            MatMultProg prog = new MatMultProg(start, end, file1, file2, curDirectory, saveFileName);
+            prog.ShowDialog();
+
+            return;
+
+        }
+
+        //====================================================================
+
+        //===============================SCROLL===============================
+
+        //-------------------NEXT YEAR-------------------
+        private void nextYearToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            net.Reset();
+
+            if (currentYear == -1)
+                return;
+
+            ++currentYear;
+            //Console.WriteLine("Display Matrx: {0:s}", displayMatrix);
+            try
+            {
+                if (loadFrom == "Matrix")
+                {
+                    if (openFileDialog.Multiselect)
+                    {
+                        currentYear = net.LoadFromMultipleFiles(fileNames, currentYear);
+                    }
+                    else
+                    {
+                        // Yushan
+                        currentYear = net.LoadFromMatrixFile(openFileDialog.FileName, currentYear);
+                    }
+                }
+                else if (loadFrom == "Dyadic")
+                {
+                    if (openFileDialog.Multiselect)
+                    {
+                        currentYear = net.LoadFromMultivariableDyadicFile(openFileDialog.FileName, currentYear);
+                    }
+                    else
+                    {
+                        currentYear = net.LoadFromDyadicFile(openFileDialog.FileName, currentYear);
+                    }
+                }
+                else if (loadFrom == "Affil")
+                {
+                    currentYear = net.LoadFromAffiliationFile(openFileDialog.FileName, currentYear);
+                }
+                else if (loadFrom == "Monadic")
+                {
+                    currentYear = net.LoadFromMonadicFile(openFileDialog.FileName, currentYear);
+                }
+                else if (loadFrom == "Random")
+                {
+                    net.LoadRandom(_randomForm.N, "Data", _randomSymmetric, _randomForm.ProbRange, _randomForm.MinProb, _randomForm.MaxProb, _randomForm.RandomN, _randomForm.RandomMinN, _randomForm.RandomMaxN, _randomForm.RandomIntN);
+                    --currentYear;
+                }
+                else if (loadFrom == "ValuedRandom")
+                {
+                    net.LoadValuedRandom(_vrandomForm.N, "Data", _randomSymmetric, _vrandomForm.vmin, _vrandomForm.vmax, _vrandomForm.datatype, _vrandomForm.zerodiagonalized, _vrandomForm.ProbRange, _vrandomForm.MinProb, _vrandomForm.MaxProb, _vrandomForm.RandomN, _vrandomForm.RandomMinN, _vrandomForm.RandomMaxN, _vrandomForm.RandomIntN);
+                    --currentYear;
+                }
+                else if (loadFrom == "ABMModel")
+                {
+                    net.mTable["Data"] = net.mList[currentYear - _ABMForm.netID];
+                }
+
+                // Yushan
+                else if (loadFrom == "GlobalRandom")
+                {
+                    if (currentYear == netID.Count)
+                    {
+                        currentYear = 0;
+                    }
+                    net.LoadGlobalRandom(dataGrid, mRandList, displayMatrix, netID[currentYear]);
+                }
+                else if (loadFrom == "ConfigModel")
+                {
+                    if (currentYear == netID.Count)
+                    {
+                        currentYear = 0;
+                    }
+                    net.LoadConfigModel(dataGrid, mRandList, displayMatrix, netID[currentYear], nodeLabels[netID[currentYear]]);
+                }
+                else if (loadFrom == "NetworkDependenceStatistics")
+                {
+                    if (currentYear == orderedNetIds.Length)
+                    {
+                        currentYear = 0;
+                    }
+                    net.LoadNetworkDependenceStatistics(dataGrid, displayMatrix, ndsOutput, orderedNetIds, currentYear);
+                }
+                //
+            }
+            catch (Exception E)
+            {
+                --currentYear;
+                MessageBox.Show("Unable to advance to next year: " + E.Message, "Error!");
+                return;
+            }
+            if (net.CohesionFilename != null)
+                net.CohesionMatrix = MatrixReader.ReadMatrixFromFile(net.CohesionFilename, currentYear);
+
+            if (_rmvIsolatesForm.RemoveIsolates)
+            {
+                if (!_rmvdIsolates)
+                    _ogOptionsFormCMinMembers = _optionsForm.CMinMembers;
+                _optionsForm.CMinMembers = _rmvIsolatesForm.MinGroupSize;
+                net.RemoveIsolates(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _rmvIsolatesForm.MinGroupSize, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                _rmvdIsolates = true;
+            }
+            DoStandardize();
+            LoadData();
+            SetFormTitle();
+        }
+
+        //-----------------PREVIOUS YEAR-----------------
+        private void previousYearToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (currentYear == -1)
+                return;
+            --currentYear;
+
+            try
+            {
+                if (loadFrom == "Matrix")
+                {
+                    if (openFileDialog.Multiselect)
+                    {
+
+                        currentYear = net.LoadFromMultipleFiles(fileNames, net.GetPreviousYear(fileNames[0], ++currentYear));
+                    }
+                    else
+                    {
+                        currentYear = net.LoadFromMatrixFile(openFileDialog.FileName, net.GetPreviousYear(openFileDialog.FileName, ++currentYear));
+                    }
+                }
+                else if (loadFrom == "Dyadic")
+                {
+                    if (openFileDialog.Multiselect)
+                    {
+                        currentYear = net.LoadFromMultivariableDyadicFile(openFileDialog.FileName, net.GetPreviousYear(openFileDialog.FileName, ++currentYear));
+                    }
+                    else
+                    {
+
+                        currentYear = net.LoadFromDyadicFile(openFileDialog.FileName, net.GetPreviousYear(openFileDialog.FileName, ++currentYear));
+                    }
+
+                }
+                else if (loadFrom == "Affil")
+                {
+                    currentYear = net.LoadFromAffiliationFile(openFileDialog.FileName, net.GetPreviousYear(openFileDialog.FileName, ++currentYear));
+                }
+                else if (loadFrom == "Monadic")
+                {
+                    currentYear = net.LoadFromMonadicFile(openFileDialog.FileName, net.GetPreviousYear(openFileDialog.FileName, ++currentYear));
+                }
+                else if (loadFrom == "Random")
+                {
+                    net.LoadRandom(_randomForm.N, "Data", _randomSymmetric, _randomForm.ProbRange, _randomForm.MinProb, _randomForm.MaxProb, _randomForm.RandomN, _randomForm.RandomMinN, _randomForm.RandomMaxN, _randomForm.RandomIntN);
+                    ++currentYear;
+                }
+                else if (loadFrom == "ValuedRandom")
+                {
+                    net.LoadValuedRandom(_vrandomForm.N, "Data", _randomSymmetric, _vrandomForm.vmin, _vrandomForm.vmax, _vrandomForm.datatype, _vrandomForm.zerodiagonalized, _vrandomForm.ProbRange, _vrandomForm.MinProb, _vrandomForm.MaxProb, _vrandomForm.RandomN, _vrandomForm.RandomMinN, _vrandomForm.RandomMaxN, _vrandomForm.RandomIntN);
+                    ++currentYear;
+                }
+                else if (loadFrom == "ABMModel")
+                {
+                    net.mTable["Data"] = net.mList[currentYear - _ABMForm.netID];
+                }
+                // Yushan
+                else if (loadFrom == "GlobalRandom")
+                {
+                    if (currentYear == -1)
+                    {
+                        currentYear = netID.Count - 1;
+                    }
+                    net.LoadGlobalRandom(dataGrid, mRandList, displayMatrix, netID[currentYear]);
+                }
+                else if (loadFrom == "ConfigModel")
+                {
+                    if (currentYear == -1)
+                    {
+                        currentYear = netID.Count - 1;
+                    }
+                    net.LoadConfigModel(dataGrid, mRandList, displayMatrix, netID[currentYear], nodeLabels[netID[currentYear]]);
+                }
+                else if (loadFrom == "NetworkDependenceStatistics")
+                {
+                    if (currentYear == -1)
+                    {
+                        currentYear = orderedNetIds.Length - 1;
+                    }
+                    net.LoadNetworkDependenceStatistics(dataGrid, displayMatrix, ndsOutput, orderedNetIds, currentYear);
+                }
+                //
+            }
+            catch (Exception E)
+            {
+                ++currentYear;
+                MessageBox.Show("Unable to advance to previous year: " + E.Message, "Error!");
+                return;
+            }
+
+            if (net.CohesionFilename != null)
+                net.CohesionMatrix = MatrixReader.ReadMatrixFromFile(net.CohesionFilename, currentYear);
+
+            if (_rmvIsolatesForm.RemoveIsolates)
+            {
+                if (!_rmvdIsolates)
+                    _ogOptionsFormCMinMembers = _optionsForm.CMinMembers;
+                _optionsForm.CMinMembers = _rmvIsolatesForm.MinGroupSize;
+                net.RemoveIsolates(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _rmvIsolatesForm.MinGroupSize, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                _rmvdIsolates = true;
+            }
+            DoStandardize();
+            LoadData();
+            SetFormTitle();
+        }
+
+        //-----------------JUMP TO YEAR-----------------
+        private void jumpToYearToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (loadFrom == "Random")
+            {
+                MessageBox.Show("Cannot jump to specific year with random data!", "Error!");
+                return;
+            }
+            if (loadFrom == "ValuedRandom")
+            {
+                MessageBox.Show("Cannot jump to specific year with random data!", "Error!");
+                return;
+            }
+
+            int newYear = 0;
+            if (currentYear == -1)
+                return;
+
+            JumpToForm jump = new JumpToForm();
+
+            // Yushan
+            /* - Need to further generalize input year to string so that "jumpYr" can be dumped. 
+  - Other functions whose input network IDs are still defaulted to integer will need this integer variable "jumpYr" */
+
+            int jumpYear = -1;
+
+            //if (loadFrom == "GlobalRandom" || loadFrom == "ConfigModel")
+            //    jump.year = netID[currentYear];
+            //else
+            //{
+            //    jump.year = currentYear.ToString();
+            //    jumpYear = currentYear;
+            //}
+            jump.year = currentYear.ToString();
+            jumpYear = currentYear;
+            jump.ShowDialog();
+
+            //if (loadFrom == "GlobalRandom" || loadFrom == "ConfigModel")
+            //{
+            //    try
+            //    {
+            //        jumpYear = netID.FindIndex(x => x == jump.year);
+            //    }
+            //    catch (Exception)
+            //    {
+            //        MessageBox.Show("The network ID entered is invalid!", "Error!");
+            //        return;
+            //    }
+            //}
+            //else
+            //{
+            //    try
+            //    {
+            //        jumpYear = int.Parse(jump.year);
+            //    }
+            //    catch (Exception)
+            //    {
+            //        MessageBox.Show("The year entered is invalid!", "Error!");
+            //        return;
+            //    }
+            //}
+            ////
+            try
+            {
+                jumpYear = int.Parse(jump.year);
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("The year entered is invalid!", "Error!");
+                return;
+            }
+
+            try
+            {
+                if (jumpYear != currentYear) // No need to be wasteful and reload unnecessarily
+                {
+
+                    if (loadFrom == "Matrix")
+                    {
+                        if (openFileDialog.Multiselect)
+                        {
+                            newYear = net.LoadFromMultipleFiles(fileNames, jumpYear);
+                        }
+                        else
+                        {
+                            newYear = net.LoadFromMatrixFile(openFileDialog.FileName, jumpYear);
+                        }
+                    }
+                    else if (loadFrom == "Dyadic")
+                    {
+                        if (openFileDialog.Multiselect)
+                        {
+                            newYear = net.LoadFromMultivariableDyadicFile(openFileDialog.FileName, jumpYear);
+                        }
+                        else
+                        {
+                            newYear = net.LoadFromDyadicFile(openFileDialog.FileName, jumpYear);
+                        }
+                    }
+                    else if (loadFrom == "Affil")
+                    {
+                        newYear = net.LoadFromAffiliationFile(openFileDialog.FileName, jumpYear);
+                    }
+                    else if (loadFrom == "Monadic")
+                    {
+                        newYear = net.LoadFromMonadicFile(openFileDialog.FileName, jumpYear);
+                    }
+                    else if (loadFrom == "ABMModel")
+                    {
+                        newYear = jumpYear;
+                        net.mTable["Data"] = net.mList[jumpYear - _ABMForm.netID];
+                    }
+                    // Yushan
+                    else if (loadFrom == "GlobalRandom")
+                    {
+                        net.LoadGlobalRandom(dataGrid, mRandList, displayMatrix, netID[jumpYear]);
+                        newYear = jumpYear;
+                    }
+                    else if (loadFrom == "ConfigModel")
+                    {
+                        net.LoadConfigModel(dataGrid, mRandList, displayMatrix, netID[jumpYear], nodeLabels[netID[jumpYear]]);
+                        newYear = jumpYear;
+                    }
+                    else if (loadFrom == "NetworkDependenceStatistics")
+                    {
+                        net.LoadNetworkDependenceStatistics(dataGrid, displayMatrix, ndsOutput, orderedNetIds, jumpYear);
+                        newYear = jumpYear;
+                    }
+                    //
+                }
+            }
+            catch (Exception E)
+            {
+                MessageBox.Show("Unable to jump to year: " + E.Message, "Error!");
+                return;
+            }
+
+            if (newYear != -1)
+            {
+                if (net.CohesionFilename != null)
+                    net.CohesionMatrix = MatrixReader.ReadMatrixFromFile(net.CohesionFilename, currentYear);
+
+                currentYear = newYear;
+                DoStandardize();
+                LoadData();
+                SetFormTitle();
+            }
+            else
+            {
+                if (loadFrom == "Matrix")
+                {
+                    if (openFileDialog.Multiselect)
+                    {
+                        net.LoadFromMultipleFiles(fileNames, currentYear);
+                    }
+                    else
+                    {
+                        net.LoadFromMatrixFile(openFileDialog.FileName, currentYear);
+                    }
+                }
+                else if (loadFrom == "Dyadic")
+                {
+                    if (openFileDialog.Multiselect)
+                    {
+                        net.LoadFromMultivariableDyadicFile(openFileDialog.FileName, currentYear);
+                    }
+                    else
+                    {
+                        net.LoadFromDyadicFile(openFileDialog.FileName, currentYear);
+                    }
+                }
+                else if (loadFrom == "Affil")
+                {
+                    currentYear = net.LoadFromAffiliationFile(openFileDialog.FileName, currentYear);
+                }
+                else if (loadFrom == "Monadic")
+                {
+                    currentYear = net.LoadFromMonadicFile(openFileDialog.FileName, currentYear);
+                }
+                else if (loadFrom == "ABMModel")
+                {
+                    currentYear = _ABMForm.netID;
+                    net.mTable["Data"] = net.mList[0];
+                }
+                // Yushan
+                else if (loadFrom == "GlobalRandom")
+                {
+                    net.LoadGlobalRandom(dataGrid, mRandList, displayMatrix, netID[currentYear]);
+                }
+                else if (loadFrom == "ConfigModel")
+                {
+                    net.LoadConfigModel(dataGrid, mRandList, displayMatrix, netID[currentYear], nodeLabels[netID[currentYear]]);
+                }
+                else if (loadFrom == "NetworkDependenceStatistics")
+                {
+                    net.LoadNetworkDependenceStatistics(dataGrid, displayMatrix, ndsOutput, orderedNetIds, currentYear);
+                }
+                //
+                MessageBox.Show("That year is not present in this file!", "Error!");
+                return;
+            }
+            if (_rmvIsolatesForm.RemoveIsolates)
+            {
+                if (!_rmvdIsolates)
+                    _ogOptionsFormCMinMembers = _optionsForm.CMinMembers;
+                _optionsForm.CMinMembers = _rmvIsolatesForm.MinGroupSize;
+                net.RemoveIsolates(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _rmvIsolatesForm.MinGroupSize, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                _rmvdIsolates = true;
+            }
+        }
+
+        //-----------------FIRST YEAR-----------------
+        private void firstToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (loadFrom == "Random")
+            {
+                MessageBox.Show("Cannot go to first year with random data!", "Error!");
+                return;
+            }
+            if (loadFrom == "ValuedRandom")
+            {
+                MessageBox.Show("Cannot go to first year with random data!", "Error!");
+                return;
+            }
+
+            if (loadFrom == "Matrix")
+            {
+                if (openFileDialog.Multiselect)
+                {
+                    currentYear = net.GetFirstYear(fileNames[0]);
+                    currentYear = net.LoadFromMultipleFiles(fileNames, currentYear);
+                }
+                else
+                {
+                    currentYear = net.GetFirstYear(openFileDialog.FileName);
+                    currentYear = net.LoadFromMatrixFile(openFileDialog.FileName, currentYear);
+                }
+            }
+            else if (loadFrom == "Dyadic")
+            {
+                if (openFileDialog.Multiselect)
+                {
+                    currentYear = net.GetFirstYear(openFileDialog.FileName);
+                    currentYear = net.LoadFromMultivariableDyadicFile(openFileDialog.FileName, currentYear);
+                }
+                else
+                {
+                    currentYear = net.GetFirstYear(openFileDialog.FileName);
+                    currentYear = net.LoadFromDyadicFile(openFileDialog.FileName, currentYear);
+                }
+            }
+            else if (loadFrom == "Affil")
+            {
+                currentYear = net.GetFirstYear(openFileDialog.FileName);
+                currentYear = net.LoadFromAffiliationFile(openFileDialog.FileName, currentYear);
+            }
+            else if (loadFrom == "Monadic")
+            {
+                currentYear = net.GetFirstYear(openFileDialog.FileName);
+                currentYear = net.LoadFromMonadicFile(openFileDialog.FileName, currentYear);
+            }
+            else if (loadFrom == "ABMModel")
+            {
+                currentYear = _ABMForm.netID;
+                net.mTable["Data"] = net.mList[0];
+            }
+
+            // Yushan
+            else if (loadFrom == "GlobalRandom")
+            {
+                currentYear = 0;
+                net.LoadGlobalRandom(dataGrid, mRandList, displayMatrix, netID[currentYear]);
+            }
+            else if (loadFrom == "ConfigModel")
+            {
+                currentYear = 0;
+                net.LoadConfigModel(dataGrid, mRandList, displayMatrix, netID[currentYear], nodeLabels[netID[currentYear]]);
+            }
+            else if (loadFrom == "NetworkDependenceStatistics")
+            {
+                currentYear = 0;
+                net.LoadNetworkDependenceStatistics(dataGrid, displayMatrix, ndsOutput, orderedNetIds, currentYear);
+            }
+
+            if (net.CohesionFilename != null)
+                net.CohesionMatrix = MatrixReader.ReadMatrixFromFile(net.CohesionFilename, currentYear);
+
+            if (_rmvIsolatesForm.RemoveIsolates)
+            {
+                if (!_rmvdIsolates)
+                    _ogOptionsFormCMinMembers = _optionsForm.CMinMembers;
+                _optionsForm.CMinMembers = _rmvIsolatesForm.MinGroupSize;
+                net.RemoveIsolates(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _rmvIsolatesForm.MinGroupSize, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                _rmvdIsolates = true;
+            }
+            DoStandardize();
+            LoadData();
+            SetFormTitle();
+        }
+
+        //-----------------LAST YEAR-----------------
+        private void lastToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (loadFrom == "Random")
+            {
+                MessageBox.Show("Cannot go to last year with random data!", "Error!");
+                return;
+            }
+            if (loadFrom == "ValuedRandom")
+            {
+                MessageBox.Show("Cannot go to last year with random data!", "Error!");
+                return;
+            }
+
+            if (loadFrom == "Matrix")
+            {
+                if (openFileDialog.Multiselect)
+                {
+                    currentYear = net.GetLastYear(fileNames[0]);
+                    currentYear = net.LoadFromMultipleFiles(fileNames, currentYear);
+                }
+                else
+                {
+                    currentYear = net.GetLastYear(openFileDialog.FileName);
+                    currentYear = net.LoadFromMatrixFile(openFileDialog.FileName, currentYear);
+                }
+            }
+            else if (loadFrom == "Dyadic")
+            {
+                if (openFileDialog.Multiselect)
+                {
+                    currentYear = net.GetLastYear(openFileDialog.FileName);
+                    currentYear = net.LoadFromMultivariableDyadicFile(openFileDialog.FileName, currentYear);
+                }
+                else
+                {
+                    currentYear = net.GetLastYear(openFileDialog.FileName);
+                    currentYear = net.LoadFromDyadicFile(openFileDialog.FileName, currentYear);
+                }
+            }
+            else if (loadFrom == "Affil")
+            {
+                currentYear = net.GetLastYear(openFileDialog.FileName);
+                currentYear = net.LoadFromAffiliationFile(openFileDialog.FileName, currentYear);
+            }
+            else if (loadFrom == "Monadic")
+            {
+                currentYear = net.GetLastYear(openFileDialog.FileName);
+                currentYear = net.LoadFromMonadicFile(openFileDialog.FileName, currentYear);
+            }
+            else if (loadFrom == "ABMModel")
+            {
+                currentYear = _ABMForm.netID + _ABMForm.networks - 1;
+                net.mTable["Data"] = net.mList[currentYear - _ABMForm.netID];
+            }
+            // Yushan
+            else if (loadFrom == "GlobalRandom")
+            {
+                currentYear = netID.Count - 1;
+                net.LoadGlobalRandom(dataGrid, mRandList, displayMatrix, netID[currentYear]);
+            }
+            else if (loadFrom == "ConfigModel")
+            {
+                currentYear = netID.Count - 1;
+                net.LoadConfigModel(dataGrid, mRandList, displayMatrix, netID[currentYear], nodeLabels[netID[currentYear]]);
+            }
+            else if (loadFrom == "NetworkDependenceStatistics")
+            {
+                currentYear = orderedNetIds.Length - 1;
+                net.LoadNetworkDependenceStatistics(dataGrid, displayMatrix, ndsOutput, orderedNetIds, currentYear);
+            }
+            //
+
+            if (net.CohesionFilename != null)
+                net.CohesionMatrix = MatrixReader.ReadMatrixFromFile(net.CohesionFilename, currentYear);
+
+            if (_rmvIsolatesForm.RemoveIsolates)
+            {
+                if (!_rmvdIsolates)
+                    _ogOptionsFormCMinMembers = _optionsForm.CMinMembers;
+                _optionsForm.CMinMembers = _rmvIsolatesForm.MinGroupSize;
+                net.RemoveIsolates(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _rmvIsolatesForm.MinGroupSize, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                _rmvdIsolates = true;
+            }
+            DoStandardize();
+            LoadData();
+            SetFormTitle();
+        }
+
+        //==================================================================
 
         // This function does the actual file loading
         // It is called by the fileForm
@@ -3859,35 +4138,6 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
             SetChecked();
         }
 
-        private void resetToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            net = new Network.NetworkGUI();
-            startYear = -1;
-            currentYear = -1;
-            loadFrom = "";
-            displayMatrix = "Data";
-            SetChecked();
-            _centralityForm = new CentralityForm();
-            _cliqueForm = new CliqueForm();
-            _optionsForm.ReachNumMatrices = -1;
-            _optionsForm.CMinMembers = 1;
-            _optionsForm.Alpha = 0.0;
-            _randomForm = new RandomForm();
-            _vrandomForm = new ValuedRandomForm();
-            _optionsForm = new OptionsForm();
-            _randomForm.N = 3;
-            _vrandomForm.N = 3;
-            _blocForm = new BlocForm();
-
-            useMultipleFiles = false;
-            multipleMatrixFilesToolStripMenuItem.Enabled = true;
-            _multiplicationForm = new MultiplicationForm();
-            dataGrid.Columns.Clear();
-             _nfsForm = new NetworkFormationSimulationForm(this);
-
-            BufferedFileTable.Clear();
-        }
-
         private void reset()
         {
             //net = new Network.NetworkGUI();
@@ -3915,64 +4165,6 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
             dataGrid.Columns.Clear();
 
             BufferedFileTable.Clear();
-        }
-
-        private void dichotomizeToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                if (_dichotomizeForm.ShowDialog() == DialogResult.OK)
-                {
-                    if (_dichotomizeForm.CutoffText == "")
-                        throw new FormException("No Cutoff value has been defined");
-
-                    if (_dichotomizeForm.CutoffValue != -1.0)
-                        net.setDictomoization(true, _dichotomizeForm.CutoffValue);
-                    else if (_dichotomizeForm.CutoffValue == -1.0)
-                        net.setDictomoization(true, _dichotomizeForm.Cutoff[currentYear]);
-                    
-                    _dichotomizeForm.CutoffText = "";
-                    SetNewDisplayMatrix("Data");
-                    LoadData();
-                    SetChecked();
-                }
-            }
-            catch (Exception E)
-            {
-                MessageBox.Show(E.Message);
-            }
-        }
-
-        private void recodeToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            DialogResult result = _recodeForm.ShowDialog();
-            if (result == DialogResult.OK)
-            {
-                try
-                {
-                    if (_recodeForm.isValid())
-                        net.setRecode(true, _recodeForm.ValidRows);
-                    else
-                    {
-                        //net.setRecode(false, null);
-                        throw new Exception("Invalid format for recoding");
-                    }
-                    _recodeForm.ClearTextBoxes();
-                    SetNewDisplayMatrix("Data");
-                    LoadData();
-                    SetChecked();
-                }
-                catch (Exception E)
-                {
-                    MessageBox.Show(E.Message);
-                }
-            }
-            else if (result == DialogResult.Cancel)
-            {
-                // do nothing for now
-            }
-
-            
         }
 
         private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -4087,11 +4279,6 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
             DoStandardize();
 
             LoadData();
-        }
-
-        private void closeFileToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            BufferedFileTable.RemoveFile(openFileDialog.FileName);
         }
 
         private void networkFormationSimulationToolStripMenuItem_Click(object sender, EventArgs e)
@@ -5820,111 +6007,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
             SetChecked();
         }
 
-        private void matrixMultiplicationToolStripMenuItem1_Click(object sender, EventArgs e) //Alvin
-        {
-            SetNewDisplayMatrix("Multiplication");
-            _multiplicationForm.ShowDialog();
-            //if the x button is used to cancel form
-            if (!_multiplicationForm.isValid)
-                return;
-
-            LoadData();
-            SetChecked();
-        }
-
-        private void unitBasedConversionToolStripMenuItem3_Click(object sender, EventArgs e)
-        {
-            SetNewDisplayMatrix("Data");
-            LoadData();
-            SetChecked();
-        }
-
-        private void eventBasedConversionToolStripMenuItem3_Click(object sender, EventArgs e)
-        {
-            SetNewDisplayMatrix("DataEvent");
-            LoadData();
-            SetChecked();
-        }
-
-        private void unitBasedConversionToolStripMenuItem4_Click(object sender, EventArgs e)
-        {
-            SetNewDisplayMatrix("AffilCorrelation");
-            LoadData();
-            SetChecked();
-        }
-
-        private void eventBasedConversionToolStripMenuItem4_Click(object sender, EventArgs e)
-        {
-            SetNewDisplayMatrix("AffilCorrelationEvent");
-            LoadData();
-            SetChecked();
-        }
-
-        private void unitBasedConversionToolStripMenuItem5_Click(object sender, EventArgs e)
-        {
-            SetNewDisplayMatrix("AffilEuclidean");
-            LoadData();
-            SetChecked();
-        }
-
-        private void eventBasedConversionToolStripMenuItem5_Click(object sender, EventArgs e)
-        {
-            SetNewDisplayMatrix("AffilEuclideanEvent");
-            LoadData();
-            SetChecked();
-        }
-
-        private void affiliationToSociomatrixConversionToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            // need this to created an instance of the ToolStripMenuItem
-        }
-
-        private void matrixFileToolStripMenuItem_Click_1(object sender, EventArgs e)
-        {
-            matrixToolStripMenuItem.Checked = true;
-            dyadicFileToolStripMenuItem2.Checked = false;
-            monadicFileToolStripMenuItem1.Checked = false;
-            ef = Network.ElementwiseFormat.Matrix;
-            if (openFileDialog2.ShowDialog() == DialogResult.OK)
-            {
-                SetNewDisplayMatrix("Elementwise");
-                LoadData();
-                SetChecked();
-            }
-        }
-
-        private void dyadicFileToolStripMenuItem2_Click(object sender, EventArgs e)
-        {
-            matrixToolStripMenuItem.Checked = false;
-            dyadicFileToolStripMenuItem2.Checked = true;
-            monadicFileToolStripMenuItem1.Checked = false;
-            ef = Network.ElementwiseFormat.Matrix;
-            if (openFileDialog2.ShowDialog() == DialogResult.OK)
-            {
-                SetNewDisplayMatrix("Elementwise");
-                LoadData();
-                SetChecked();
-            }
-        }
-
-        private void monadicFileToolStripMenuItem1_Click(object sender, EventArgs e)
-        {
-            matrixToolStripMenuItem.Checked = false;
-            dyadicFileToolStripMenuItem2.Checked = false;
-            monadicFileToolStripMenuItem1.Checked = true;
-            ef = Network.ElementwiseFormat.Matrix;
-            if (openFileDialog2.ShowDialog() == DialogResult.OK)
-            {
-                SetNewDisplayMatrix("Elementwise");
-                LoadData();
-                SetChecked();
-            }
-        }
-
-        private void elementwiseMultiplicationToolStripMenuItem1_Click(object sender, EventArgs e)
-        {
-            // need this to created an instance of the ToolStripMenuItem
-        }
+        
 
         private void dyadicTransitivityToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -6431,35 +6514,6 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
 
         }
 
-        private void matrixMultSaveToolStripMenuItem_Click(object sender, EventArgs e) //bug december
-        {
-            matMult.ShowDialog();
-            //if the x button is used to cancel form
-            if (!matMult.isValid)
-                return;
-
-
-            //obtaining data from form
-            int start = matMult.InitialYear;
-            int end = matMult.FinalYear;
-            string file1 = matMult.File1;
-            string file2 = matMult.File2;
-            string curDirectory = getCurrentDirectory(file1);
-            string saveFileName = matMult.SaveFile;
-
-            //creating file 
-            using (StreamWriter sw = new System.IO.StreamWriter(curDirectory + saveFileName + ".csv"))
-            {
-                sw.WriteLine("Year,row,col,edge");
-            }
-
-            MatMultProg prog = new MatMultProg(start, end, file1, file2, curDirectory, saveFileName);
-            prog.ShowDialog();
-
-            return;
-
-        }
-
         private void clear(StreamReader sr)
         {
             sr.ReadLine();
@@ -6663,8 +6717,6 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         {
 
         }
-
-        
 
         /*private void testToolStripMenuItem_Click(object sender, EventArgs e)
         {
