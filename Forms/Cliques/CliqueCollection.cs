@@ -65,6 +65,22 @@ namespace Network.Cliques
             //LoadCliqueByCliqueOverlap();
         }
 
+        public CliqueCollection(CliqueCollection cc)
+        {
+            if(cc == null)
+            {
+                return;
+            }
+            _cliques = new List<Clique>();
+            foreach(Clique c in cc.Cliques)
+            {
+                _cliques.Add(new Clique(c));
+            }
+            _cliqueOverlap = new Matrix(cc.CliqueOverlap);
+            _cliqueByCliqueOverlap = new Matrix(cc.CliqueByCliqueOverlap);
+            _minCliqueSize = cc.MinCliqueSize;
+        }
+
         public void LoadCliqueOverlap()
         {
             _cliqueOverlap.Clear();
@@ -101,12 +117,15 @@ namespace Network.Cliques
                 }
             }*/
         
+        public List<Clique> Cliques
+        {
+            get { return _cliques; }
+        }
 
-
-        
-                
-
-        
+        public int MinCliqueSize
+        {
+            get { return _minCliqueSize; }
+        }
 
         public int Count
         {

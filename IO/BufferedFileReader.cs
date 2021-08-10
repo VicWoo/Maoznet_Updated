@@ -20,6 +20,9 @@ namespace Network.IO
         // Yushan
         private readonly List<string> _networkRealId;
         //
+        //Baadal
+        private readonly NetworkIdTable _reverseNetworkIdTable;
+        //
         private readonly BufferedStream _stream;
         private Type _type;
 
@@ -52,6 +55,7 @@ namespace Network.IO
             _bufferSize = bufferSize;
             _lines = new List<string>();
             _networkIdTable = new NetworkIdTable();
+            _reverseNetworkIdTable = new NetworkIdTable();
             // Yushan
             _networkRealId = new List<string>();
             //
@@ -173,6 +177,10 @@ namespace Network.IO
                     _networkRealId.Add(firstPart);
                     _networkId = 0;
                     _networkIdTable[_networkId] = _lines.Count - 2;
+                    if (Int32.TryParse(firstPart, out int realNetId))
+                    {
+                        _reverseNetworkIdTable[realNetId] = _networkId;
+                    }
                     Console.WriteLine("network ID: {0:d}; network Real ID: {1:s}", _networkId, _networkRealId[_networkId]);
                 }
                 else if (!String.Equals(_networkRealId[_networkRealId.Count - 1], firstPart))
@@ -180,6 +188,10 @@ namespace Network.IO
                     _networkRealId.Add(firstPart);
                     _networkId++;
                     _networkIdTable[_networkId] = _lines.Count - 2;
+                    if (Int32.TryParse(firstPart, out int realNetId))
+                    {
+                        _reverseNetworkIdTable[realNetId] = _networkId;
+                    }
                     Console.WriteLine("network ID: {0:d}; network Real ID: {1:s}", _networkId, _networkRealId[_networkId]);
                 }
             }
@@ -191,6 +203,7 @@ namespace Network.IO
             if (!_networkIdTable.ContainsNetworkId(networkId))
             {
                 _networkIdTable[networkId] = _lines.Count - 2;
+                _reverseNetworkIdTable[_lines.Count - 2] = _networkId;
             }
         }
 
@@ -267,6 +280,14 @@ namespace Network.IO
         // Returns successful year
         public int JumpToNetworkId(int networkId, bool forwards)
         {
+            /*try
+            {
+                networkId = _reverseNetworkIdTable[networkId];  //for when we feed actual network ids instead of index
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error in JumpToNetworkId " + e);
+            }*/
             if (_networkIdTable.ContainsNetworkId(networkId))
             {
                 _curLine = _networkIdTable[networkId];

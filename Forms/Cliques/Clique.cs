@@ -31,6 +31,16 @@ namespace Network.Cliques
 
         }
 
+        public Clique(Clique c)// : this(q.Members, q.MemberRangeSize)
+        {
+            if (c == null)
+                return;
+            _members = new List<int>(c.Members);
+            _memberSet = new byte[c.MemberRangeSize];
+            Array.Copy(c.MemberSet, _memberSet, c.MemberRangeSize);
+            _cohesion = c.Cohesion;
+        }
+
         public int Size
         {
             get { return _members.Count; }

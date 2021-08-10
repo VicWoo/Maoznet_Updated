@@ -276,7 +276,7 @@ namespace NetworkGUI
             this.resetToolStripMenuItem,
             this.exitToolStripMenuItem});
             this.filesToolStripMenuItem.Name = "filesToolStripMenuItem";
-            this.filesToolStripMenuItem.Size = new System.Drawing.Size(46, 24);
+            this.filesToolStripMenuItem.Size = new System.Drawing.Size(46, 26);
             this.filesToolStripMenuItem.Text = "File";
             // 
             // loadFromToolStripMenuItem
@@ -531,7 +531,7 @@ namespace NetworkGUI
             this.elementwiseMultiplicationToolStripMenuItem1,
             this.matrixMultSaveToolStripMenuItem});
             this.DataManagementToolStripMenuItem.Name = "DataManagementToolStripMenuItem";
-            this.DataManagementToolStripMenuItem.Size = new System.Drawing.Size(147, 24);
+            this.DataManagementToolStripMenuItem.Size = new System.Drawing.Size(147, 26);
             this.DataManagementToolStripMenuItem.Text = "Data Management";
             // 
             // dichotomizeToolStripMenuItem
@@ -565,7 +565,7 @@ namespace NetworkGUI
             this.unitBasedConversionToolStripMenuItem3,
             this.eventBasedConversionToolStripMenuItem3});
             this.sociomatrixToolStripMenuItem2.Name = "sociomatrixToolStripMenuItem2";
-            this.sociomatrixToolStripMenuItem2.Size = new System.Drawing.Size(224, 26);
+            this.sociomatrixToolStripMenuItem2.Size = new System.Drawing.Size(171, 26);
             this.sociomatrixToolStripMenuItem2.Text = "Sociomatrix";
             this.sociomatrixToolStripMenuItem2.Click += new System.EventHandler(this.sociomatrixToolStripMenuItem2_Click);
             // 
@@ -589,7 +589,7 @@ namespace NetworkGUI
             this.unitBasedConversionToolStripMenuItem4,
             this.eventBasedConversionToolStripMenuItem4});
             this.correlationToolStripMenuItem1.Name = "correlationToolStripMenuItem1";
-            this.correlationToolStripMenuItem1.Size = new System.Drawing.Size(224, 26);
+            this.correlationToolStripMenuItem1.Size = new System.Drawing.Size(171, 26);
             this.correlationToolStripMenuItem1.Text = "Correlation";
             this.correlationToolStripMenuItem1.Click += new System.EventHandler(this.correlationToolStripMenuItem1_Click);
             // 
@@ -613,7 +613,7 @@ namespace NetworkGUI
             this.unitBasedConversionToolStripMenuItem5,
             this.eventBasedConversionToolStripMenuItem5});
             this.euclideanToolStripMenuItem.Name = "euclideanToolStripMenuItem";
-            this.euclideanToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.euclideanToolStripMenuItem.Size = new System.Drawing.Size(171, 26);
             this.euclideanToolStripMenuItem.Text = "Euclidean";
             this.euclideanToolStripMenuItem.Click += new System.EventHandler(this.euclideanToolStripMenuItem_Click);
             // 
@@ -686,14 +686,14 @@ namespace NetworkGUI
             this.firstToolStripMenuItem,
             this.lastToolStripMenuItem});
             this.yearToolStripMenuItem.Name = "yearToolStripMenuItem";
-            this.yearToolStripMenuItem.Size = new System.Drawing.Size(60, 24);
+            this.yearToolStripMenuItem.Size = new System.Drawing.Size(60, 26);
             this.yearToolStripMenuItem.Text = "Scroll";
             // 
             // nextToolStripMenuItem
             // 
             this.nextToolStripMenuItem.Name = "nextToolStripMenuItem";
             this.nextToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.nextToolStripMenuItem.Size = new System.Drawing.Size(197, 26);
+            this.nextToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.nextToolStripMenuItem.Text = "Next";
             this.nextToolStripMenuItem.Click += new System.EventHandler(this.nextYearToolStripMenuItem_Click);
             // 
@@ -701,7 +701,7 @@ namespace NetworkGUI
             // 
             this.previousToolStripMenuItem.Name = "previousToolStripMenuItem";
             this.previousToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
-            this.previousToolStripMenuItem.Size = new System.Drawing.Size(197, 26);
+            this.previousToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.previousToolStripMenuItem.Text = "Previous";
             this.previousToolStripMenuItem.Click += new System.EventHandler(this.previousYearToolStripMenuItem_Click);
             // 
@@ -709,7 +709,7 @@ namespace NetworkGUI
             // 
             this.jumpToolStripMenuItem.Name = "jumpToolStripMenuItem";
             this.jumpToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.J)));
-            this.jumpToolStripMenuItem.Size = new System.Drawing.Size(197, 26);
+            this.jumpToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.jumpToolStripMenuItem.Text = "Jump";
             this.jumpToolStripMenuItem.Click += new System.EventHandler(this.jumpToYearToolStripMenuItem_Click);
             // 
@@ -717,7 +717,7 @@ namespace NetworkGUI
             // 
             this.firstToolStripMenuItem.Name = "firstToolStripMenuItem";
             this.firstToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.firstToolStripMenuItem.Size = new System.Drawing.Size(197, 26);
+            this.firstToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.firstToolStripMenuItem.Text = "First ";
             this.firstToolStripMenuItem.Click += new System.EventHandler(this.firstToolStripMenuItem_Click);
             // 
@@ -725,7 +725,7 @@ namespace NetworkGUI
             // 
             this.lastToolStripMenuItem.Name = "lastToolStripMenuItem";
             this.lastToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.I)));
-            this.lastToolStripMenuItem.Size = new System.Drawing.Size(197, 26);
+            this.lastToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.lastToolStripMenuItem.Text = "Last ";
             this.lastToolStripMenuItem.Click += new System.EventHandler(this.lastToolStripMenuItem_Click);
             // 
@@ -737,7 +737,7 @@ namespace NetworkGUI
             this.byColumnToolStripMenuItem,
             this.byDiagonalToolStripMenuItem});
             this.standardizeToolStripMenuItem.Name = "standardizeToolStripMenuItem";
-            this.standardizeToolStripMenuItem.Size = new System.Drawing.Size(102, 24);
+            this.standardizeToolStripMenuItem.Size = new System.Drawing.Size(102, 26);
             this.standardizeToolStripMenuItem.Text = "Standardize";
             // 
             // noneToolStripMenuItem
@@ -806,7 +806,7 @@ namespace NetworkGUI
             // optionsToolStripMenuItem
             // 
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(75, 24);
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(75, 26);
             this.optionsToolStripMenuItem.Text = "Options";
             this.optionsToolStripMenuItem.Click += new System.EventHandler(this.optionsToolStripMenuItem_Click);
             // 
@@ -834,7 +834,7 @@ namespace NetworkGUI
             this.networkSpilloverToolStripMenuItem,
             this.ndStatsToolStripMenuItem});
             this.matrixToolStripMenuItem.Name = "matrixToolStripMenuItem";
-            this.matrixToolStripMenuItem.Size = new System.Drawing.Size(156, 24);
+            this.matrixToolStripMenuItem.Size = new System.Drawing.Size(156, 26);
             this.matrixToolStripMenuItem.Text = "Network Operations";
             // 
             // dataMatrixToolStripMenuItem
@@ -1084,7 +1084,7 @@ namespace NetworkGUI
             this.newOverlappingCommunitiesToolStripMenuItem,
             this.removeIsolatesToolStripMenuItem});
             this.blockmodelsToolStripMenuItem.Name = "blockmodelsToolStripMenuItem";
-            this.blockmodelsToolStripMenuItem.Size = new System.Drawing.Size(165, 24);
+            this.blockmodelsToolStripMenuItem.Size = new System.Drawing.Size(165, 26);
             this.blockmodelsToolStripMenuItem.Text = "Subgroup Operations";
             this.blockmodelsToolStripMenuItem.Click += new System.EventHandler(this.blockmodelsToolStripMenuItem_Click);
             // 
@@ -1695,7 +1695,7 @@ namespace NetworkGUI
             this.dyadicMultiplexImbalanceToolStripMenuItem,
             this.pathBasedImbalanceToolStripMenuItem});
             this.signedNetworkOperationsToolStripMenuItem.Name = "signedNetworkOperationsToolStripMenuItem";
-            this.signedNetworkOperationsToolStripMenuItem.Size = new System.Drawing.Size(206, 24);
+            this.signedNetworkOperationsToolStripMenuItem.Size = new System.Drawing.Size(206, 26);
             this.signedNetworkOperationsToolStripMenuItem.Text = "Signed Network Operations";
             // 
             // dataMatrixToolStripMenuItem1
@@ -1841,7 +1841,7 @@ namespace NetworkGUI
             this.coalitionStructureToolStripMenuItem,
             this.nPIToolStripMenuItem});
             this.coalitionAnalysisToolStripMenuItem.Name = "coalitionAnalysisToolStripMenuItem";
-            this.coalitionAnalysisToolStripMenuItem.Size = new System.Drawing.Size(140, 24);
+            this.coalitionAnalysisToolStripMenuItem.Size = new System.Drawing.Size(140, 26);
             this.coalitionAnalysisToolStripMenuItem.Text = "Coalition Analysis";
             // 
             // protoCoalitionsToolStripMenuItem
@@ -1891,7 +1891,7 @@ namespace NetworkGUI
             this.nAPTSimulationToolStripMenuItem,
             this.agentBasedModelToolStripMenuItem});
             this.networkFormationSimulationToolStripMenuItem.Name = "networkFormationSimulationToolStripMenuItem";
-            this.networkFormationSimulationToolStripMenuItem.Size = new System.Drawing.Size(226, 24);
+            this.networkFormationSimulationToolStripMenuItem.Size = new System.Drawing.Size(226, 26);
             this.networkFormationSimulationToolStripMenuItem.Text = "Network Formation Simulation";
             this.networkFormationSimulationToolStripMenuItem.Click += new System.EventHandler(this.networkFormationSimulationToolStripMenuItem_Click);
             // 
@@ -1940,7 +1940,7 @@ namespace NetworkGUI
             // multipleCliqueAnalysisToolStripMenuItem
             // 
             this.multipleCliqueAnalysisToolStripMenuItem.Name = "multipleCliqueAnalysisToolStripMenuItem";
-            this.multipleCliqueAnalysisToolStripMenuItem.Size = new System.Drawing.Size(181, 24);
+            this.multipleCliqueAnalysisToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
             this.multipleCliqueAnalysisToolStripMenuItem.Text = "Multiple Clique Analysis";
             this.multipleCliqueAnalysisToolStripMenuItem.Click += new System.EventHandler(this.multipleCliqueAnalysisToolStripMenuItem_Click);
             // 
@@ -1950,7 +1950,7 @@ namespace NetworkGUI
             this.contentsToolStripMenuItem,
             this.aboutToolStripMenuItem});
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(55, 24);
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(55, 26);
             this.helpToolStripMenuItem.Text = "Help";
             this.helpToolStripMenuItem.Click += new System.EventHandler(this.helpToolStripMenuItem_Click);
             // 

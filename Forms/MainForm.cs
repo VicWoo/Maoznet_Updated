@@ -43,6 +43,7 @@ namespace NetworkGUI
         bool _rmvdIsolates = false;
         bool _changedOptionsFormCMinMembers = false;
         int _ogOptionsFormCMinMembers = 1;
+        bool nullMat = false;
         //
 
         public OptionsForm _optionsForm = new OptionsForm();
@@ -1030,7 +1031,6 @@ namespace NetworkGUI
         private void matrixFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             openFileDialog.Multiselect = false;
-
             try
             {
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
@@ -1307,7 +1307,6 @@ namespace NetworkGUI
         private void dyadicFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             openFileDialog.Multiselect = false;
-
             try
             {
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
@@ -3261,88 +3260,83 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
             net.Reset();
 
             if (currentYear == -1)
+            {
+                net.Restore();
                 return;
+            }
 
             ++currentYear;
             //Console.WriteLine("Display Matrx: {0:s}", displayMatrix);
             try
             {
-                if (loadFrom == "Matrix")
+                switch (loadFrom)
                 {
-                    if (openFileDialog.Multiselect)
-                    {
-                        currentYear = net.LoadFromMultipleFiles(fileNames, currentYear);
-                    }
-                    else
-                    {
-                        // Yushan
-                        currentYear = net.LoadFromMatrixFile(openFileDialog.FileName, currentYear);
-                    }
-                }
-                else if (loadFrom == "Dyadic")
-                {
-                    if (openFileDialog.Multiselect)
-                    {
-                        currentYear = net.LoadFromMultivariableDyadicFile(openFileDialog.FileName, currentYear);
-                    }
-                    else
-                    {
-                        currentYear = net.LoadFromDyadicFile(openFileDialog.FileName, currentYear);
-                    }
-                }
-                else if (loadFrom == "Affil")
-                {
-                    currentYear = net.LoadFromAffiliationFile(openFileDialog.FileName, currentYear);
-                }
-                else if (loadFrom == "Monadic")
-                {
-                    currentYear = net.LoadFromMonadicFile(openFileDialog.FileName, currentYear);
-                }
-                else if (loadFrom == "Random")
-                {
-                    net.LoadRandom(_randomForm.N, "Data", _randomSymmetric, _randomForm.ProbRange, _randomForm.MinProb, _randomForm.MaxProb, _randomForm.RandomN, _randomForm.RandomMinN, _randomForm.RandomMaxN, _randomForm.RandomIntN);
-                    --currentYear;
-                }
-                else if (loadFrom == "ValuedRandom")
-                {
-                    net.LoadValuedRandom(_vrandomForm.N, "Data", _randomSymmetric, _vrandomForm.vmin, _vrandomForm.vmax, _vrandomForm.datatype, _vrandomForm.zerodiagonalized, _vrandomForm.ProbRange, _vrandomForm.MinProb, _vrandomForm.MaxProb, _vrandomForm.RandomN, _vrandomForm.RandomMinN, _vrandomForm.RandomMaxN, _vrandomForm.RandomIntN);
-                    --currentYear;
-                }
-                else if (loadFrom == "ABMModel")
-                {
-                    net.mTable["Data"] = net.mList[currentYear - _ABMForm.netID];
-                }
-
-                // Yushan
-                else if (loadFrom == "GlobalRandom")
-                {
-                    if (currentYear == netID.Count)
-                    {
-                        currentYear = 0;
-                    }
-                    net.LoadGlobalRandom(dataGrid, mRandList, displayMatrix, netID[currentYear]);
-                }
-                else if (loadFrom == "ConfigModel")
-                {
-                    if (currentYear == netID.Count)
-                    {
-                        currentYear = 0;
-                    }
-                    net.LoadConfigModel(dataGrid, mRandList, displayMatrix, netID[currentYear], nodeLabels[netID[currentYear]]);
-                }
-                else if (loadFrom == "NetworkDependenceStatistics")
-                {
-                    if (currentYear == orderedNetIds.Length)
-                    {
-                        currentYear = 0;
-                    }
-                    net.LoadNetworkDependenceStatistics(dataGrid, displayMatrix, ndsOutput, orderedNetIds, currentYear);
+                    case "Matrix":
+                        if (openFileDialog.Multiselect)
+                        {
+                            currentYear = net.LoadFromMultipleFiles(fileNames, currentYear);
+                        }
+                        else
+                        {
+                            // Yushan
+                            currentYear = net.LoadFromMatrixFile(openFileDialog.FileName, currentYear);
+                        }
+                        break;
+                    case "Dyadic":
+                        if (openFileDialog.Multiselect)
+                        {
+                            currentYear = net.LoadFromMultivariableDyadicFile(openFileDialog.FileName, currentYear);
+                        }
+                        else
+                        {
+                            currentYear = net.LoadFromDyadicFile(openFileDialog.FileName, currentYear);
+                        }
+                        break;
+                    case "Affil":
+                        currentYear = net.LoadFromAffiliationFile(openFileDialog.FileName, currentYear);
+                        break;
+                    case "Monadic":
+                        currentYear = net.LoadFromMonadicFile(openFileDialog.FileName, currentYear);
+                        break;
+                    case "Random":
+                        net.LoadRandom(_randomForm.N, "Data", _randomSymmetric, _randomForm.ProbRange, _randomForm.MinProb, _randomForm.MaxProb, _randomForm.RandomN, _randomForm.RandomMinN, _randomForm.RandomMaxN, _randomForm.RandomIntN);
+                        --currentYear;
+                        break;
+                    case "ValuedRandom":
+                        net.LoadValuedRandom(_vrandomForm.N, "Data", _randomSymmetric, _vrandomForm.vmin, _vrandomForm.vmax, _vrandomForm.datatype, _vrandomForm.zerodiagonalized, _vrandomForm.ProbRange, _vrandomForm.MinProb, _vrandomForm.MaxProb, _vrandomForm.RandomN, _vrandomForm.RandomMinN, _vrandomForm.RandomMaxN, _vrandomForm.RandomIntN);
+                        --currentYear;
+                        break;
+                    case "ABMModel":
+                        net.mTable["Data"] = net.mList[currentYear - _ABMForm.netID];
+                        break;
+                    case "GlobalRandom":
+                        if (currentYear == netID.Count)
+                        {
+                            currentYear = 0;
+                        }
+                        net.LoadGlobalRandom(dataGrid, mRandList, displayMatrix, netID[currentYear]);
+                        break;
+                    case "ConfigModel":
+                        if (currentYear == netID.Count)
+                        {
+                            currentYear = 0;
+                        }
+                        net.LoadConfigModel(dataGrid, mRandList, displayMatrix, netID[currentYear], nodeLabels[netID[currentYear]]);
+                        break;
+                    case "NetworkDependenceStatistics":
+                        if (currentYear == orderedNetIds.Length)
+                        {
+                            currentYear = 0;
+                        }
+                        net.LoadNetworkDependenceStatistics(dataGrid, displayMatrix, ndsOutput, orderedNetIds, currentYear);
+                        break;
                 }
                 //
             }
             catch (Exception E)
             {
                 --currentYear;
+                net.Restore();
                 MessageBox.Show("Unable to advance to next year: " + E.Message, "Error!");
                 return;
             }
@@ -3533,6 +3527,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
             try
             {
                 jumpYear = int.Parse(jump.year);
+                //jumpYear -= 1;
             }
             catch (Exception)
             {
@@ -3545,56 +3540,50 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                 if (jumpYear != currentYear) // No need to be wasteful and reload unnecessarily
                 {
 
-                    if (loadFrom == "Matrix")
+                    switch (loadFrom)
                     {
-                        if (openFileDialog.Multiselect)
-                        {
-                            newYear = net.LoadFromMultipleFiles(fileNames, jumpYear);
-                        }
-                        else
-                        {
-                            newYear = net.LoadFromMatrixFile(openFileDialog.FileName, jumpYear);
-                        }
-                    }
-                    else if (loadFrom == "Dyadic")
-                    {
-                        if (openFileDialog.Multiselect)
-                        {
-                            newYear = net.LoadFromMultivariableDyadicFile(openFileDialog.FileName, jumpYear);
-                        }
-                        else
-                        {
-                            newYear = net.LoadFromDyadicFile(openFileDialog.FileName, jumpYear);
-                        }
-                    }
-                    else if (loadFrom == "Affil")
-                    {
-                        newYear = net.LoadFromAffiliationFile(openFileDialog.FileName, jumpYear);
-                    }
-                    else if (loadFrom == "Monadic")
-                    {
-                        newYear = net.LoadFromMonadicFile(openFileDialog.FileName, jumpYear);
-                    }
-                    else if (loadFrom == "ABMModel")
-                    {
-                        newYear = jumpYear;
-                        net.mTable["Data"] = net.mList[jumpYear - _ABMForm.netID];
-                    }
-                    // Yushan
-                    else if (loadFrom == "GlobalRandom")
-                    {
-                        net.LoadGlobalRandom(dataGrid, mRandList, displayMatrix, netID[jumpYear]);
-                        newYear = jumpYear;
-                    }
-                    else if (loadFrom == "ConfigModel")
-                    {
-                        net.LoadConfigModel(dataGrid, mRandList, displayMatrix, netID[jumpYear], nodeLabels[netID[jumpYear]]);
-                        newYear = jumpYear;
-                    }
-                    else if (loadFrom == "NetworkDependenceStatistics")
-                    {
-                        net.LoadNetworkDependenceStatistics(dataGrid, displayMatrix, ndsOutput, orderedNetIds, jumpYear);
-                        newYear = jumpYear;
+                        case "Matrix":
+                            if (openFileDialog.Multiselect)
+                            {
+                                newYear = net.LoadFromMultipleFiles(fileNames, jumpYear);
+                            }
+                            else
+                            {
+                                newYear = net.LoadFromMatrixFile(openFileDialog.FileName, jumpYear);
+                            }
+                            break;
+                        case "Dyadic":
+                            if (openFileDialog.Multiselect)
+                            {
+                                newYear = net.LoadFromMultivariableDyadicFile(openFileDialog.FileName, jumpYear);
+                            }
+                            else
+                            {
+                                newYear = net.LoadFromDyadicFile(openFileDialog.FileName, jumpYear);
+                            }
+                            break;
+                        case "Affil":
+                            newYear = net.LoadFromAffiliationFile(openFileDialog.FileName, jumpYear);
+                            break;
+                        case "Monadic":
+                            newYear = net.LoadFromMonadicFile(openFileDialog.FileName, jumpYear);
+                            break;
+                        case "ABMModel":
+                            newYear = jumpYear;
+                            net.mTable["Data"] = net.mList[jumpYear - _ABMForm.netID];
+                            break;
+                        case "GlobalRandom":
+                            net.LoadGlobalRandom(dataGrid, mRandList, displayMatrix, netID[jumpYear]);
+                            newYear = jumpYear;
+                            break;
+                        case "ConfigModel":
+                            net.LoadConfigModel(dataGrid, mRandList, displayMatrix, netID[jumpYear], nodeLabels[netID[jumpYear]]);
+                            newYear = jumpYear;
+                            break;
+                        case "NetworkDependenceStatistics":
+                            net.LoadNetworkDependenceStatistics(dataGrid, displayMatrix, ndsOutput, orderedNetIds, jumpYear);
+                            newYear = jumpYear;
+                            break;
                     }
                     //
                 }
@@ -4595,20 +4584,31 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                 {
                     for (int i = 0; i < files.Length; i++)
                     {
-                        networkRealIdList = new List<string>();
-                        net.SmartLoad(files[i].fileName, out Null, out networkRealIdList);
-                        // Yushan
-                        for (int k = 0; k < networkRealIdList.Count; k++)
+                        bool flag = true;
+                        try
                         {
-                            //Console.WriteLine("network[{0:d}] real ID: {1:s}", k, networkRealIdList[k]);
+                            networkRealIdList = new List<string>();
+                            net.SmartLoad(files[i].fileName, out Null, out networkRealIdList);
+                            flag = false;
+                            // Yushan
+                            for (int k = 0; k < networkRealIdList.Count; k++)
+                            {
+                                //Console.WriteLine("network[{0:d}] real ID: {1:s}", k, networkRealIdList[k]);
+                            }
+                            net.cet = files[i].option;
+                            temp = clique.convertClique(net.FindCliques(files[i].cutOff, false, 0.0, 0xFFFF, 0, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag));
+                            net.merge(cliques, temp);
+                            if (useweight)
+                                net.LoadweightVector(weightfile);
+                            cliqueList.Add(temp);
+                            net.data.Add(net.mTable["Data"]);
+                        } catch(Exception e)
+                        {
+                            if (flag)
+                                net.Restore();
+                            MessageBox.Show("There was an error processing DealWithMultipleCliques! " + e.ToString());
+                            continue;
                         }
-                        net.cet = files[i].option;
-                        temp = clique.convertClique(net.FindCliques(files[i].cutOff, false, 0.0, 0xFFFF, 0, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag));
-                        net.merge(cliques, temp);
-                        if (useweight)
-                            net.LoadweightVector(weightfile);
-                        cliqueList.Add(temp);
-                        net.data.Add(net.mTable["Data"]);
                     }
                 }
                 else
@@ -5548,6 +5548,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         {
             if (_rmvIsolatesForm.RemoveIsolates)
             {
+
                 if (!_rmvdIsolates)
                     _ogOptionsFormCMinMembers = _optionsForm.CMinMembers;
                 _optionsForm.CMinMembers = _rmvIsolatesForm.MinGroupSize;
