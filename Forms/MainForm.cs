@@ -3482,44 +3482,48 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
 
             int jumpYear = -1;
 
-            //if (loadFrom == "GlobalRandom" || loadFrom == "ConfigModel")
-            //    jump.year = netID[currentYear];
-            //else
-            //{
-            //    jump.year = currentYear.ToString();
-            //    jumpYear = currentYear;
-            //}
+            /*if (loadFrom == "GlobalRandom" || loadFrom == "ConfigModel")
+                jump.year = netID[currentYear];
+            else
+            {
+                jump.year = currentYear.ToString();
+                jumpYear = currentYear;
+            }*/
             jump.year = networkRealIdList[currentYear];
             jumpYear = currentYear;
             jump.ShowDialog();
 
-            //if (loadFrom == "GlobalRandom" || loadFrom == "ConfigModel")
-            //{
-            //    try
-            //    {
-            //        jumpYear = netID.FindIndex(x => x == jump.year);
-            //    }
-            //    catch (Exception)
-            //    {
-            //        MessageBox.Show("The network ID entered is invalid!", "Error!");
-            //        return;
-            //    }
-            //}
-            //else
-            //{
-            //    try
-            //    {
-            //        jumpYear = int.Parse(jump.year);
-            //    }
-            //    catch (Exception)
-            //    {
-            //        MessageBox.Show("The year entered is invalid!", "Error!");
-            //        return;
-            //    }
-            //}
-            ////
-            if(int.TryParse(jump.year, out jumpYear))
+            /*if (loadFrom == "GlobalRandom" || loadFrom == "ConfigModel")
             {
+                try
+                {
+                    jumpYear = netID.FindIndex(x => x == jump.year);
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("The network ID entered is invalid!", "Error!");
+                    return;
+                }
+            }
+            else
+            {
+                try
+                {
+                    jumpYear = int.Parse(jump.year);
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("The year entered is invalid!", "Error!");
+                    return;
+                }
+            }*/
+            
+            
+            if (int.TryParse(jump.year, out jumpYear))
+            {
+                //Checking networkRealIdList to see whether year input by user is actually in the
+                //networkrealidlist and if so get index since input to loading files is index of
+                //year and not actual real year value
                 jumpYear = networkRealIdList.FindIndex(x => x.Contains(jump.year));
                 if(jumpYear == -1)
                 {
@@ -3536,7 +3540,6 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
             {
                 if (jumpYear != currentYear) // No need to be wasteful and reload unnecessarily
                 {
-
                     switch (loadFrom)
                     {
                         case "Matrix":
