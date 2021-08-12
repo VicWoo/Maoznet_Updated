@@ -263,7 +263,7 @@ namespace NetworkGUI
             this.helpToolStripMenuItem});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
-            this.menuStrip.Size = new System.Drawing.Size(1582, 28);
+            this.menuStrip.Size = new System.Drawing.Size(1582, 30);
             this.menuStrip.TabIndex = 0;
             this.menuStrip.Text = "menuStrip1";
             // 
@@ -1974,12 +1974,12 @@ namespace NetworkGUI
             this.dataGrid.AllowUserToDeleteRows = false;
             this.dataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGrid.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGrid.Location = new System.Drawing.Point(0, 28);
+            this.dataGrid.Location = new System.Drawing.Point(0, 30);
             this.dataGrid.Margin = new System.Windows.Forms.Padding(4);
             this.dataGrid.Name = "dataGrid";
             this.dataGrid.ReadOnly = true;
             this.dataGrid.RowHeadersWidth = 80;
-            this.dataGrid.Size = new System.Drawing.Size(1582, 495);
+            this.dataGrid.Size = new System.Drawing.Size(1582, 493);
             this.dataGrid.TabIndex = 1;
             this.dataGrid.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGrid_CellContentClick);
             // 
