@@ -3753,6 +3753,11 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                 return;
             }
 
+            if (currentYear == -1)
+            {
+                return;
+            }
+
             switch (loadFrom)
             {
                 case "Matrix":

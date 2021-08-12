@@ -76,8 +76,14 @@ namespace Network.Cliques
             {
                 _cliques.Add(new Clique(c));
             }
-            _cliqueOverlap = new Matrix(cc.CliqueOverlap);
-            _cliqueByCliqueOverlap = new Matrix(cc.CliqueByCliqueOverlap);
+            if (cc.CliqueOverlap == null)
+                _cliqueOverlap = null;
+            else
+                _cliqueOverlap = new Matrix(cc.CliqueOverlap);
+            if (cc.CliqueByCliqueOverlap == null)
+                _cliqueByCliqueOverlap = null;
+            else
+                _cliqueByCliqueOverlap = new Matrix(cc.CliqueByCliqueOverlap);
             _minCliqueSize = cc.MinCliqueSize;
         }
 
