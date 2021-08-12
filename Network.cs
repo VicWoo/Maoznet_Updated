@@ -123,6 +123,7 @@ namespace Network
         protected int blockSize;
 
         protected Matrix SESEmatrix = null;
+        protected Matrix tempSESEmatrixSave = null;
 
         protected List<Clique> overlapComm = null;
 
@@ -156,10 +157,12 @@ namespace Network
         protected string prevTransitivityType = "";
         protected List<double> NPOLA_Sums;
         protected CliqueCollection _cliques = null;
+        protected CliqueCollection _tempCliqueSave = null;
         protected BlockCollection _blocks = null;
         protected Matrix _blockDensity = null;
         protected CommCollection _communities = null;
         protected CliqueCollection comcliques = null;
+        protected CliqueCollection tempComcliquesSave = null;
         protected BlockCollection comblocks = null;
         protected CommCollection comComm = null;
 
@@ -3161,15 +3164,19 @@ namespace Network
         }
 
 
-        public void RemoveIsolates(double cutoff, bool calcSE, double maxik, int year, int cmin, bool loadCOC, int cliqueOrder, bool kCliqueDiag)
+        public bool RemoveIsolates(double cutoff, bool calcSE, double maxik, int year, int cmin, bool loadCOC, int cliqueOrder, bool kCliqueDiag)
         {
             FindCliques(cutoff, calcSE, maxik, year, cmin, loadCOC, cliqueOrder, kCliqueDiag);
+            if (_cliques.Count == 0)
+            {
+                ogMatrixData = new Matrix(mTable["Data"]);
+                mTable["Data"] = new Matrix(1, 1, ogMatrixData.NetworkId, ogMatrixData.NetworkIdStr);
+                return true;        //return true because it resultant matrix will be null
+            }
             List<int> isolates = new List<int>();
             // Now check the rows
             for (int row = 0; row < mTable["Data"].Rows; row++)
             {
-                // Generate an array to hold this row
-                string[] newRow = new string[_cliques.Count];
                 bool all0 = true;
                 for (int col = 0; col < _cliques.Count; col++)
                 {
@@ -3194,6 +3201,7 @@ namespace Network
             //}
             mTable["Data"] = new Matrix(mTable["Data"].SubmatrixWithRemovedRows(isolates));
             mTable["Data"].NetworkIdStr = ogMatrixData.NetworkIdStr;
+            return false;       //return false because resultant matrix is not null
         }
 
         public void RestoreIsolates()
@@ -8847,9 +8855,12 @@ namespace Network
         public int LoadFromDyadicFile(string fileName, int year)
         {
             // Reset various matrices which depend on the data matrix
-            Reset();
-
-            mTable["Data"] = MatrixReader.ReadMatrixFromFile(fileName, year);
+            Matrix tempMat = MatrixReader.ReadMatrixFromFile(fileName, year);
+            if(tempMat != null)
+            {
+                Reset();
+                mTable["Data"] = new Matrix(tempMat);
+            }
             return mTable["Data"].NetworkId;
         }
 
@@ -8861,26 +8872,204 @@ namespace Network
 
         public int LoadFromMatrixFile(string fileName, int year)
         {
-            // Reset various matrices which depend on the data matrix
-            Reset();
-
-            // Simply load from the file into the data matrix
-            mTable["Data"] = MatrixReader.ReadMatrixFromFile(fileName, year);
+            Matrix tempMat = MatrixReader.ReadMatrixFromFile(fileName, year);
+            if (tempMat != null)
+            {
+                Reset();
+                mTable["Data"] = new Matrix(tempMat);
+            }
             return mTable["Data"].NetworkId;
+        }
+
+        public void Restore()
+        {
+            mTable["Dependency"] = new Matrix(mTable["TDependency"]);
+            mTable["Temp"] = new Matrix(mTable["TTemp"]);
+            mTable["RoleEquiv"] = new Matrix(mTable["TRoleEquiv"]);
+            mTable["SEC"] = new Matrix(mTable["TSEC"]);
+            mTable["SEE"] = new Matrix(mTable["TSEE"]);
+            mTable["SESE"] = new Matrix(mTable["TSESE"]);
+            mTable["Reachability"] = new Matrix(mTable["TReachability"]);
+            mTable["CognitiveReachability"] = new Matrix(mTable["TCognitiveReachability"]);
+            mTable["Centrality"] = new Matrix(mTable["TCentrality"]);
+            mTable["Components"] = new Matrix(mTable["TComponents"]);
+            mTable["OverlapDiag"] = new Matrix(mTable["TOverlapDiag"]);
+            mTable["Overlap"] = new Matrix(mTable["TOverlap"]);
+            mTable["ClosenessDistance"] = new Matrix(mTable["TClosenessDistance"]);
+            mTable["Affil"] = new Matrix(mTable["TAffil"]);
+            mTable["GlobalRandom"] = new Matrix(mTable["TGlobalRandom"]);
+            mTable["ConfigModel"] = new Matrix(mTable["TConfigModel"]);
+            mTable["Data"] = new Matrix(mTable["TData"]);
+            mTable["TempSave"] = new Matrix(mTable["TTempSave"]);
+            _cliques = new CliqueCollection(_tempCliqueSave);
+            comcliques = new CliqueCollection(tempComcliquesSave);
+            SESEmatrix = new Matrix(tempSESEmatrixSave);
+
+
+            mTable["TDependency"] = mTable["TTemp"] = mTable["TRoleEquiv"] = mTable["TSEC"] =
+            mTable["TSEE"] = mTable["TSESE"] = mTable["TReachability"] = mTable["TCognitiveReachability"] =
+            mTable["TCentrality"] = mTable["TComponents"] = mTable["TOverlapDiag"] = mTable["TOverlap"] =
+            mTable["TClosenessDistance"] = mTable["TAffil"] = mTable["TGlobalRandom"] = mTable["TConfigModel"] = null;
+            mTable["TData"] = null;
+            mTable["TTempSave"] = null;
+            //communities = null;
+            //mTable.Clear();
+            _tempCliqueSave = null;
+            tempComcliquesSave = null;
+            tempSESEmatrixSave = null;
         }
 
         public void Reset()
         {
+            if(mTable.ContainsKey("Dependency"))
+            {
+                if (mTable["Dependency"] != null)
+                {
+                    mTable["TDependency"] = new Matrix(mTable["Dependency"]);
+                }
+            }
+            if (mTable.ContainsKey("Temp"))
+            {
+                if (mTable["Temp"] != null)
+                {
+                    mTable["TTemp"] = new Matrix(mTable["Temp"]);
+                }
+            }
+            if(mTable.ContainsKey("RoleEquiv")) 
+            {
+                if(mTable["RoleEquiv"] != null) 
+                {
+                    mTable["TRoleEquiv"] = new Matrix(mTable["RoleEquiv"]);
+                }
+            }
+            if(mTable.ContainsKey("SEC")) 
+            {
+                if(mTable["SEC"] != null) 
+                {
+                    mTable["TSEC"] = new Matrix(mTable["SEC"]);
+                }
+            }
+            if(mTable.ContainsKey("SEE")) 
+            {
+                if(mTable["SEE"] != null) 
+                {
+                    mTable["TSEE"] = new Matrix(mTable["SEE"]);
+                }
+            }
+            if(mTable.ContainsKey("SESE")) 
+            {
+                if(mTable["SESE"] != null) 
+                {
+                    mTable["TSESE"] = new Matrix(mTable["SESE"]);
+                }
+            }
+            if(mTable.ContainsKey("Reachability")) 
+            {
+                if(mTable["Reachability"] != null) 
+                {
+                    mTable["TReachability"] = new Matrix(mTable["Reachability"]);
+                }
+            }
+            if(mTable.ContainsKey("CognitiveReachability")) 
+            {
+                if(mTable["CognitiveReachability"] != null) 
+                {
+                    mTable["TCognitiveReachability"] = new Matrix(mTable["CognitiveReachability"]);
+                }
+            }
+            if(mTable.ContainsKey("Centrality")) 
+            {
+                if(mTable["Centrality"] != null) 
+                {
+                    mTable["TCentrality"] = new Matrix(mTable["Centrality"]);
+                }
+            }
+            if(mTable.ContainsKey("Components")) 
+            {
+                if(mTable["Components"] != null) 
+                {
+                    mTable["TComponents"] = new Matrix(mTable["Components"]);
+                }
+            }
+            if(mTable.ContainsKey("OverlapDiag")) 
+            {
+                if(mTable["OverlapDiag"] != null) 
+                {
+                    mTable["TOverlapDiag"] = new Matrix(mTable["OverlapDiag"]);
+                }
+            }
+            if(mTable.ContainsKey("Overlap")) 
+            {
+                if(mTable["Overlap"] != null) 
+                {
+                    mTable["TOverlap"] = new Matrix(mTable["Overlap"]);
+                }
+            }
+            if(mTable.ContainsKey("ClosenessDistance")) 
+            {
+                if(mTable["ClosenessDistance"] != null) 
+                {
+                    mTable["TClosenessDistance"] = new Matrix(mTable["ClosenessDistance"]);
+                }
+            }
+            if(mTable.ContainsKey("Affil")) 
+            {
+                if(mTable["Affil"] != null) 
+                {
+                    mTable["TAffil"] = new Matrix(mTable["Affil"]);
+                }
+            }
+            if(mTable.ContainsKey("GlobalRandom")) 
+            {
+                if(mTable["GlobalRandom"] != null) 
+                {
+                    mTable["TGlobalRandom"] = new Matrix(mTable["GlobalRandom"]);
+                }
+            }
+            if(mTable.ContainsKey("ConfigModel")) 
+            {
+                if(mTable["ConfigModel"] != null) 
+                {
+                    mTable["TConfigModel"] = new Matrix(mTable["ConfigModel"]);
+                }
+            }
+            if(mTable.ContainsKey("Data")) 
+            {
+                if(mTable["Data"] != null) 
+                {
+                    mTable["TData"] = new Matrix(mTable["Data"]);
+                }
+            }
+            if(mTable.ContainsKey("TempSave")) 
+            {
+                if(mTable["TempSave"] != null) 
+                {
+                    mTable["TTempSave"] = new Matrix(mTable["TempSave"]);
+                }
+            }
+            if(_cliques != null)
+            {
+                _tempCliqueSave = new CliqueCollection(_cliques);
+            }
+            if(comcliques != null)
+            {
+                tempComcliquesSave = new CliqueCollection(comcliques);
+            }
+            if(SESEmatrix != null)
+            {
+                tempSESEmatrixSave = new Matrix(SESEmatrix);
+            }
+                                                                                    
             mTable["Dependency"] = mTable["Temp"] = mTable["RoleEquiv"] = mTable["SEC"] =
             mTable["SEE"] = mTable["SESE"] = mTable["Reachability"] = mTable["CognitiveReachability"] = 
             mTable["Centrality"] = mTable["Components"] = mTable["OverlapDiag"] = mTable["Overlap"] = 
             mTable["ClosenessDistance"] = mTable["Affil"] = mTable["GlobalRandom"] = mTable["ConfigModel"] = null;
             mTable["Data"] = null;
+            mTable["TempSave"] = null;
             //communities = null;
             //mTable.Clear();
             _cliques = null;
             comcliques = null;
-
             SESEmatrix = null;
         }
 
@@ -8926,11 +9115,20 @@ namespace Network
 
         public int LoadFromMonadicFile(string fileName, int year)
         {
-            // Reset various matrices which depend on the data matrix
             Reset();
+            int ans = 0;
+            try
+            {
+                ans = LoadFromMonadicFileIntoMatrix(fileName, year, "Data");
+            } catch(Exception e)
+            {
+                Console.WriteLine("Error in LoadFromMonadicFile! " + e.ToString());
+                Restore();
+                ans = 0;
+            }
 
             // Simply load from the file into the data matrix
-            return LoadFromMonadicFileIntoMatrix(fileName, year, "Data");
+            return ans;
         }
 
         public void SaveMatrixToMatrixFile(string fileName, int year, string m,
@@ -9658,7 +9856,7 @@ namespace Network
                         //string line = year.ToString() + "," + mTable[m].RowLabels[row].ToString() + ",";
                         // Yushan
                         string line = mTable[m].NetworkIdStr + "," + mTable[m].RowLabels[row].ToString() + ",";
-                        line += mTable[m].RowLabels[col].ToString() + "," + mTable[m][row, col].ToString();
+                        line += mTable[m].RowLabels[row].ToString() + "," + mTable[m][row, col].ToString();
                         sw.WriteLine(line);
                     }
 
@@ -10089,7 +10287,7 @@ namespace Network
                 var output_writer_data = new StreamWriter(outputfile, true);
 
                 double[,] matrix = PIF.supportScript(inputfile, order, Null, startYear + saveLoop, networkRealIdList);
-
+                
                 int totalRows = matrix.GetLength(0);
                 int totalCols = matrix.GetLength(1);
 
@@ -10464,29 +10662,40 @@ namespace Network
 
 
         // The multiple/multivar saving routines
-        public void SaveToMultipleMatrixFiles(string fromFile, string[] toFiles, int year, bool Overwrite)
+        public void SaveToMultipleMatrixFiles(string fromFile, string[] toFiles, int year, bool Overwrite, bool rmvIsolates, double cutoff, bool calcSE, double maxik, int cmin, bool loadCOC, int cliqueOrder, bool kCliqueDiag)
         {
+            mTable["TempSave"] = new Matrix(mTable["Data"]);
             // Convert the multivar dyadic into several matrix files
             for (int skip = 0; skip < toFiles.Length; ++skip)
             {
                 // Load the file
-                mTable["Temp"] = MatrixReader.ReadMatrixFromFile(fromFile, year, skip);
-                year = mTable["Temp"].NetworkId;
-
+                mTable["Data"] = MatrixReader.ReadMatrixFromFile(fromFile, year, skip);
+                year = mTable["Data"].NetworkId;
+                if(rmvIsolates)
+                    RemoveIsolates(cutoff, calcSE, maxik, year, cmin, loadCOC, cliqueOrder, kCliqueDiag);
                 // And save it
-                SaveMatrixToMatrixFile(toFiles[skip], year, "Temp", true, true, Overwrite);
+                SaveMatrixToMatrixFile(toFiles[skip], year, "Data", true, true, Overwrite);
             }
+            mTable["Data"] = new Matrix(mTable["TempSave"]);
         }
 
-        public int SaveToMultivariableDyadicFile(string[] fromFiles, string fileName, int year, int prevYear, bool Overwrite)
+        public int SaveToMultivariableDyadicFile(string[] fromFiles, string fileName, int year, int prevYear, bool Overwrite, bool rmvIsolates, double cutoff, bool calcSE, double maxik, int cmin, bool loadCOC, int cliqueOrder, bool kCliqueDiag)
         {
+            mTable["TempSave"] = new Matrix(mTable["Data"]);
             // Load the first one
-            year = LoadFromMatrixFileIntoMatrix(fromFiles[0], year, "Temp");
+            string tableName = "Data";
+            year = LoadFromMatrixFileIntoMatrix(fromFiles[0], year, tableName);
 
             if (year == prevYear)
+            {
+                mTable["Data"] = new Matrix(mTable["TempSave"]);
                 return year;
+            }
 
-            Matrix M = mTable["Temp"];
+            if(rmvIsolates)
+                RemoveIsolates(cutoff, calcSE, maxik, year, cmin, loadCOC, cliqueOrder, kCliqueDiag);
+
+            Matrix M = mTable[tableName];
 
             // Now setup a matrix to store the dyadic values
             Matrix m = new Matrix(M.Rows * M.Cols, fromFiles.Length);
@@ -10496,9 +10705,13 @@ namespace Network
                 for (int i = 0; i < fromFiles.Length; ++i)
                 {
                     if (i > 0)
-                        LoadFromMatrixFileIntoMatrix(fromFiles[i], year, "Temp");
+                    {
+                        LoadFromMatrixFileIntoMatrix(fromFiles[i], year, tableName);
+                        if (rmvIsolates)
+                            RemoveIsolates(cutoff, calcSE, maxik, year, cmin, loadCOC, cliqueOrder, kCliqueDiag);
+                    }
 
-                    M = mTable["Temp"];
+                    M = mTable[tableName];
 
                     // Add to our matrix
                     for (int r = 0; r < M.Rows; ++r)
@@ -10540,7 +10753,7 @@ namespace Network
                 else
                     sw.WriteLine("var" + (i + 1));
 
-            M = mTable["Temp"];
+            M = mTable[tableName];
             for (int i = 0; i < m.Rows; ++i)
             {
                 sw.Write(year + ",");
@@ -10565,7 +10778,7 @@ namespace Network
 
             sw.Flush();
             sw.Close();
-
+            mTable["Data"] = new Matrix(mTable["TempSave"]);
             return year;
         }
 

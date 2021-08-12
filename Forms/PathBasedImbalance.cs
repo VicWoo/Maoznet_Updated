@@ -568,6 +568,7 @@ namespace NetworkGUI.Forms
             local_reader.Close();
            return output;
         }
+        
         public double[,] displayScript(string inputFile, int order, bool Null)
         {
             string file_name = inputFile.Replace(@"\\", @"\");
