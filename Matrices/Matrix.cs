@@ -46,6 +46,38 @@ namespace Network.Matrices
 
         public Matrix(int rows, int cols, int networkId, string networkId_str)
         {
+            if (networkId_str == null)
+                return;
+            InitMatrix(rows, cols, networkId, networkId_str);
+        }
+
+        // Yushan
+        public Matrix(int rows, int cols, string networkId_str) 
+        {
+            if (networkId_str == null)
+                return;
+            InitMatrix(rows, cols, 0, networkId_str);
+        }
+        public Matrix(int rows, int cols)
+        {
+            InitMatrix(rows, cols, 0, "0");
+        }
+        public Matrix(int rows) 
+        {
+            InitMatrix(rows, rows, 0, "0");
+        }
+        public Matrix(Matrix m)
+        {
+            if (m == null)
+            {
+                return;
+            }
+            InitMatrix(m.Rows, m.Cols, 0, "0");
+            m.CloneTo(this);
+        }
+
+        private void InitMatrix(int rows, int cols, int networkId, string networkId_str)
+        {
             if (rows <= 0)
                 throw new ArgumentOutOfRangeException("rows");
             if (cols <= 0)
@@ -53,7 +85,7 @@ namespace Network.Matrices
 
             colIsNonInteger = false;
             actualCol = new List<string>();
-            
+
             _rows = rows;
             _cols = cols;
             _rowLabels = new MatrixLabels(_rows);
@@ -99,7 +131,7 @@ namespace Network.Matrices
 
                 for (int i = 0; i < splitCount; i++)
                 {
-                    TextWriter tw = new StreamWriter(Constants.tempDir + "/" + 
+                    TextWriter tw = new StreamWriter(Constants.tempDir + "/" +
                         Constants.TempMatrix + _count_id + i.ToString() + ".txt");
                     for (int row = 0; row < splitRowSize; row++)
                     {
@@ -136,16 +168,6 @@ namespace Network.Matrices
 
             SetUpAverageArrays();
             currentFileUsed = 0;
-        }
-
-        // Yushan
-        public Matrix(int rows, int cols, string networkId_str) : this(rows, cols, 0, networkId_str) { }
-        public Matrix(int rows, int cols) : this(rows, cols, 0, "0") { }
-        public Matrix(int rows) : this(rows, rows, 0, "0") { }
-        public Matrix(Matrix m)
-            : this(m._rows, m._cols)
-        {
-            m.CloneTo(this);
         }
 
         private void SetUpAverageArrays()
@@ -371,7 +393,8 @@ namespace Network.Matrices
         {
             for (int i = 0; i < _rows; ++i)
                 this[i, col] = v[i];
-        }
+        }       
+
 
         public virtual double this[string r, string c]
         {
