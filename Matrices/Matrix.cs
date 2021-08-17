@@ -350,7 +350,7 @@ namespace Network.Matrices
             if (lhs._cols != rhs._rows)
                 throw new MatrixException("Dimensions of matrices do not match for multiplication.");
 
-            Matrix result = new Matrix(lhs._rows, rhs._cols);
+            Matrix result = new Matrix(lhs._rows, rhs._cols, rhs.NetworkId, rhs.NetworkIdStr);
             result.RowLabels.CopyFrom(lhs.RowLabels);
             result.ColLabels.CopyFrom(rhs.ColLabels);
             result.Clear();

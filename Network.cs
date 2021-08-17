@@ -8881,29 +8881,82 @@ namespace Network
             return mTable["Data"].NetworkId;
         }
 
+        public void checkAndInit(string check, string initt)
+        {
+            if(mTable.ContainsKey(check))
+            {
+                if(mTable[check] == null)
+                {
+                    mTable[initt] = null;
+                } else
+                {
+                    mTable[initt] = new Matrix(mTable[check]);
+                }
+            }
+        }
+
         public void Restore()
         {
-            mTable["Dependency"] = new Matrix(mTable["TDependency"]);
-            mTable["Temp"] = new Matrix(mTable["TTemp"]);
-            mTable["RoleEquiv"] = new Matrix(mTable["TRoleEquiv"]);
-            mTable["SEC"] = new Matrix(mTable["TSEC"]);
-            mTable["SEE"] = new Matrix(mTable["TSEE"]);
-            mTable["SESE"] = new Matrix(mTable["TSESE"]);
-            mTable["Reachability"] = new Matrix(mTable["TReachability"]);
-            mTable["CognitiveReachability"] = new Matrix(mTable["TCognitiveReachability"]);
-            mTable["Centrality"] = new Matrix(mTable["TCentrality"]);
-            mTable["Components"] = new Matrix(mTable["TComponents"]);
-            mTable["OverlapDiag"] = new Matrix(mTable["TOverlapDiag"]);
-            mTable["Overlap"] = new Matrix(mTable["TOverlap"]);
-            mTable["ClosenessDistance"] = new Matrix(mTable["TClosenessDistance"]);
-            mTable["Affil"] = new Matrix(mTable["TAffil"]);
-            mTable["GlobalRandom"] = new Matrix(mTable["TGlobalRandom"]);
-            mTable["ConfigModel"] = new Matrix(mTable["TConfigModel"]);
-            mTable["Data"] = new Matrix(mTable["TData"]);
-            mTable["TempSave"] = new Matrix(mTable["TTempSave"]);
-            _cliques = new CliqueCollection(_tempCliqueSave);
-            comcliques = new CliqueCollection(tempComcliquesSave);
-            SESEmatrix = new Matrix(tempSESEmatrixSave);
+            string k = "Dependency";
+            checkAndInit("T" + k, k);
+            k = "Temp";
+            checkAndInit("T" + k, k);
+            k = "RoleEquiv";
+            checkAndInit("T" + k, k);
+            k = "SEC";
+            checkAndInit("T" + k, k);
+            k = "SEE";
+            checkAndInit("T" + k, k);
+            k = "SESE";
+            checkAndInit("T" + k, k);
+            k = "Reachability";
+            checkAndInit("T" + k, k);
+            k = "CognitiveReachability";
+            checkAndInit("T" + k, k);
+            k = "Centrality";
+            checkAndInit("T" + k, k);
+            k = "Components";
+            checkAndInit("T" + k, k);
+            k = "OverlapDiag";
+            checkAndInit("T" + k, k);
+            k = "Overlap";
+            checkAndInit("T" + k, k);
+            k = "ClosenessDistance";
+            checkAndInit("T" + k, k);
+            k = "Affil";
+            checkAndInit("T" + k, k);
+            k = "GlobalRandom";
+            checkAndInit("T" + k, k);
+            k = "ConfigModel";
+            checkAndInit("T" + k, k);
+            k = "Data";
+            checkAndInit("T" + k, k);
+            k = "TempSave";
+            checkAndInit("T" + k, k);
+            if (_tempCliqueSave == null)
+            {
+                _cliques = null;
+            }
+            else
+            {
+                _cliques = new CliqueCollection(_tempCliqueSave);
+            }
+            if (tempComcliquesSave == null)
+            {
+                comcliques = null;
+            }
+            else
+            {
+                comcliques = new CliqueCollection(tempComcliquesSave);
+            }
+            if (tempSESEmatrixSave == null)
+            {
+                SESEmatrix = null;
+            }
+            else
+            {
+                SESEmatrix = new Matrix(tempSESEmatrixSave);
+            }
 
 
             mTable["TDependency"] = mTable["TTemp"] = mTable["TRoleEquiv"] = mTable["TSEC"] =
@@ -8921,141 +8974,60 @@ namespace Network
 
         public void Reset()
         {
-            if(mTable.ContainsKey("Dependency"))
+            string k = "Dependency";
+            checkAndInit(k, "T" + k);
+            k = "Temp";
+            checkAndInit(k, "T" + k);
+            k = "RoleEquiv";
+            checkAndInit(k, "T" + k);
+            k = "SEC";
+            checkAndInit(k, "T" + k);
+            k = "SEE";
+            checkAndInit(k, "T" + k);
+            k = "SESE";
+            checkAndInit(k, "T" + k);
+            k = "Reachability";
+            checkAndInit(k, "T" + k);
+            k = "CognitiveReachability";
+            checkAndInit(k, "T" + k);
+            k = "Centrality";
+            checkAndInit(k, "T" + k);
+            k = "Components";
+            checkAndInit(k, "T" + k);
+            k = "OverlapDiag";
+            checkAndInit(k, "T" + k);
+            k = "Overlap";
+            checkAndInit(k, "T" + k);
+            k = "ClosenessDistance";
+            checkAndInit(k, "T" + k);
+            k = "Affil";
+            checkAndInit(k, "T" + k);
+            k = "GlobalRandom";
+            checkAndInit(k, "T" + k);
+            k = "ConfigModel";
+            checkAndInit(k, "T" + k);
+            k = "Data";
+            checkAndInit(k, "T" + k);
+            k = "TempSave";
+            checkAndInit(k, "T" + k);
+            if(_cliques == null)
             {
-                if (mTable["Dependency"] != null)
-                {
-                    mTable["TDependency"] = new Matrix(mTable["Dependency"]);
-                }
-            }
-            if (mTable.ContainsKey("Temp"))
-            {
-                if (mTable["Temp"] != null)
-                {
-                    mTable["TTemp"] = new Matrix(mTable["Temp"]);
-                }
-            }
-            if(mTable.ContainsKey("RoleEquiv")) 
-            {
-                if(mTable["RoleEquiv"] != null) 
-                {
-                    mTable["TRoleEquiv"] = new Matrix(mTable["RoleEquiv"]);
-                }
-            }
-            if(mTable.ContainsKey("SEC")) 
-            {
-                if(mTable["SEC"] != null) 
-                {
-                    mTable["TSEC"] = new Matrix(mTable["SEC"]);
-                }
-            }
-            if(mTable.ContainsKey("SEE")) 
-            {
-                if(mTable["SEE"] != null) 
-                {
-                    mTable["TSEE"] = new Matrix(mTable["SEE"]);
-                }
-            }
-            if(mTable.ContainsKey("SESE")) 
-            {
-                if(mTable["SESE"] != null) 
-                {
-                    mTable["TSESE"] = new Matrix(mTable["SESE"]);
-                }
-            }
-            if(mTable.ContainsKey("Reachability")) 
-            {
-                if(mTable["Reachability"] != null) 
-                {
-                    mTable["TReachability"] = new Matrix(mTable["Reachability"]);
-                }
-            }
-            if(mTable.ContainsKey("CognitiveReachability")) 
-            {
-                if(mTable["CognitiveReachability"] != null) 
-                {
-                    mTable["TCognitiveReachability"] = new Matrix(mTable["CognitiveReachability"]);
-                }
-            }
-            if(mTable.ContainsKey("Centrality")) 
-            {
-                if(mTable["Centrality"] != null) 
-                {
-                    mTable["TCentrality"] = new Matrix(mTable["Centrality"]);
-                }
-            }
-            if(mTable.ContainsKey("Components")) 
-            {
-                if(mTable["Components"] != null) 
-                {
-                    mTable["TComponents"] = new Matrix(mTable["Components"]);
-                }
-            }
-            if(mTable.ContainsKey("OverlapDiag")) 
-            {
-                if(mTable["OverlapDiag"] != null) 
-                {
-                    mTable["TOverlapDiag"] = new Matrix(mTable["OverlapDiag"]);
-                }
-            }
-            if(mTable.ContainsKey("Overlap")) 
-            {
-                if(mTable["Overlap"] != null) 
-                {
-                    mTable["TOverlap"] = new Matrix(mTable["Overlap"]);
-                }
-            }
-            if(mTable.ContainsKey("ClosenessDistance")) 
-            {
-                if(mTable["ClosenessDistance"] != null) 
-                {
-                    mTable["TClosenessDistance"] = new Matrix(mTable["ClosenessDistance"]);
-                }
-            }
-            if(mTable.ContainsKey("Affil")) 
-            {
-                if(mTable["Affil"] != null) 
-                {
-                    mTable["TAffil"] = new Matrix(mTable["Affil"]);
-                }
-            }
-            if(mTable.ContainsKey("GlobalRandom")) 
-            {
-                if(mTable["GlobalRandom"] != null) 
-                {
-                    mTable["TGlobalRandom"] = new Matrix(mTable["GlobalRandom"]);
-                }
-            }
-            if(mTable.ContainsKey("ConfigModel")) 
-            {
-                if(mTable["ConfigModel"] != null) 
-                {
-                    mTable["TConfigModel"] = new Matrix(mTable["ConfigModel"]);
-                }
-            }
-            if(mTable.ContainsKey("Data")) 
-            {
-                if(mTable["Data"] != null) 
-                {
-                    mTable["TData"] = new Matrix(mTable["Data"]);
-                }
-            }
-            if(mTable.ContainsKey("TempSave")) 
-            {
-                if(mTable["TempSave"] != null) 
-                {
-                    mTable["TTempSave"] = new Matrix(mTable["TempSave"]);
-                }
-            }
-            if(_cliques != null)
+                _tempCliqueSave = null;
+            } else
             {
                 _tempCliqueSave = new CliqueCollection(_cliques);
             }
-            if(comcliques != null)
+            if(comcliques == null)
+            {
+                tempComcliquesSave = null;
+            } else
             {
                 tempComcliquesSave = new CliqueCollection(comcliques);
             }
-            if(SESEmatrix != null)
+            if(SESEmatrix == null)
+            {
+                tempSESEmatrixSave = null;
+            } else
             {
                 tempSESEmatrixSave = new Matrix(SESEmatrix);
             }

@@ -42,14 +42,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="NetworkGUI.exe" size="1333760">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="NetworkGUI.exe" size="1331200">
       <assemblyIdentity name="NetworkGUI" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>+x7SFF4jp9bTlWN/BGA4gsuVm1PRih8J8dgDhPL8DhY=</dsig:DigestValue>
+        <dsig:DigestValue>iLFJ1FkNnCy4AqRzYiTvc0UZEDC2tygW5nqf/g0eW8g=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
