@@ -9750,19 +9750,27 @@ namespace Network
         public void SaveMatrixToDyadicFile(string fileName, int year, string m, string label, bool Overwrite)
         {
             StreamWriter sw;
-            if (!File.Exists(fileName))
+            try
             {
-                sw = File.CreateText(fileName);
-            }
-            else
-            {
-                if (Overwrite)
+                if (!File.Exists(fileName))
                 {
-                    File.Delete(fileName);
                     sw = File.CreateText(fileName);
                 }
                 else
-                    sw = File.AppendText(fileName);
+                {
+                    if (Overwrite)
+                    {
+                        File.Delete(fileName);
+                        sw = File.CreateText(fileName);
+                    }
+                    else
+                        sw = File.AppendText(fileName);
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Error with saving file! " + e.Message);
+                return;
             }
 
             // Should we print the label?
@@ -9828,7 +9836,7 @@ namespace Network
                         //string line = year.ToString() + "," + mTable[m].RowLabels[row].ToString() + ",";
                         // Yushan
                         string line = mTable[m].NetworkIdStr + "," + mTable[m].RowLabels[row].ToString() + ",";
-                        line += mTable[m].RowLabels[row].ToString() + "," + mTable[m][row, col].ToString();
+                        line += mTable[m].ColLabels[col].ToString() + "," + mTable[m][row, col].ToString();
                         sw.WriteLine(line);
                     }
 
