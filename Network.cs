@@ -9761,89 +9761,89 @@ namespace Network
                     if (Overwrite)
                     {
                         File.Delete(fileName);
-                        sw = File.CreateText(fileName);
+                            sw = File.CreateText(fileName);
                     }
                     else
                         sw = File.AppendText(fileName);
                 }
+                
+                // Should we print the label?
+                if (label != null)
+                {
+                    sw.WriteLine(label);
+                }
+                else if (label == "")
+                {
+                    sw.WriteLine("\"year\",\"statei\",\"statej\",\"value\""); // Some decent default?
+                }
+
+
+                //for (int row = 0; row < temp; row++)
+                //{
+                //     generate an array to hold this row
+                //    string[] newrow = new string[temp];
+
+                //    double r = 1.0;
+                //    if (stddiag)
+                //        r = _cliques.getcliquebycliqueoverlap(row, row);
+                //    for (int col = 0; col < temp; col++)
+                //        newrow[col] = (_cliques.getcliquebycliqueoverlap(row, col) / r).tostring();
+
+                //    data.rows.add(newrow);
+
+                //    data.rows[row].headercell.value = data.columns[row].headercell.value;
+                //}
+
+                if (m == "CBCO" || m == "CBCODiag")
+                {
+                    _cliques.LoadCliqueByCliqueOverlap();
+                    double clique_value = 0;
+                    int temp = _cliques.Count;
+                    string tempLine;
+
+
+                    for (int row = 0; row < temp; ++row)
+                    {
+                        double r = 1.0;
+                        if (m == "CBCODiag")
+                            r = _cliques.GetCliqueByCliqueOverlap(row, row);
+                        //string line = year.ToString() + "," + (row + 1).ToString() + ",";
+                        // Yushan
+                        string line = mTable[m].NetworkIdStr + "," + (row + 1).ToString() + ",";
+                        for (int col = 0; col < temp; col++)
+                        {
+                            clique_value = _cliques.GetCliqueByCliqueOverlap(row, col) / r;
+                            tempLine = line + (col + 1).ToString() + "," + clique_value.ToString();
+
+                            sw.WriteLine(tempLine);
+                        }
+                    }
+                }
+
+                else
+                {
+                    for (int row = 0; row < mTable[m].Rows; ++row)
+                    {
+                        Application.DoEvents();
+                        for (int col = 0; col < mTable[m].Cols; ++col)
+                        {
+                            //string line = year.ToString() + "," + mTable[m].RowLabels[row].ToString() + ",";
+                            // Yushan
+                            string line = mTable[m].NetworkIdStr + "," + mTable[m].RowLabels[row].ToString() + ",";
+                            line += mTable[m].ColLabels[col].ToString() + "," + mTable[m][row, col].ToString();
+                            sw.WriteLine(line);
+                        }
+
+                    }
+                }
+                sw.Flush();
+                sw.Close();
             }
             catch (Exception e)
             {
-                MessageBox.Show("Error with saving file! " + e.Message);
+                MessageBox.Show("Error with saving dyadic file! " + e.Message);
                 return;
             }
-
-            // Should we print the label?
-            if (label != null)
-            {
-                sw.WriteLine(label);
-            }
-            else if (label == "")
-            {
-                sw.WriteLine("\"year\",\"statei\",\"statej\",\"value\""); // Some decent default?
-            }
-
-
-            //for (int row = 0; row < temp; row++)
-            //{
-            //     generate an array to hold this row
-            //    string[] newrow = new string[temp];
-
-            //    double r = 1.0;
-            //    if (stddiag)
-            //        r = _cliques.getcliquebycliqueoverlap(row, row);
-            //    for (int col = 0; col < temp; col++)
-            //        newrow[col] = (_cliques.getcliquebycliqueoverlap(row, col) / r).tostring();
-
-            //    data.rows.add(newrow);
-
-            //    data.rows[row].headercell.value = data.columns[row].headercell.value;
-            //}
-            
-            if (m == "CBCO" || m == "CBCODiag")
-            {
-                _cliques.LoadCliqueByCliqueOverlap();
-                double clique_value = 0;
-                int temp = _cliques.Count;
-                string tempLine;
-
-
-                for (int row = 0; row < temp; ++row)
-                {
-                    double r = 1.0;
-                    if (m == "CBCODiag")
-                        r = _cliques.GetCliqueByCliqueOverlap(row, row);
-                    //string line = year.ToString() + "," + (row + 1).ToString() + ",";
-                    // Yushan
-                    string line = mTable[m].NetworkIdStr + "," + (row + 1).ToString() + ",";
-                    for (int col = 0; col < temp; col++)
-                    {
-                        clique_value = _cliques.GetCliqueByCliqueOverlap(row, col) / r;
-                        tempLine = line + (col + 1).ToString() + "," + clique_value.ToString();
-
-                        sw.WriteLine(tempLine);
-                    }
-                }
-            }
-
-            else
-            {
-                for (int row = 0; row < mTable[m].Rows; ++row)
-                {
-                    Application.DoEvents();
-                    for (int col = 0; col < mTable[m].Cols; ++col)
-                    {
-                        //string line = year.ToString() + "," + mTable[m].RowLabels[row].ToString() + ",";
-                        // Yushan
-                        string line = mTable[m].NetworkIdStr + "," + mTable[m].RowLabels[row].ToString() + ",";
-                        line += mTable[m].ColLabels[col].ToString() + "," + mTable[m][row, col].ToString();
-                        sw.WriteLine(line);
-                    }
-
-                }
-            }
-            sw.Flush();
-            sw.Close();
         }
 
         public void LoadMultiplicationMatrix(string filename, bool dyadic, int year, string targetMatrix, string sourceMatrix) //Alvin here

@@ -2084,29 +2084,33 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                         //DoLoadCorrect(year);
                         currentYear = year;
                         RemoveIsolatesLoadData();
-
-                        if (displayMatrix == "Affiliation")
-                            net.SaveAffiliationToMatrixFile(saveFileDialog.FileName, year, _optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.InputType == "StructEquiv",
-                                                            _optionsForm.FileName, _optionsForm.InputType == "Dyadic", _optionsForm.Density, _optionsForm.SumMean, _optionsForm.SumMeanFilename,
-                                                            _optionsForm.svcFile, _optionsForm.SaveOverwrite && year == startYear,
-                                                            cliqueSizeToolStripMenuItem1.Checked, cliqueCohesionToolStripMenuItem1.Checked, estebanRayIndexToolStripMenuItem1.Checked, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
-                        else if (displayMatrix == "Affil" && loadFrom == "Affil")
-                            net.SaveAffiliationMatrixToMatrixFile(saveFileDialog.FileName, year, _optionsForm.SaveOverwrite && year == startYear);
-                        else if (displayMatrix == "NatDep")
-                            net.SaveNationalDependencyToMatrixFile(saveFileDialog.FileName, year, _optionsForm.SaveOverwrite && year == startYear);
-                        else if (displayMatrix == "CONCOR")
-                            net.SaveBlocAffiliationToMatrixFile(saveFileDialog.FileName, year, _blocForm.pos, _optionsForm.SaveOverwrite && year == startYear, openFileDialog.Multiselect);
-                        else if (displayMatrix == "Clustering")
-                            net.SaveBlocAffiliationToMatrixFile(saveFileDialog.FileName, year, _blocForm.pos, _optionsForm.SaveOverwrite && year == startYear, openFileDialog.Multiselect);
-                        else if (displayMatrix == "CBCO" || displayMatrix == "CBCODiag")
-                            net.SaveCBCOverlapToFile(saveFileDialog.FileName, year, displayMatrix != "Characteristics",
-                                displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwrite && year == startYear, diag);
-                        else
+                        try
                         {
-                            net.SaveMatrixToMatrixFile(saveFileDialog.FileName, year, displayMatrix, displayMatrix != "Characteristics",
-                                displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwrite && year == startYear);
+                            if (displayMatrix == "Affiliation")
+                                net.SaveAffiliationToMatrixFile(saveFileDialog.FileName, year, _optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.InputType == "StructEquiv",
+                                                                _optionsForm.FileName, _optionsForm.InputType == "Dyadic", _optionsForm.Density, _optionsForm.SumMean, _optionsForm.SumMeanFilename,
+                                                                _optionsForm.svcFile, _optionsForm.SaveOverwrite && year == startYear,
+                                                                cliqueSizeToolStripMenuItem1.Checked, cliqueCohesionToolStripMenuItem1.Checked, estebanRayIndexToolStripMenuItem1.Checked, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                            else if (displayMatrix == "Affil" && loadFrom == "Affil")
+                                net.SaveAffiliationMatrixToMatrixFile(saveFileDialog.FileName, year, _optionsForm.SaveOverwrite && year == startYear);
+                            else if (displayMatrix == "NatDep")
+                                net.SaveNationalDependencyToMatrixFile(saveFileDialog.FileName, year, _optionsForm.SaveOverwrite && year == startYear);
+                            else if (displayMatrix == "CONCOR")
+                                net.SaveBlocAffiliationToMatrixFile(saveFileDialog.FileName, year, _blocForm.pos, _optionsForm.SaveOverwrite && year == startYear, openFileDialog.Multiselect);
+                            else if (displayMatrix == "Clustering")
+                                net.SaveBlocAffiliationToMatrixFile(saveFileDialog.FileName, year, _blocForm.pos, _optionsForm.SaveOverwrite && year == startYear, openFileDialog.Multiselect);
+                            else if (displayMatrix == "CBCO" || displayMatrix == "CBCODiag")
+                                net.SaveCBCOverlapToFile(saveFileDialog.FileName, year, displayMatrix != "Characteristics",
+                                    displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwrite && year == startYear, diag);
+                            else
+                            {
+                                net.SaveMatrixToMatrixFile(saveFileDialog.FileName, year, displayMatrix, displayMatrix != "Characteristics",
+                                    displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwrite && year == startYear);
+                            }
+                        } catch(Exception er)
+                        {
+                            MessageBox.Show(er.Message);
                         }
-
 
                     }
                     progress.curYear = year;

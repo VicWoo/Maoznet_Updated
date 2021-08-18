@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Network.Matrices;
-using System.IO; 
+using System.IO;
+using System.Windows.Forms;
 
 namespace Network.IO
 {
@@ -21,46 +22,52 @@ namespace Network.IO
         public static void WriteMatrixToMatrixFile(Matrix m, string filename,
             bool overwrite, bool writeNetworkId, bool writeColLabels)
         {
-            using (StreamWriter writer = new StreamWriter(filename, !overwrite))
+            try
             {
-                if (writeNetworkId)
-                    //writer.WriteLine(m.NetworkId);
+                using (StreamWriter writer = new StreamWriter(filename, !overwrite))
+                {
+                    if (writeNetworkId)
+                        //writer.WriteLine(m.NetworkId);
+                        // Yushan
+                        writer.WriteLine(m.NetworkIdStr);
+
+                    if (writeColLabels)
+                    {
+                        // writer.Write(',');
+                        // writer.WriteLine(m.ColLabels.ToString());
+                        for (int j = 0; j < m.Cols; ++j)
+                        {
+                            if (String.Equals(m.ColLabels[j], "Network ID") || String.Equals(m.ColLabels[j], "Year")) { }
+                            else
+                            {
+                                writer.Write(',');
+                                writer.Write(m.ColLabels[j]);
+                            }
+                        }
+                        writer.WriteLine();
+                    }
+
+                    for (int i = 0; i < m.Rows; ++i)
+                    {
+                        writer.Write(m.RowLabels[i]);
+                        for (int j = 0; j < m.Cols; ++j)
+                        {
+                            if (String.Equals(m.ColLabels[j], "Network ID") || String.Equals(m.ColLabels[j], "Year")) ;
+                            else
+                            {
+                                writer.Write(',');
+                                writer.Write(m[i, j]);
+                            }
+                        }
+                        writer.WriteLine();
+                    }
                     // Yushan
-                    writer.WriteLine(m.NetworkIdStr);
-
-                if (writeColLabels)
-                {
-                    // writer.Write(',');
-                    // writer.WriteLine(m.ColLabels.ToString());
-                    for (int j = 0; j < m.Cols; ++j)
-                    {
-                        if (String.Equals(m.ColLabels[j], "Network ID") || String.Equals(m.ColLabels[j], "Year")) {}
-                        else
-                        {
-                            writer.Write(',');
-                            writer.Write(m.ColLabels[j]);
-                        }
-                    }
-                    writer.WriteLine();
+                    writer.Flush();
+                    writer.Close();
                 }
-
-                for (int i = 0; i < m.Rows; ++i)
-                {
-                    writer.Write(m.RowLabels[i]);
-                    for (int j = 0; j < m.Cols; ++j)
-                    {
-                        if (String.Equals(m.ColLabels[j], "Network ID") || String.Equals(m.ColLabels[j], "Year")) ;
-                        else
-                        {
-                            writer.Write(',');
-                            writer.Write(m[i, j]);
-                        }
-                    }
-                    writer.WriteLine();
-                }
-                // Yushan
-                writer.Flush();
-                writer.Close();
+            } catch (Exception e)
+            {
+                MessageBox.Show("Error in saving matrix file! " + e.Message);
             }
         }
 
