@@ -695,7 +695,9 @@ namespace NetworkGUI
                         net.LoadMultiplexNull(dataGrid, currentYear, fileNames, openFileDialog.FileName, loadFrom, FirstOrder);
                     break;
 
-
+                case "Louvain":
+                    net.LouvainCommunitiesExtraction(dataGrid, communityType);
+                    break;
             }
         }
 
@@ -6826,6 +6828,53 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         
 
         private void newOverlappingCommunitiesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        //------------------Louvain Community Algorithm------------------
+        //Community Affiliation Matrix Louvain
+        private void louvainComAffilMatToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            communityType = CommunityType.louvainAffil;
+            SetNewDisplayMatrix("Louvain");
+            CheckRemoveIsolates();
+            LoadData();
+            SetChecked();
+        }
+
+        //Community Density Matrix Louvain
+        private void louvainComDensityMatToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        //Relative Density Community Density Matrix Louvain
+        private void louvainComRelativeDensityToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        //Community Cohesion Matrix Louvain
+        private void louvainComCohesionMatToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        //Community Characteristics Louvain
+        private void louvainComCharToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        //Modularity Coefficient Louvain
+        private void louvainModCoeffToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        //Community Coefficient Louvain
+        private void louvainComCoeffToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
         }

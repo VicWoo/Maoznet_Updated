@@ -55,8 +55,14 @@ namespace Network
         Coefficients,
         Separation,
         newCoefficients,
-        ovCoefficients
-        
+        ovCoefficients,
+        louvainAffil,
+        lovainDensity,
+        lovainCohesion,
+        louvainChar,
+        louvainMod,
+        louvainCoeff
+
     }
 
     public enum ElementwiseFormat { Matrix, Dyadic, Monadic };
@@ -1850,6 +1856,289 @@ namespace Network
             {
                 nedges += indegree[i];
             }
+        }
+
+        //Baadal
+        //===========================LOUVAIN===========================
+        //Find and return [𝛴𝑡𝑜𝑡, 𝛴𝑖𝑛]
+        private List<double> LouvainSigmaTotIn(List<int> community, Dictionary<int, Dictionary<int, double>> outEdges)
+        {
+            double sigmaTot = 0.0;  //𝛴𝑡𝑜𝑡 the sum of the weights of all links to nodes in 𝐶
+            double sigmaIn = 0.0;   //𝛴𝑖𝑛 be the sum of the weights of the links inside 𝐶
+            foreach(var node in community)
+            {
+                List<int> destNodes = new List<int>(outEdges[node].Keys);
+                foreach(var dn in destNodes)
+                {
+                    sigmaTot += outEdges[node][dn]; //add weight of connection
+                    if (community.Contains(dn))
+                        sigmaIn += outEdges[node][dn]; //add weight of connection
+                }
+            }
+            List<double> TotIn = new List<double>();
+            TotIn.Add(sigmaTot);
+            TotIn.Add(sigmaIn);
+            return TotIn;
+        }
+
+        //Find and return [𝑘𝑖 𝑖𝑛, 𝑘𝑖]
+        private List<double> LouvainKInI(int node, List<int> community, Dictionary<int, Dictionary<int, double>> outEdges)
+        {
+            List<double> kInI = new List<double>();
+            double kiin = 0.0;  //𝑘𝑖,𝑖𝑛 the sum of the weights of links from node 𝑖 to nodes in the community 𝐶
+            double ki = 0.0;    //𝑘𝑖 the sum of the weights of all links incident in node 𝑖
+            List<int> destNodes = new List<int>(outEdges[node].Keys);
+            foreach (var dn in destNodes)
+            {
+                ki += outEdges[node][dn];
+                if(community.Contains(dn))
+                {
+                    kiin += outEdges[node][dn];
+                }
+            }
+
+            foreach(var vertice in community)
+            {
+                List<int> tDestNodes = new List<int>(outEdges[vertice].Keys);
+                if(tDestNodes.Contains(node))
+                {
+                    kiin += outEdges[vertice][node];
+                }
+            }
+
+            kInI.Add(kiin);
+            kInI.Add(ki);
+
+            return kInI;
+        }
+
+        //Find delta Mod using accelerated Louvain Algo
+        //http://www.ijcee.org/vol8/927-A023.pdf
+        private double LouvainModularityGain(int node, List<int> srcCommmunity, List<int> destCommmunity, double m, Dictionary<int, Dictionary<int, double>> outEdges)
+        {
+            List<double> TotIn, kInI;
+            double sigmaTot, kiin, ki;
+            
+            //Modularity Delta(Source Community --> Node) Removing node from Source Community
+            double rmvMod = 0.0;
+            if (srcCommmunity.Count != 0)
+            {
+                TotIn = LouvainSigmaTotIn(srcCommmunity, outEdges);
+                sigmaTot = TotIn[0];
+                kInI = LouvainKInI(node, srcCommmunity, outEdges);
+                kiin = kInI[0];
+                ki = kInI[1];
+                if (m != 0.0)
+                    rmvMod = ((sigmaTot * ki) / (2 * m)) - kiin;
+            }
+
+            //Modularity Delta(Node --> Destination Community) Adding node to Destination Community
+            double mergeMod = 0.0;
+            TotIn = LouvainSigmaTotIn(destCommmunity, outEdges);
+            sigmaTot = TotIn[0];
+            kInI = LouvainKInI(node, destCommmunity, outEdges);
+            kiin = kInI[0];
+            ki = kInI[1];
+            if(m != 0.0)
+                mergeMod = kiin - ((sigmaTot * ki) / (2 * m));
+            return rmvMod + mergeMod;
+        }
+
+        //Find Total Modularity of graph
+        private double LouvainModularity(double m, List<List<int>> communityList, Dictionary<int, Dictionary<int, double>> outEdges)
+        {
+            double q = 0.0;
+            double m2 = 2 * m;
+            foreach(var community in communityList)
+            {
+                List<double> TotIn = LouvainSigmaTotIn(community, outEdges);
+                double sigmaTot = TotIn[0];
+                double sigmaIn = TotIn[1];
+                q += (sigmaIn / m2) - ((sigmaTot / m2) * (sigmaTot / m2));
+            }
+            return q;
+        }
+
+        //Find best community for given vertex to move into
+        private void LouvainFindBestCommunity(int vertex, ref List<List<int>> C, ref Dictionary<int, int> verticeCom, Dictionary<int, Dictionary<int, double>> outEdges, double m, ref bool changed)
+        {
+            double maxModIncr = 0.0;
+            int destCom = verticeCom[vertex];    //by default it is source community
+            C[verticeCom[vertex]].Remove(vertex);
+            List<int> neighbors = new List<int>(outEdges[vertex].Keys);
+            foreach (var n in neighbors)
+            {
+                double mod = LouvainModularityGain(vertex, C[verticeCom[vertex]],  C[verticeCom[n]], m, outEdges);
+                if (mod > maxModIncr)
+                {
+                    destCom = verticeCom[n];
+                    maxModIncr = mod;
+                    changed = true;
+                }
+            }
+            C[destCom].Add(vertex);
+            verticeCom[vertex] = destCom;
+        }
+
+        // This function will add the weighted connections/links between different
+        // newly aggregated communities from individual vertices.
+        private void LouvainBuildNewGraph(ref Dictionary<int, Dictionary<int, double>> outEdges, Dictionary<int, int> verticeCom)
+        {
+            Dictionary<int, Dictionary<int, double>> newOutEdges = new Dictionary<int, Dictionary<int, double>>();
+            List<int> keys = new List<int>(outEdges.Keys);
+            foreach(var k in keys)
+            {
+                if(!newOutEdges.ContainsKey(verticeCom[k]))
+                {
+                    newOutEdges[verticeCom[k]] = new Dictionary<int, double>();
+                }
+                List<int> destinationNodes = new List<int>(outEdges[k].Keys);
+                foreach(var dn in destinationNodes)
+                {
+                    if(newOutEdges[verticeCom[k]].ContainsKey(verticeCom[dn]))
+                        newOutEdges[verticeCom[k]][verticeCom[dn]] += outEdges[k][dn];
+                    else
+                        newOutEdges[verticeCom[k]][verticeCom[dn]] = outEdges[k][dn];
+                }
+            }
+
+            outEdges.Clear();
+            keys = new List<int>(newOutEdges.Keys);
+            foreach (var k in keys)
+            {
+                outEdges[k] = new Dictionary<int, double>(newOutEdges[k]);
+            }
+            newOutEdges.Clear();
+        }
+
+        //Collapses all vertices into communities and treat communities as new single
+        //vertex/node and repeat algo.
+        private void LouvainRestructure(ref List<int> vvertices, ref Dictionary<int, int> verticeCom, ref List<List<int>> C, ref Dictionary<int, Dictionary<int, double>> outEdges, ref Dictionary<int, List<int>> comVertice, int k)
+        {
+            vvertices.Clear();
+            if(k == 0)
+            {
+                comVertice.Clear();
+            }
+            Dictionary<int, List<int>> newComVertice = new Dictionary<int, List<int>>();
+            for (int i = 0; i < C.Count; i++)
+            {
+                if (C[i].Count > 0)
+                {
+                    //Add new vertices
+                    vvertices.Add(i);
+                    //if we are at a higher iteration, comVertice will contain an 
+                    //overall community of vertices, where the vertices are also
+                    //communities from previous iterations, so we replace the previous
+                    //overall community vertex with the actual vertices of the
+                    //original graph
+                    if (k > 0)  //if not first overall iteration
+                    {
+                        newComVertice[i] = new List<int>();
+                        for (int j = 0; j < C[i].Count; j++)
+                        {
+                            newComVertice[i].AddRange(comVertice[C[i][j]]);
+                        }
+                    }
+                    else
+                    {
+                        comVertice[i] = new List<int>(C[i]);
+                    }
+                }
+            }
+            //Reset comVertice to reflect updated community values
+            if (k > 0)
+            {
+                comVertice.Clear();
+                List<int> lkeys = new List<int>(newComVertice.Keys);
+                foreach (var ky in lkeys)
+                {
+                    comVertice[ky] = new List<int>(newComVertice[ky]);
+                }
+                newComVertice.Clear();
+            }
+            //Build links and calulate link weights between new communities
+            LouvainBuildNewGraph(ref outEdges, verticeCom);
+            //Reset C (community list) to reflect new single vertices in their own community
+            C.Clear();
+            verticeCom.Clear();
+            for (int i = 0; i < vvertices.Count; i++)
+            {
+                C.Add(new List<int>());
+                C[i].Add(vvertices[i]);
+                //Add new vertice --> community pointer
+                verticeCom[vvertices[i]] = i;
+            }
+        }
+
+        //Use Louvain Algorithm to find communities
+        //https://towardsdatascience.com/louvain-algorithm-93fde589f58c
+        public void LouvainCommunitiesExtraction(DataGridView data, CommunityType commType)
+        {
+            //Initialize vars
+            List<int> vvertices = new List<int>();  //name is vvertices because didnt want to break any other variable if it is also called vertices
+            Dictionary<int, Dictionary<int, double>> outEdges = new Dictionary<int, Dictionary<int, double>>();    //List[i][j] where i = current vertice, j = destination vertice i is connected to, List[i][j] = weight of connection
+            List<List<int>> C = new List<List<int>>();
+            Dictionary<int, int> verticeCom = new Dictionary<int, int>(); //vertice --> community id at higher level
+            Dictionary<int, List<int>> comVertice = new Dictionary<int, List<int>>(); //community id --> vertice at base level
+            double m = 0.0; //sum of the weights of all edges in the graph
+
+            //Assign values to vars from Data table
+            for(int i = 0; i < mTable["Data"].Rows; i++)
+            {
+                //adding vertices
+                vvertices.Add(i);
+                
+                //put each vertice into its own community
+                C.Add(new List<int>());
+                C[i].Add(i);
+                verticeCom[i] = i;
+                
+                //adding community to vertice dictionary
+                comVertice[i] = new List<int>();
+                comVertice[i].Add(i);
+
+                //adding edges/links going from vertex i to vertex j
+                outEdges[i] = new Dictionary<int, double>();
+                for(int j = 0; j < mTable["Data"].Cols; j++)
+                {
+                    if (mTable["Data"][i, j] > 0.0)
+                    {
+                        outEdges[i][j] = mTable["Data"][i, j];
+                        m += mTable["Data"][i, j];
+                    }
+                }
+            }
+
+            int k = 0;  //iteration counter
+            double newMod = LouvainModularity(m, C, outEdges);
+            double curMod = newMod;
+            bool changed = false;
+            do
+            {
+                curMod = newMod;
+                changed = false;
+
+                //Check new mod of vertice i going from original community to 
+                //neighboring communities and put i in community with max mod increase
+                foreach(var vertex in vvertices)
+                {
+                    LouvainFindBestCommunity(vertex, ref C, ref verticeCom, outEdges, m, ref changed);
+                }
+
+                newMod = LouvainModularity(m, C, outEdges);
+
+                //reset values for new iteration,
+                //i.e, construct new graph using communities
+                if(newMod - curMod > 0.001 && k < 20)
+                {
+                    LouvainRestructure(ref vvertices, ref verticeCom, ref C, ref outEdges, ref comVertice, k);
+                } else
+                {
+                    break;
+                }
+                k++;
+            } while (changed);
         }
 
         public void mainCommunityExtractionMethod(bool calcStats, bool newDiscrete, bool overlapping)
@@ -12322,9 +12611,6 @@ namespace Network
             }
             return templist;
         }
-
-
-
 
         public void calculateCommunities(DataGridView data, CommunityType commType, int year, List<UnordererdPair<string, NetworkIO.CharacteristicType>> svc,
             List<UnordererdPair<string, NetworkIO.CharacteristicType>> dvc, List<UnordererdPair<string, NetworkIO.CharacteristicType>> attrMatrix, double cutoff, double density)

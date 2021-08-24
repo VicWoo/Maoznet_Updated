@@ -797,6 +797,23 @@ namespace NetworkGUI
         {
             _clusterForm.ShowDialog();
         }
+       
+       
+        private void inputTypeAtt_CheckedChanged(object sender, EventArgs e) //For Attribute Option (12/12/15)
+        {
+            EnableButton();
+        }
+
+        private void groupBox14_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void cliqueButton_CheckedChanged(object sender, EventArgs e)
+        {
+            if (cliqueButton.Checked == true)
+                clqOverlpCheck.Checked = false;
+        }
 
         private void blockButton_CheckedChanged(object sender, EventArgs e)
         {
@@ -816,24 +833,6 @@ namespace NetworkGUI
                 clqOverlpCheck.Checked = true;
         }
 
-        private void cliqueButton_CheckedChanged(object sender, EventArgs e)
-        {
-            if (cliqueButton.Checked == true)
-                clqOverlpCheck.Checked = false;
-        }
-
-        private void groupBox14_Enter(object sender, EventArgs e)
-        {
-
-        }
-       
-       
-        private void inputTypeAtt_CheckedChanged(object sender, EventArgs e) //For Attribute Option (12/12/15)
-        {
-            EnableButton();
-        }
-        
-        
         private void radioButton1_CheckedChanged(object sender, EventArgs e) //New Discrete Communities Button
         {
             if (radioButton1.Checked == true)
@@ -845,6 +844,13 @@ namespace NetworkGUI
             if (newOvCommCheck.Checked == true)
                 clqOverlpCheck.Checked = true;
         }
+
+        private void louvainComRdBtn_CheckedChanged(object sender, EventArgs e)
+        {
+            if (louvainComRdBtn.Checked)
+                clqOverlpCheck.Checked = true;
+        }
+        
 
         private void clqOverlpCheck_CheckedChanged(object sender, EventArgs e)
         {
