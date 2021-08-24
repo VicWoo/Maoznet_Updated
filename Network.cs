@@ -1861,7 +1861,7 @@ namespace Network
         //Baadal
         //===========================LOUVAIN===========================
         //Find and return [𝛴𝑡𝑜𝑡, 𝛴𝑖𝑛]
-        private List<double> LouvainSigmaTotIn(List<int> community, Dictionary<int, Dictionary<int, double>> outEdges)
+        private List<double> LouvainSigmaTotIn(int communityId, List<int> community, Dictionary<int, Dictionary<int, double>> outEdges, Dictionary<int, int> verticeCom)
         {
             double sigmaTot = 0.0;  //𝛴𝑡𝑜𝑡 the sum of the weights of all links to nodes in 𝐶
             double sigmaIn = 0.0;   //𝛴𝑖𝑛 be the sum of the weights of the links inside 𝐶
@@ -1871,8 +1871,11 @@ namespace Network
                 foreach(var dn in destNodes)
                 {
                     sigmaTot += outEdges[node][dn]; //add weight of connection
-                    if (community.Contains(dn))
+                    //if (community.Contains(dn))
+                    if(verticeCom[dn] == communityId) 
+                    {
                         sigmaIn += outEdges[node][dn]; //add weight of connection
+                    }
                 }
             }
             List<double> TotIn = new List<double>();
@@ -1882,7 +1885,7 @@ namespace Network
         }
 
         //Find and return [𝑘𝑖 𝑖𝑛, 𝑘𝑖]
-        private List<double> LouvainKInI(int node, List<int> community, Dictionary<int, Dictionary<int, double>> outEdges)
+        private List<double> LouvainKInI(int node, int communityId, List<int> community, Dictionary<int, Dictionary<int, double>> outEdges, Dictionary<int, int> verticeCom)
         {
             List<double> kInI = new List<double>();
             double kiin = 0.0;  //𝑘𝑖,𝑖𝑛 the sum of the weights of links from node 𝑖 to nodes in the community 𝐶
@@ -1891,7 +1894,8 @@ namespace Network
             foreach (var dn in destNodes)
             {
                 ki += outEdges[node][dn];
-                if(community.Contains(dn))
+                //if(community.Contains(dn))
+                if(verticeCom[dn] == communityId)
                 {
                     kiin += outEdges[node][dn];
                 }
@@ -1914,7 +1918,7 @@ namespace Network
 
         //Find delta Mod using accelerated Louvain Algo
         //http://www.ijcee.org/vol8/927-A023.pdf
-        private double LouvainModularityGain(int node, List<int> srcCommmunity, List<int> destCommmunity, double m, Dictionary<int, Dictionary<int, double>> outEdges)
+        private double LouvainModularityGain(int node, int src, List<int> srcCommmunity, int dest, List<int> destCommmunity, double m, Dictionary<int, Dictionary<int, double>> outEdges, Dictionary<int, int> verticeCom)
         {
             List<double> TotIn, kInI;
             double sigmaTot, kiin, ki;
@@ -1923,9 +1927,9 @@ namespace Network
             double rmvMod = 0.0;
             if (srcCommmunity.Count != 0)
             {
-                TotIn = LouvainSigmaTotIn(srcCommmunity, outEdges);
+                TotIn = LouvainSigmaTotIn(src, srcCommmunity, outEdges, verticeCom);
                 sigmaTot = TotIn[0];
-                kInI = LouvainKInI(node, srcCommmunity, outEdges);
+                kInI = LouvainKInI(node, src, srcCommmunity, outEdges, verticeCom);
                 kiin = kInI[0];
                 ki = kInI[1];
                 if (m != 0.0)
@@ -1934,9 +1938,9 @@ namespace Network
 
             //Modularity Delta(Node --> Destination Community) Adding node to Destination Community
             double mergeMod = 0.0;
-            TotIn = LouvainSigmaTotIn(destCommmunity, outEdges);
+            TotIn = LouvainSigmaTotIn(dest, destCommmunity, outEdges, verticeCom);
             sigmaTot = TotIn[0];
-            kInI = LouvainKInI(node, destCommmunity, outEdges);
+            kInI = LouvainKInI(node, dest, destCommmunity, outEdges, verticeCom);
             kiin = kInI[0];
             ki = kInI[1];
             if(m != 0.0)
@@ -1945,16 +1949,18 @@ namespace Network
         }
 
         //Find Total Modularity of graph
-        private double LouvainModularity(double m, List<List<int>> communityList, Dictionary<int, Dictionary<int, double>> outEdges)
+        private double LouvainModularity(double m, List<List<int>> communityList, Dictionary<int, Dictionary<int, double>> outEdges, Dictionary<int, int> verticeCom)
         {
             double q = 0.0;
             double m2 = 2 * m;
+            int id = 0;
             foreach(var community in communityList)
             {
-                List<double> TotIn = LouvainSigmaTotIn(community, outEdges);
+                List<double> TotIn = LouvainSigmaTotIn(id, community, outEdges, verticeCom);
                 double sigmaTot = TotIn[0];
                 double sigmaIn = TotIn[1];
                 q += (sigmaIn / m2) - ((sigmaTot / m2) * (sigmaTot / m2));
+                id++;
             }
             return q;
         }
@@ -1968,7 +1974,7 @@ namespace Network
             List<int> neighbors = new List<int>(outEdges[vertex].Keys);
             foreach (var n in neighbors)
             {
-                double mod = LouvainModularityGain(vertex, C[verticeCom[vertex]],  C[verticeCom[n]], m, outEdges);
+                double mod = LouvainModularityGain(vertex, verticeCom[vertex], C[verticeCom[vertex]], verticeCom[n], C[verticeCom[n]], m, outEdges, verticeCom);
                 if (mod > maxModIncr)
                 {
                     destCom = verticeCom[n];
@@ -2111,7 +2117,7 @@ namespace Network
             }
 
             int k = 0;  //iteration counter
-            double newMod = LouvainModularity(m, C, outEdges);
+            double newMod = LouvainModularity(m, C, outEdges, verticeCom);
             double curMod = newMod;
             bool changed = false;
             do
@@ -2126,7 +2132,7 @@ namespace Network
                     LouvainFindBestCommunity(vertex, ref C, ref verticeCom, outEdges, m, ref changed);
                 }
 
-                newMod = LouvainModularity(m, C, outEdges);
+                newMod = LouvainModularity(m, C, outEdges, verticeCom);
 
                 //reset values for new iteration,
                 //i.e, construct new graph using communities
