@@ -1871,11 +1871,21 @@ namespace Network
                 foreach(var dn in destNodes)
                 {
                     sigmaTot += outEdges[node][dn]; //add weight of connection
-                    //if (community.Contains(dn))
-                    if(verticeCom[dn] == communityId) 
+                    if (verticeCom[dn] == communityId) //if (community.Contains(dn))
                     {
+                        /*if (verticeCom[dn] != communityId)
+                        {
+                            int xxx = 0;
+                        }*/
                         sigmaIn += outEdges[node][dn]; //add weight of connection
                     }
+                    /*if (verticeCom[dn] == communityId)
+                    {
+                        if (!community.Contains(dn))
+                        {
+                            int xxx = 0;
+                        }
+                    }*/
                 }
             }
             List<double> TotIn = new List<double>();
@@ -1894,11 +1904,21 @@ namespace Network
             foreach (var dn in destNodes)
             {
                 ki += outEdges[node][dn];
-                //if(community.Contains(dn))
-                if(verticeCom[dn] == communityId)
+                if (verticeCom[dn] == communityId) //if(community.Contains(dn))
                 {
+                    /*if (verticeCom[dn] != communityId)
+                    {
+                        int xxx = 0;
+                    }*/
                     kiin += outEdges[node][dn];
                 }
+                /*if (verticeCom[dn] == communityId)
+                {
+                    if(!community.Contains(dn))
+                    {
+                        int xxx = 0;
+                    }
+                }*/
             }
 
             foreach(var vertice in community)
@@ -1946,6 +1966,7 @@ namespace Network
             if(m != 0.0)
                 mergeMod = kiin - ((sigmaTot * ki) / (2 * m));
             return rmvMod + mergeMod;
+            //return mergeMod;
         }
 
         //Find Total Modularity of graph
@@ -1969,12 +1990,18 @@ namespace Network
         private void LouvainFindBestCommunity(int vertex, ref List<List<int>> C, ref Dictionary<int, int> verticeCom, Dictionary<int, Dictionary<int, double>> outEdges, double m, ref bool changed)
         {
             double maxModIncr = 0.0;
+            int srcCom = verticeCom[vertex];
             int destCom = verticeCom[vertex];    //by default it is source community
             C[verticeCom[vertex]].Remove(vertex);
+            verticeCom[vertex] = -1;    //vertex currently does not belong to any community
             List<int> neighbors = new List<int>(outEdges[vertex].Keys);
             foreach (var n in neighbors)
             {
-                double mod = LouvainModularityGain(vertex, verticeCom[vertex], C[verticeCom[vertex]], verticeCom[n], C[verticeCom[n]], m, outEdges, verticeCom);
+                double mod = 0.0;
+                if (vertex != n)
+                {
+                    mod = LouvainModularityGain(vertex, srcCom, C[srcCom], verticeCom[n], C[verticeCom[n]], m, outEdges, verticeCom);
+                }
                 if (mod > maxModIncr)
                 {
                     destCom = verticeCom[n];
@@ -2127,6 +2154,7 @@ namespace Network
 
                 //Check new mod of vertice i going from original community to 
                 //neighboring communities and put i in community with max mod increase
+                //randomizeVertices(ref vvertices);
                 foreach(var vertex in vvertices)
                 {
                     LouvainFindBestCommunity(vertex, ref C, ref verticeCom, outEdges, m, ref changed);
