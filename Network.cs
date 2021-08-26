@@ -59,6 +59,7 @@ namespace Network
         ovCoefficients,
         louvainAffil,
         louvainDensity,
+        louvainSepCof,
         louvainCohesion,
         louvainChar,
         louvainMod,
@@ -2343,6 +2344,28 @@ namespace Network
                         data.Rows[row].HeaderCell.Value = "Comm " + (row + 1).ToString();
                         mTable[m_name].RowLabels[row] = "Comm " + (row + 1).ToString();
                     }
+                    break;
+
+                case CommunityType.louvainSepCof:   //To find separation coefficient we need to find densities first
+                    //if for eg there are 2 coms,
+                    //sepCof = (density[1,1] - density[1,2] + density[2,2] - density[2,1]) / 2 * (2-1)
+                    double sepCof = 0.0;
+                    for (int row = 0; row < ncoms; row++)
+                    {
+                        double diagonal = 0.0;
+                        for (int col = 0; col < ncoms; col++)
+                        {
+                            double louvainDensity = LouvainDensity(descComs[row], descComs[col], ogOutEdges);
+                            sepCof -= louvainDensity;
+                            if (row == col)
+                                diagonal = louvainDensity;
+                        }
+                        sepCof += (ncoms * diagonal);
+                    }
+                    sepCof /= (double)(ncoms * (ncoms - 1));
+
+                    data.Columns.Add("1", "Separation Coefficient");
+                    data.Rows.Add(sepCof);
                     break;
             }
         }

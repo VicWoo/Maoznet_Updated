@@ -6875,20 +6875,18 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
             SetChecked();
         }
 
-        //Community Characteristics Louvain
-        private void louvainComCharToolStripMenuItem_Click(object sender, EventArgs e)
+        //Separation Coefficient Louvain
+        private void louvainSepCoeffToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            communityType = CommunityType.louvainSepCof;
+            SetNewDisplayMatrix("Louvain");
+            CheckRemoveIsolates();
+            LoadData();
+            SetChecked();
         }
 
         //Modularity Coefficient Louvain
         private void louvainModCoeffToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        //Community Coefficient Louvain
-        private void louvainComCoeffToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
         }
