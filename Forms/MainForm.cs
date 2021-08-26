@@ -6848,13 +6848,21 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         //Community Density Matrix Louvain
         private void louvainComDensityMatToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            communityType = CommunityType.louvainDensity;
+            SetNewDisplayMatrix("Louvain");
+            CheckRemoveIsolates();
+            LoadData();
+            SetChecked();
         }
 
         //Relative Density Community Density Matrix Louvain
         private void louvainComRelativeDensityToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            communityType = CommunityType.louvainDensity;
+            SetNewDisplayMatrix("Louvain");
+            CheckRemoveIsolates();
+            LoadData();
+            SetChecked();
         }
 
         //Community Cohesion Matrix Louvain

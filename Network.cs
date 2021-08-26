@@ -58,8 +58,8 @@ namespace Network
         newCoefficients,
         ovCoefficients,
         louvainAffil,
-        lovainDensity,
-        lovainCohesion,
+        louvainDensity,
+        louvainCohesion,
         louvainChar,
         louvainMod,
         louvainCoeff
@@ -2016,7 +2016,7 @@ namespace Network
             //do
             //{
                 changed = false;
-                randomizeVertices(ref vvertices);
+                //randomizeVertices(ref vvertices);
                 foreach (var vertex in vvertices)
                 {
                     //int vertex = vvertices[r.Next(0, vvertices.Count)];
@@ -2153,18 +2153,35 @@ namespace Network
             }
         }
 
+        private double LouvainDensity(List<int> srcCom, List<int> destCom, Dictionary<int, Dictionary<int, double>> outEdges)
+        {
+            double totConnections = 0.0;
+            foreach(var src in srcCom)
+            {
+                foreach(var dest in destCom)
+                {
+                    if(outEdges[src].ContainsKey(dest))
+                        totConnections += outEdges[src][dest];
+                }
+            }
+            int nsrc = srcCom.Count;
+            int ndest = destCom.Count;
+            return (totConnections / (double)(nsrc * ndest));
+        }
+
         //Use Louvain Algorithm to find communities
         //https://towardsdatascience.com/louvain-algorithm-93fde589f58c
         public void LouvainCommunitiesExtraction(DataGridView data, CommunityType commType)
         {
             //Initialize vars
             List<int> vvertices = new List<int>();  //name is vvertices because didnt want to break any other variable if it is also called vertices
-            //Dictionary<int, int> ogVertices = new Dictionary<int, int>();
             Dictionary<int, Dictionary<int, double>> outEdges = new Dictionary<int, Dictionary<int, double>>();    //List[i][j] where i = current vertice, j = destination vertice i is connected to, List[i][j] = weight of connection
+            Dictionary<int, Dictionary<int, double>> ogOutEdges = new Dictionary<int, Dictionary<int, double>>();
             List<List<int>> C = new List<List<int>>();
             Dictionary<int, int> verticeCom = new Dictionary<int, int>(); //vertice --> community id at higher level
             Dictionary<int, List<int>> comVertice = new Dictionary<int, List<int>>(); //community id --> vertice at base level
             double m = 0.0; //sum of the weights of all edges in the graph
+
             //Assign values to vars from Data table
             for(int i = 0; i < mTable["Data"].Rows; i++)
             {
@@ -2183,7 +2200,7 @@ namespace Network
 
                 //adding edges/links going from vertex i to vertex j
                 outEdges[i] = new Dictionary<int, double>();
-                for(int j = 0; j < mTable["Data"].Cols; j++)
+                for (int j = 0; j < mTable["Data"].Cols; j++)
                 {
                     if (mTable["Data"][i, j] > 0.0)
                     {
@@ -2191,8 +2208,12 @@ namespace Network
                         m += mTable["Data"][i, j];
                     }
                 }
+                ogOutEdges[i] = new Dictionary<int, double>(outEdges[i]);
             }
-            List<int> ogVertices = new List<int>(vvertices);
+
+            int nvertices = vvertices.Count;
+
+            //Main method
             int k = 0;  //iteration counter
             double newMod = LouvainModularity(m, C, outEdges, verticeCom);
             double curMod = newMod;
@@ -2216,30 +2237,29 @@ namespace Network
                 }
                 k++;
             } while (true);
-            
+
             //sort communities in descending order according to number of members
-            var sortedDict = from entry in comVertice orderby entry.Value.Count descending select entry;
-            
+            List<KeyValuePair<int, List<int>>> descComs = (from entry in comVertice orderby entry.Value.Count descending select entry).ToList<KeyValuePair<int, List<int>>>();
+
             //converting comVertice into community format the program needs
-            int[,] comm = new int[ogVertices.Count, comVertice.Count];
+            int[,] comm = new int[nvertices, comVertice.Count];
             int comId = 0;
-            foreach (var sd in sortedDict)
+            foreach (var dc in descComs)
             {
-                foreach(var member in sd.Value)
+                foreach(var member in dc.Value)
                 {
                     comm[member, comId] = 1;
                 }
                 comId++;
             }
-            
+
             //bbflag
-            switch(commType)
+            string m_name = "Community";
+            int nrows = comm.GetLength(0);
+            int ncoms = comm.GetLength(1);
+            switch (commType)
             {
                 case CommunityType.louvainAffil:
-                    string m_name = "Community";
-                    int nrows = comm.GetLength(0);
-                    int ncoms = comm.GetLength(1);
-                    
                     data.Columns.Clear(); // Clear data grid and prep for affliation matrix
                     mTable[m_name] = new Matrix(nrows, ncoms); // may not need
 
@@ -2263,6 +2283,31 @@ namespace Network
                         mTable[m_name].RowLabels[row] = mTable["Data"].RowLabels[row]; //Add row labels
                     }
                     commAffil = new Matrix(mTable[m_name]);
+                    break;
+
+                case CommunityType.louvainDensity:
+                    data.Columns.Clear();
+                    mTable[m_name] = new Matrix(ncoms); // may not need
+                    
+                    //Add columns of table
+                    for(int col = 0; col < ncoms; col++)
+                    {
+                        data.Columns.Add((col).ToString(), "Comm " + (col + 1).ToString());
+                        mTable[m_name].ColLabels[col] = "Comm " + (col + 1).ToString();
+                    }
+
+                    for(int row = 0; row < ncoms; row++)
+                    {
+                        string[] newRow = new string[descComs.Count];
+                        for (int col = 0; col < ncoms; col++)
+                        {
+                            mTable[m_name][row, col] = LouvainDensity(descComs[row].Value, descComs[col].Value, ogOutEdges);
+                            newRow[col] = mTable[m_name][row, col].ToString();
+                        }
+                        data.Rows.Add(newRow);
+                        data.Rows[row].HeaderCell.Value = "Comm " + (row + 1).ToString();
+                        mTable[m_name].RowLabels[row] = "Comm " + (row + 1).ToString();
+                    }
                     break;
             }
         }
