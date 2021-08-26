@@ -1958,15 +1958,17 @@ namespace Network
 
             //Modularity Delta(Node --> Destination Community) Adding node to Destination Community
             double mergeMod = 0.0;
-            TotIn = LouvainSigmaTotIn(dest, destCommmunity, outEdges, verticeCom);
-            sigmaTot = TotIn[0];
-            kInI = LouvainKInI(node, dest, destCommmunity, outEdges, verticeCom);
-            kiin = kInI[0];
-            ki = kInI[1];
-            if(m != 0.0)
-                mergeMod = kiin - ((sigmaTot * ki) / (2 * m));
+            if(destCommmunity.Count != 0)
+            {
+                TotIn = LouvainSigmaTotIn(dest, destCommmunity, outEdges, verticeCom);
+                sigmaTot = TotIn[0];
+                kInI = LouvainKInI(node, dest, destCommmunity, outEdges, verticeCom);
+                kiin = kInI[0];
+                ki = kInI[1];
+                if (m != 0.0)
+                    mergeMod = kiin - ((sigmaTot * ki) / (2 * m));
+            }
             return rmvMod + mergeMod;
-            //return mergeMod;
         }
 
         //Find Total Modularity of graph
@@ -1986,31 +1988,96 @@ namespace Network
             return q;
         }
 
-        //Find best community for given vertex to move into
-        private void LouvainFindBestCommunity(int vertex, ref List<List<int>> C, ref Dictionary<int, int> verticeCom, Dictionary<int, Dictionary<int, double>> outEdges, double m, ref bool changed)
+        private void randomizeVertices(ref List<int> vvertices)
         {
-            double maxModIncr = 0.0;
-            int srcCom = verticeCom[vertex];
-            int destCom = verticeCom[vertex];    //by default it is source community
-            C[verticeCom[vertex]].Remove(vertex);
-            verticeCom[vertex] = -1;    //vertex currently does not belong to any community
-            List<int> neighbors = new List<int>(outEdges[vertex].Keys);
-            foreach (var n in neighbors)
+            // Creating a object for Random class
+            Random r = new Random();
+            int n = vvertices.Count;
+            // Start from the last element and swap one by one. We don't need to
+            // run for the first element that's why i > 0
+            for (int i = n - 1; i > 0; i--)
             {
-                double mod = 0.0;
-                if (vertex != n)
-                {
-                    mod = LouvainModularityGain(vertex, srcCom, C[srcCom], verticeCom[n], C[verticeCom[n]], m, outEdges, verticeCom);
-                }
-                if (mod > maxModIncr)
-                {
-                    destCom = verticeCom[n];
-                    maxModIncr = mod;
-                    changed = true;
-                }
+                // Pick a random index from 0 to i
+                int j = r.Next(0, i + 1);
+
+                // Swap arr[i] with the element at random index
+                int temp = vvertices[i];
+                vvertices[i] = vvertices[j];
+                vvertices[j] = temp;
             }
-            C[destCom].Add(vertex);
-            verticeCom[vertex] = destCom;
+        }
+
+        private void randomizeComs(ref List<List<int>> C)
+        {
+            // Creating a object for Random class
+            Random r = new Random();
+            int n = C.Count;
+            // Start from the last element and swap one by one. We don't need to
+            // run for the first element that's why i > 0
+            for (int i = n - 1; i > 0; i--)
+            {
+                // Pick a random index from 0 to i
+                int j = r.Next(0, i + 1);
+
+                // Swap arr[i] with the element at random index
+                List<int> temp = new List<int>(C[i]);
+                C[i] = new List<int>(C[j]);
+                C[j] = new List<int>(temp);
+            }
+        }
+
+        //Find best community for given vertex to move into
+        private void LouvainMoveNodes(List<int> vvertices, ref List<List<int>> C, ref Dictionary<int, int> verticeCom, Dictionary<int, Dictionary<int, double>> outEdges, double m)
+        {
+            bool changed = false;
+            Random r = new Random();
+            //do
+            //{
+                changed = false;
+                randomizeVertices(ref vvertices);
+                foreach (var vertex in vvertices)
+                {
+                    //int vertex = vvertices[r.Next(0, vvertices.Count)];
+                    double maxModIncr = 0.0;
+                    int srcCom = verticeCom[vertex];
+                    int destCom = srcCom;    //by default it is source community
+                    C[verticeCom[vertex]].Remove(vertex);
+                    verticeCom[vertex] = -1;    //vertex currently does not belong to any community
+                    List<int> neighbors = new List<int>(outEdges[vertex].Keys);
+                    foreach (var n in neighbors)
+                    {
+                        double mod = 0.0;
+                        if (vertex != n)
+                        {
+                            mod = LouvainModularityGain(vertex, srcCom, C[srcCom], verticeCom[n], C[verticeCom[n]], m, outEdges, verticeCom);
+                        }
+                        if (mod > maxModIncr)
+                        {
+                            destCom = verticeCom[n];
+                            maxModIncr = mod;
+                            changed = true;
+                        }
+                    }
+                    /*int id = 0;
+                    foreach (var com in C)
+                    {
+                        double mod = 0.0;
+                        if (com.Count != 0)
+                        {
+                            mod = LouvainModularityGain(vertex, srcCom, C[srcCom], id, com, m, outEdges, verticeCom);
+                        }
+                        if (mod > maxModIncr)
+                        {
+                            destCom = id;
+                            maxModIncr = mod;
+                            changed = true;
+                        }
+                        id++;
+                    }*/
+                    C[destCom].Add(vertex);
+                    verticeCom[vertex] = destCom;
+                }
+            //} while (changed);
         }
 
         // This function will add the weighted connections/links between different
@@ -2018,28 +2085,28 @@ namespace Network
         private void LouvainBuildNewGraph(ref Dictionary<int, Dictionary<int, double>> outEdges, Dictionary<int, int> verticeCom)
         {
             Dictionary<int, Dictionary<int, double>> newOutEdges = new Dictionary<int, Dictionary<int, double>>();
-            List<int> keys = new List<int>(outEdges.Keys);
-            foreach(var k in keys)
+            List<int> sourceNodes = new List<int>(outEdges.Keys);
+            foreach(var sn in sourceNodes)
             {
-                if(!newOutEdges.ContainsKey(verticeCom[k]))
+                if(!newOutEdges.ContainsKey(verticeCom[sn]))
                 {
-                    newOutEdges[verticeCom[k]] = new Dictionary<int, double>();
+                    newOutEdges[verticeCom[sn]] = new Dictionary<int, double>();
                 }
-                List<int> destinationNodes = new List<int>(outEdges[k].Keys);
+                List<int> destinationNodes = new List<int>(outEdges[sn].Keys);
                 foreach(var dn in destinationNodes)
                 {
-                    if(newOutEdges[verticeCom[k]].ContainsKey(verticeCom[dn]))
-                        newOutEdges[verticeCom[k]][verticeCom[dn]] += outEdges[k][dn];
+                    if(newOutEdges[verticeCom[sn]].ContainsKey(verticeCom[dn]))
+                        newOutEdges[verticeCom[sn]][verticeCom[dn]] += outEdges[sn][dn];
                     else
-                        newOutEdges[verticeCom[k]][verticeCom[dn]] = outEdges[k][dn];
+                        newOutEdges[verticeCom[sn]][verticeCom[dn]] = outEdges[sn][dn];
                 }
             }
 
             outEdges.Clear();
-            keys = new List<int>(newOutEdges.Keys);
-            foreach (var k in keys)
+            sourceNodes = new List<int>(newOutEdges.Keys);
+            foreach (var sn in sourceNodes)
             {
-                outEdges[k] = new Dictionary<int, double>(newOutEdges[k]);
+                outEdges[sn] = new Dictionary<int, double>(newOutEdges[sn]);
             }
             newOutEdges.Clear();
         }
@@ -2146,20 +2213,13 @@ namespace Network
             int k = 0;  //iteration counter
             double newMod = LouvainModularity(m, C, outEdges, verticeCom);
             double curMod = newMod;
-            bool changed = false;
             do
             {
                 curMod = newMod;
-                changed = false;
 
                 //Check new mod of vertice i going from original community to 
                 //neighboring communities and put i in community with max mod increase
-                //randomizeVertices(ref vvertices);
-                foreach(var vertex in vvertices)
-                {
-                    LouvainFindBestCommunity(vertex, ref C, ref verticeCom, outEdges, m, ref changed);
-                }
-
+                LouvainMoveNodes(vvertices, ref C, ref verticeCom, outEdges, m);
                 newMod = LouvainModularity(m, C, outEdges, verticeCom);
 
                 //reset values for new iteration,
@@ -2172,7 +2232,7 @@ namespace Network
                     break;
                 }
                 k++;
-            } while (changed);
+            } while (true);
         }
 
         public void mainCommunityExtractionMethod(bool calcStats, bool newDiscrete, bool overlapping)
