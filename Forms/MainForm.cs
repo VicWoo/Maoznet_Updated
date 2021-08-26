@@ -698,7 +698,7 @@ namespace NetworkGUI
                     break;
 
                 case "Louvain":
-                    net.LouvainCommunitiesExtraction(dataGrid, communityType);
+                    net.LouvainCommunitiesExtraction(dataGrid, communityType, currentYear, _optionsForm.Density);
                     break;
             }
         }
@@ -6868,7 +6868,11 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         //Community Cohesion Matrix Louvain
         private void louvainComCohesionMatToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            communityType = CommunityType.louvainCohesion;
+            SetNewDisplayMatrix("Louvain");
+            CheckRemoveIsolates();
+            LoadData();
+            SetChecked();
         }
 
         //Community Characteristics Louvain

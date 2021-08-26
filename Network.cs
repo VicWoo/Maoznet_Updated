@@ -2171,7 +2171,7 @@ namespace Network
 
         //Use Louvain Algorithm to find communities
         //https://towardsdatascience.com/louvain-algorithm-93fde589f58c
-        public void LouvainCommunitiesExtraction(DataGridView data, CommunityType commType)
+        public void LouvainCommunitiesExtraction(DataGridView data, CommunityType commType, int year, double density)
         {
             //Initialize vars
             List<int> vvertices = new List<int>();  //name is vvertices because didnt want to break any other variable if it is also called vertices
@@ -2239,28 +2239,41 @@ namespace Network
             } while (true);
 
             //sort communities in descending order according to number of members
-            List<KeyValuePair<int, List<int>>> descComs = (from entry in comVertice orderby entry.Value.Count descending select entry).ToList<KeyValuePair<int, List<int>>>();
+            List<List<int>> descComs = (from entry in comVertice orderby entry.Value.Count descending select entry.Value).ToList<List<int>>();
+            
+            //setting global variables that already exist in the program
+            if(communities == null)
+                communities = new List<int[]>();
+            else
+                communities.Clear();
+            comNum = descComs.Count;
 
             //converting comVertice into community format the program needs
             int[,] comm = new int[nvertices, comVertice.Count];
-            int comId = 0;
-            foreach (var dc in descComs)
+            for (int col = 0; col < descComs.Count; col++)
             {
-                foreach(var member in dc.Value)
+                int[] tempCom = new int[nvertices];
+                foreach (var member in descComs[col])
                 {
-                    comm[member, comId] = 1;
+                    comm[member, col] = 1;
+                    tempCom[member] = 1;
                 }
-                comId++;
+                //adding data to relevant global variables to hopefully avoid breaking any
+                //preexisting code
+                communities.Add(tempCom);
             }
 
             //bbflag
             string m_name = "Community";
             int nrows = comm.GetLength(0);
             int ncoms = comm.GetLength(1);
+            
+            // Clear data grid and prep for matrix
+            data.Rows.Clear();
+            data.Columns.Clear();
             switch (commType)
             {
                 case CommunityType.louvainAffil:
-                    data.Columns.Clear(); // Clear data grid and prep for affliation matrix
                     mTable[m_name] = new Matrix(nrows, ncoms); // may not need
 
                     // add the labels to the columns of the grid
@@ -2286,24 +2299,46 @@ namespace Network
                     break;
 
                 case CommunityType.louvainDensity:
-                    data.Columns.Clear();
                     mTable[m_name] = new Matrix(ncoms); // may not need
-                    
+
                     //Add columns of table
-                    for(int col = 0; col < ncoms; col++)
+                    for (int col = 0; col < ncoms; col++)
                     {
                         data.Columns.Add((col).ToString(), "Comm " + (col + 1).ToString());
                         mTable[m_name].ColLabels[col] = "Comm " + (col + 1).ToString();
                     }
-
-                    for(int row = 0; row < ncoms; row++)
+                    //Add matrix values and data table values
+                    for (int row = 0; row < ncoms; row++)
                     {
                         string[] newRow = new string[descComs.Count];
                         for (int col = 0; col < ncoms; col++)
                         {
-                            mTable[m_name][row, col] = LouvainDensity(descComs[row].Value, descComs[col].Value, ogOutEdges);
+                            mTable[m_name][row, col] = LouvainDensity(descComs[row], descComs[col], ogOutEdges);
                             newRow[col] = mTable[m_name][row, col].ToString();
                         }
+                        data.Rows.Add(newRow);
+                        data.Rows[row].HeaderCell.Value = "Comm " + (row + 1).ToString();
+                        mTable[m_name].RowLabels[row] = "Comm " + (row + 1).ToString();
+                    }
+                    break;
+
+                case CommunityType.louvainCohesion: //Copied from calculateCommunities()
+                    LoadStructEquiv(density, year, "Data");
+                    mTable[m_name] = computeCommCohesiveMatrix();
+
+                    for (int i = 0; i < mTable[m_name].Rows; ++i)
+                    {
+                        data.Columns.Add((i + 1).ToString(), "Comm " + (i + 1).ToString());
+                        mTable[m_name].ColLabels[i] = "Comm " + (i + 1).ToString();
+                    }
+
+                    for (int row = 0; row < mTable[m_name].Rows; row++)
+                    {
+                        // Generate an array to hold this row
+                        string[] newRow = new string[comNum];
+                        for (int col = 0; col < mTable[m_name].Cols; col++)
+                            newRow[col] = mTable[m_name][row, col].ToString();
+
                         data.Rows.Add(newRow);
                         data.Rows[row].HeaderCell.Value = "Comm " + (row + 1).ToString();
                         mTable[m_name].RowLabels[row] = "Comm " + (row + 1).ToString();
@@ -3377,7 +3412,7 @@ namespace Network
 
         public Matrix computeCommCohesiveMatrix()
         {
-            Matrix cohesiveMatrix = new Matrix(comNum, comNum);
+            Matrix cohesiveMatrix = new Matrix(comNum);
 
             // for external files
             if (cohesionFilename != null)
@@ -13079,13 +13114,13 @@ namespace Network
                 comm_T_coh_list.Add(T_coh);
 
             }
-           
+
+            //bbflag
             string m_name = "Community";
             ///////////////////// Preliminary Calculations finished, time to specialize //////////////////
             if (commType == CommunityType.Affil || commType == CommunityType.newAffil || commType == CommunityType.ovAffil)
             {
                 // group is the vector that produces the community affiliaton matrix
-                //bbflag
                 data.Columns.Clear(); // Clear data grid and prep for affliation matrix
                 
                 mTable[m_name] = new Matrix(group.Length, comNum); // may not need
