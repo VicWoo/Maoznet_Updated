@@ -2182,6 +2182,7 @@ namespace Network
             Dictionary<int, int> verticeCom = new Dictionary<int, int>(); //vertice --> community id at higher level
             Dictionary<int, List<int>> comVertice = new Dictionary<int, List<int>>(); //community id --> vertice at base level
             double m = 0.0; //sum of the weights of all edges in the graph
+            List<double> modularityCoeff = new List<double>();
 
             //Assign values to vars from Data table
             for(int i = 0; i < mTable["Data"].Rows; i++)
@@ -2221,7 +2222,7 @@ namespace Network
             do
             {
                 curMod = newMod;
-
+                modularityCoeff.Add(curMod);
                 //Check new mod of vertice i going from original community to 
                 //neighboring communities and put i in community with max mod increase
                 LouvainMoveNodes(vvertices, ref C, ref verticeCom, outEdges, m);
@@ -2366,6 +2367,15 @@ namespace Network
 
                     data.Columns.Add("1", "Separation Coefficient");
                     data.Rows.Add(sepCof);
+                    break;
+
+                case CommunityType.louvainMod:
+                    data.Columns.Add("1", "Modularity Coefficient");
+                    for (int i = 0; i < modularityCoeff.Count; i++)
+                    {
+                        data.Rows.Add(modularityCoeff[i]);
+                        data.Rows[i].HeaderCell.Value = "Iteration " + (i).ToString();
+                    }
                     break;
             }
         }

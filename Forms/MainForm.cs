@@ -386,7 +386,10 @@ namespace NetworkGUI
                     break;
             }
             //net.ClearPreviousData(displayMatrix);
-
+            
+            //Auto resize display
+            dataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
+            dataGrid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
         }
 
         private void DoLoadCorrect(int currentYear)
@@ -6888,7 +6891,11 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         //Modularity Coefficient Louvain
         private void louvainModCoeffToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            communityType = CommunityType.louvainMod;
+            SetNewDisplayMatrix("Louvain");
+            CheckRemoveIsolates();
+            LoadData();
+            SetChecked();
         }
 
         /*private void testToolStripMenuItem_Click(object sender, EventArgs e)
