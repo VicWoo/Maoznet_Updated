@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
@@ -2007,25 +2008,6 @@ namespace Network
             }
         }
 
-        private void randomizeComs(ref List<List<int>> C)
-        {
-            // Creating a object for Random class
-            Random r = new Random();
-            int n = C.Count;
-            // Start from the last element and swap one by one. We don't need to
-            // run for the first element that's why i > 0
-            for (int i = n - 1; i > 0; i--)
-            {
-                // Pick a random index from 0 to i
-                int j = r.Next(0, i + 1);
-
-                // Swap arr[i] with the element at random index
-                List<int> temp = new List<int>(C[i]);
-                C[i] = new List<int>(C[j]);
-                C[j] = new List<int>(temp);
-            }
-        }
-
         //Find best community for given vertex to move into
         private void LouvainMoveNodes(List<int> vvertices, ref List<List<int>> C, ref Dictionary<int, int> verticeCom, Dictionary<int, Dictionary<int, double>> outEdges, double m)
         {
@@ -2177,12 +2159,12 @@ namespace Network
         {
             //Initialize vars
             List<int> vvertices = new List<int>();  //name is vvertices because didnt want to break any other variable if it is also called vertices
+            //Dictionary<int, int> ogVertices = new Dictionary<int, int>();
             Dictionary<int, Dictionary<int, double>> outEdges = new Dictionary<int, Dictionary<int, double>>();    //List[i][j] where i = current vertice, j = destination vertice i is connected to, List[i][j] = weight of connection
             List<List<int>> C = new List<List<int>>();
             Dictionary<int, int> verticeCom = new Dictionary<int, int>(); //vertice --> community id at higher level
             Dictionary<int, List<int>> comVertice = new Dictionary<int, List<int>>(); //community id --> vertice at base level
             double m = 0.0; //sum of the weights of all edges in the graph
-
             //Assign values to vars from Data table
             for(int i = 0; i < mTable["Data"].Rows; i++)
             {
@@ -2190,9 +2172,10 @@ namespace Network
                 vvertices.Add(i);
                 
                 //put each vertice into its own community
+                //keeping it in terms of vvertices so that we can change vertices and still program should work
                 C.Add(new List<int>());
-                C[i].Add(i);
-                verticeCom[i] = i;
+                C[i].Add(vvertices[i]);
+                verticeCom[vvertices[i]] = i;
                 
                 //adding community to vertice dictionary
                 comVertice[i] = new List<int>();
@@ -2209,7 +2192,7 @@ namespace Network
                     }
                 }
             }
-
+            List<int> ogVertices = new List<int>(vvertices);
             int k = 0;  //iteration counter
             double newMod = LouvainModularity(m, C, outEdges, verticeCom);
             double curMod = newMod;
@@ -2233,6 +2216,55 @@ namespace Network
                 }
                 k++;
             } while (true);
+            
+            //sort communities in descending order according to number of members
+            var sortedDict = from entry in comVertice orderby entry.Value.Count descending select entry;
+            
+            //converting comVertice into community format the program needs
+            int[,] comm = new int[ogVertices.Count, comVertice.Count];
+            int comId = 0;
+            foreach (var sd in sortedDict)
+            {
+                foreach(var member in sd.Value)
+                {
+                    comm[member, comId] = 1;
+                }
+                comId++;
+            }
+            
+            //bbflag
+            switch(commType)
+            {
+                case CommunityType.louvainAffil:
+                    string m_name = "Community";
+                    int nrows = comm.GetLength(0);
+                    int ncoms = comm.GetLength(1);
+                    
+                    data.Columns.Clear(); // Clear data grid and prep for affliation matrix
+                    mTable[m_name] = new Matrix(nrows, ncoms); // may not need
+
+                    // add the labels to the columns of the grid
+                    for (int i = 0; i < ncoms; i++)
+                    {
+                        data.Columns.Add((i).ToString(), "Comm " + (i + 1).ToString());
+                        mTable[m_name].ColLabels[i] = "Comm " + (i + 1).ToString();
+                    }
+                    //Add row values to datagrid as well as new matrix
+                    for (int row = 0; row < nrows; row++)
+                    {
+                        string[] newRow = new string[ncoms];
+                        for (int col = 0; col < ncoms; col++)
+                        {
+                            mTable[m_name][row, col] = comm[row, col];
+                            newRow[col] = comm[row, col].ToString();
+                        }
+                        data.Rows.Add(newRow);
+                        data.Rows[row].HeaderCell.Value = mTable["Data"].RowLabels[row];
+                        mTable[m_name].RowLabels[row] = mTable["Data"].RowLabels[row]; //Add row labels
+                    }
+                    commAffil = new Matrix(mTable[m_name]);
+                    break;
+            }
         }
 
         public void mainCommunityExtractionMethod(bool calcStats, bool newDiscrete, bool overlapping)
@@ -13008,7 +13040,7 @@ namespace Network
             if (commType == CommunityType.Affil || commType == CommunityType.newAffil || commType == CommunityType.ovAffil)
             {
                 // group is the vector that produces the community affiliaton matrix
-                
+                //bbflag
                 data.Columns.Clear(); // Clear data grid and prep for affliation matrix
                 
                 mTable[m_name] = new Matrix(group.Length, comNum); // may not need

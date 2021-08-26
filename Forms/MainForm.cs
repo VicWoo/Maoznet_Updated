@@ -347,6 +347,8 @@ namespace NetworkGUI
                     break;
                 case "Community":
                     break;
+                case "Louvain":
+                    break;
                 // new code for local Transitivity
                 case "LocalTransitivity":
                     break;
