@@ -11140,7 +11140,7 @@ namespace Network
         }
 
         // Random data load
-        public void LoadRandom(int N, string m, bool symmetric, bool range, double pmin, double pmax, bool randomN, int randomMin, int randomMax, int randomInt)
+        public void LoadRandom(int N, string m, bool symmetric, bool range, double pmin, double pmax, bool randomN, int randomMin, int randomMax, int randomInt, int year)
         {
             if (randomN)
                 N = RNG.RandomInt((randomMax - randomMin) / randomInt) * randomInt + randomMin; 
@@ -11149,11 +11149,12 @@ namespace Network
                 mTable[m] = RandomMatrix.LoadSymmetric(N, range, pmin, pmax);
             else
                 mTable[m] = RandomMatrix.LoadNonSymmetric(N, range, pmin, pmax);
-            
+
+            mTable[m].NetworkIdStr = year.ToString();
             tempDataMatrix = new Matrix(mTable[m]);
         }
 
-        public void LoadValuedRandom(int N, string m, bool symmetric, double vmin, double vmax, bool datatype, bool zerodiagonalized, bool range, double pmin, double pmax, bool randomN, int randomMin, int randomMax, int randomInt)
+        public void LoadValuedRandom(int N, string m, bool symmetric, double vmin, double vmax, bool datatype, bool zerodiagonalized, bool range, double pmin, double pmax, bool randomN, int randomMin, int randomMax, int randomInt, int year)
         {
             if (randomN)
                 N = RNG.RandomInt((randomMax - randomMin) / randomInt) * randomInt + randomMin; 
@@ -11163,6 +11164,7 @@ namespace Network
             else
                 mTable[m] = RandomMatrix.LoadValuedNonSymmetric(N,vmin,vmax,datatype,zerodiagonalized, range, pmin, pmax);
 
+            mTable[m].NetworkIdStr = year.ToString();
             tempDataMatrix = mTable[m];
         }
 
