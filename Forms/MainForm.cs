@@ -1044,6 +1044,28 @@ namespace NetworkGUI
 */
                         break;
 
+                    case "Louvain":
+                        switch(communityType)
+                        {
+                            case CommunityType.louvainAffil:
+                                louvainComAffilMatToolStripMenuItem.Checked = true;
+                                break;
+                            case CommunityType.louvainDensity:
+                                louvainComDensityMatToolStripMenuItem.Checked = true;
+                                louvainComRelativeDensityToolStripMenuItem.Checked = true;
+                                break;
+                            case CommunityType.louvainCohesion:
+                                louvainComCohesionMatToolStripMenuItem.Checked = true;
+                                break;
+                            case CommunityType.louvainSepCof:
+                                louvainSepCoeffToolStripMenuItem.Checked = true;
+                                break;
+                            case CommunityType.louvainMod:
+                                louvainModCoeffToolStripMenuItem.Checked = true;
+                                break;
+                        }
+                        break;
+
                     case "Distance":
                         distanceMatrixToolStripMenuItem.Checked = true;
                         distanceMatrixToolStripMenuItem1.Checked = true;
