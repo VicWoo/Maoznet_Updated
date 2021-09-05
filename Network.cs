@@ -1995,7 +1995,7 @@ namespace Network
             do
             {
                 changed = false;
-                //randomizeVertices(ref vvertices);
+                randomizeVertices(ref vvertices);
                 foreach (var vertex in vvertices)
                 {
                     //int vertex = vvertices[r.Next(0, vvertices.Count)];
@@ -2025,22 +2025,6 @@ namespace Network
                             changed = true;
                         }
                     }
-                    /*int id = 0;
-                    foreach (var com in C)
-                    {
-                        double mod = 0.0;
-                        if (com.Count != 0)
-                        {
-                            mod = LouvainModularityGain(vertex, srcCom, C[srcCom], id, com, m, outEdges, node2Com);
-                        }
-                        if (mod > maxModIncr)
-                        {
-                            destCom = id;
-                            maxModIncr = mod;
-                            changed = true;
-                        }
-                        id++;
-                    }*/
                     C[destCom].Add(vertex);
                     node2Com[vertex] = destCom;
                 }
@@ -2363,6 +2347,8 @@ namespace Network
                     break;
             }
         }
+
+        //=============================================================
 
         public void mainCommunityExtractionMethod(bool calcStats, bool newDiscrete, bool overlapping)
         {
