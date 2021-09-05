@@ -299,7 +299,7 @@ namespace NetworkGUI
             this.globalRandomMatrixToolStripMenuItem,
             this.configureModelMatrixToolStripMenuItem});
             this.loadFromToolStripMenuItem.Name = "loadFromToolStripMenuItem";
-            this.loadFromToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.loadFromToolStripMenuItem.Size = new System.Drawing.Size(189, 26);
             this.loadFromToolStripMenuItem.Text = "Load From";
             this.loadFromToolStripMenuItem.Click += new System.EventHandler(this.loadFromToolStripMenuItem_Click);
             // 
@@ -352,14 +352,14 @@ namespace NetworkGUI
             // 
             this.bsymmetricToolStripMenuItem.Name = "bsymmetricToolStripMenuItem";
             this.bsymmetricToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.B)));
-            this.bsymmetricToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.bsymmetricToolStripMenuItem.Size = new System.Drawing.Size(213, 26);
             this.bsymmetricToolStripMenuItem.Text = "Symmetric";
             this.bsymmetricToolStripMenuItem.Click += new System.EventHandler(this.symmetricToolStripMenuItem_Click);
             // 
             // bnonsymmetricToolStripMenuItem
             // 
             this.bnonsymmetricToolStripMenuItem.Name = "bnonsymmetricToolStripMenuItem";
-            this.bnonsymmetricToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.bnonsymmetricToolStripMenuItem.Size = new System.Drawing.Size(213, 26);
             this.bnonsymmetricToolStripMenuItem.Text = "Non-symmetric";
             this.bnonsymmetricToolStripMenuItem.Click += new System.EventHandler(this.bnonsymmetricToolStripMenuItem_Click);
             // 
@@ -448,7 +448,7 @@ namespace NetworkGUI
             this.affiliationFileToolStripMenuItem1,
             this.tableToolStripMenuItem});
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(189, 26);
             this.saveAsToolStripMenuItem.Text = "Save As";
             // 
             // dyadicFileToolStripMenuItem1
@@ -510,21 +510,21 @@ namespace NetworkGUI
             // closeFileToolStripMenuItem
             // 
             this.closeFileToolStripMenuItem.Name = "closeFileToolStripMenuItem";
-            this.closeFileToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.closeFileToolStripMenuItem.Size = new System.Drawing.Size(189, 26);
             this.closeFileToolStripMenuItem.Text = "Close File";
             this.closeFileToolStripMenuItem.Click += new System.EventHandler(this.closeFileToolStripMenuItem_Click);
             // 
             // resetToolStripMenuItem
             // 
             this.resetToolStripMenuItem.Name = "resetToolStripMenuItem";
-            this.resetToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.resetToolStripMenuItem.Size = new System.Drawing.Size(189, 26);
             this.resetToolStripMenuItem.Text = "Reset Program";
             this.resetToolStripMenuItem.Click += new System.EventHandler(this.resetToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(189, 26);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
