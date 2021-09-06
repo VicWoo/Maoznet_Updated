@@ -438,3 +438,4 @@ C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.exe.manifest
 C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.application
 C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.exe
 C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.pdb
+C:\D Drive\UC Davis\On Campus\MaozNet\Current\obj\Debug\NetworkGUI.Forms.LouvainForm.resources

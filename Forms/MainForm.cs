@@ -44,6 +44,8 @@ namespace NetworkGUI
         bool _changedOptionsFormCMinMembers = false;
         int _ogOptionsFormCMinMembers = 1;
         bool nullMat = false;
+
+        LouvainForm louvainForm = new LouvainForm();
         //
 
         public OptionsForm _optionsForm = new OptionsForm();
@@ -701,7 +703,7 @@ namespace NetworkGUI
                     break;
 
                 case "Louvain":
-                    net.LouvainCommunitiesExtraction(dataGrid, communityType, currentYear, _optionsForm.Density);
+                    net.LouvainCommunitiesExtraction(dataGrid, communityType, louvainForm.Precision, louvainForm.MaxIterations, louvainForm.UnlimitedIterations, currentYear, _optionsForm.Density);
                     break;
             }
         }
@@ -6964,6 +6966,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         {
             communityType = CommunityType.louvainAffil;
             SetNewDisplayMatrix("Louvain");
+            louvainForm.ShowDialog();
             CheckRemoveIsolates();
             LoadData();
             SetChecked();
@@ -6974,6 +6977,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         {
             communityType = CommunityType.louvainDensity;
             SetNewDisplayMatrix("Louvain");
+            louvainForm.ShowDialog();
             CheckRemoveIsolates();
             LoadData();
             SetChecked();
@@ -6984,6 +6988,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         {
             communityType = CommunityType.louvainDensity;
             SetNewDisplayMatrix("Louvain");
+            louvainForm.ShowDialog();
             CheckRemoveIsolates();
             LoadData();
             SetChecked();
@@ -6994,6 +6999,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         {
             communityType = CommunityType.louvainCohesion;
             SetNewDisplayMatrix("Louvain");
+            louvainForm.ShowDialog();
             CheckRemoveIsolates();
             LoadData();
             SetChecked();
@@ -7004,6 +7010,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         {
             communityType = CommunityType.louvainSepCof;
             SetNewDisplayMatrix("Louvain");
+            louvainForm.ShowDialog();
             CheckRemoveIsolates();
             LoadData();
             SetChecked();
@@ -7014,6 +7021,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
         {
             communityType = CommunityType.louvainMod;
             SetNewDisplayMatrix("Louvain");
+            louvainForm.ShowDialog();
             CheckRemoveIsolates();
             LoadData();
             SetChecked();

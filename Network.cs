@@ -1995,7 +1995,11 @@ namespace Network
             do
             {
                 changed = false;
-                randomizeVertices(ref vvertices);
+                //NOTE: Since Louvain algorithm is non-deterministic, it can give different answers for
+                //the same input graph if the vertex order is randomized, which is why randomization of
+                //vertices is not currently done so that the software can give the same answer every time
+                //for a given input.
+                //randomizeVertices(ref vvertices);
                 foreach (var vertex in vvertices)
                 {
                     //int vertex = vvertices[r.Next(0, vvertices.Count)];
@@ -2140,7 +2144,7 @@ namespace Network
 
         //Use Louvain Algorithm to find communities
         //https://towardsdatascience.com/louvain-algorithm-93fde589f58c
-        public void LouvainCommunitiesExtraction(DataGridView data, CommunityType commType, int year, double density)
+        public void LouvainCommunitiesExtraction(DataGridView data, CommunityType commType, double precision, int maxIterations, bool unlimitedIterations, int year, double density)
         {
             //Initialize vars
             List<int> vvertices = new List<int>();  //name is vvertices because didnt want to break any other variable if it is also called vertices
@@ -2201,7 +2205,7 @@ namespace Network
 
                 //reset values for new iteration,
                 //i.e, construct new graph using communities
-                if(newMod - curMod > 0.001 && k < 20)
+                if(newMod - curMod > precision)
                 {
                     LouvainRestructure(ref vvertices, ref node2Com, ref C, ref outEdges, ref com2Node, k);
                 } else
@@ -2209,7 +2213,7 @@ namespace Network
                     break;
                 }
                 k++;
-            } while (true);
+            } while (unlimitedIterations || k < maxIterations);
 
             //sort communities in descending order according to number of members
             List<List<int>> descComs = (from entry in com2Node orderby entry.Value.Count descending select entry.Value).ToList<List<int>>();
