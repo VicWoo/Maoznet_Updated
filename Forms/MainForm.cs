@@ -713,7 +713,7 @@ namespace NetworkGUI
             switch (loadFrom)
             {
                 case "Random":
-                    this.Text = "Matrix Manipulator v" + versionString + " - Random Data - " + _randomForm.Year.ToString();
+                    this.Text = "Matrix Manipulator v" + versionString + " - Random Data - " + (_randomForm.Year + currentYearIndex).ToString();
                     break;
                 case "ValuedRandom":
                     this.Text = "Matrix Manipulator v" + versionString + " - Value Random Data - " + _vrandomForm.Year.ToString();
@@ -1123,7 +1123,7 @@ namespace NetworkGUI
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     SetMode(false);
-                    //startYear = currentYearIndex = net.SmartLoad(openFileDialog.FileName, out loadFrom);
+                    //startYearIndex = currentYearIndex = net.SmartLoad(openFileDialog.FileName, out loadFrom);
                     networkRealIdList = new List<string>();
                     startYear = currentYearIndex = net.SmartLoad(openFileDialog.FileName, out loadFrom, out networkRealIdList);
                     // Yushan
@@ -1240,8 +1240,8 @@ namespace NetworkGUI
                     range.ShowDialog();
                     try
                     {
-                        //startYear = int.Parse(range.from);
-                        //endYear = int.Parse(range.to);
+                        //startYearIndex = int.Parse(range.from);
+                        //endYearIndex = int.Parse(range.to);
                         startYear = networkRealIdList.IndexOf(range.from);
                         endYear = networkRealIdList.IndexOf(range.to);
                         if (startYear > endYear)
@@ -1291,7 +1291,7 @@ namespace NetworkGUI
                         //Thread s = new Thread(delegate()
                         //{
                         //    net.SaveCBCOverlapToFile(saveFileDialog.FileName, year, displayMatrix != "Characteristics",
-                        //        displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwrite && year == startYear);
+                        //        displayMatrix != "Characteristics" || year == startYearIndex, _optionsForm.SaveOverwrite && year == startYearIndex);
                         //});
                         //   s.Start();
                         //while (!s.IsAlive) ;
@@ -1849,20 +1849,22 @@ namespace NetworkGUI
                 return;
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                int startYear, endYear;
+                int startYearIndex = 0, endYearIndex = 0, startYear = 0, endYear = 0;
                 YearRangeForm range = new YearRangeForm();
                 // Yushan
                 // Temporary, needed until all functions allow input network IDs to be strings
                 if (displayMatrix == "GlobalRandom" || displayMatrix == "ConfigModel")
                 {
-                    range.from = netID[currentYearIndex];
+                    range.from = netID[0];
                     range.to = netID[netID.Count - 1];
                     range.ShowDialog();
                     try
                     {
-                        startYear = netID.FindIndex(x => x == range.from);
-                        endYear = netID.FindIndex(x => x == range.to);
-                        if (startYear > endYear)
+                        startYear = int.Parse(range.from);
+                        endYear = int.Parse(range.to);
+                        startYearIndex = netID.FindIndex(x => x == range.from);
+                        endYearIndex = netID.FindIndex(x => x == range.to);
+                        if (startYearIndex > endYearIndex)
                         {
                             MessageBox.Show("The end year must be less than or equal to the start year!", "Error!");
                             return;
@@ -1880,25 +1882,32 @@ namespace NetworkGUI
                     {
                         //range.from = currentYearIndex.ToString();
                         //range.to = currentYearIndex.ToString();
-                        range.from = networkRealIdList[currentYearIndex];
+                        range.from = networkRealIdList[0];
                         range.to = networkRealIdList[networkRealIdList.Count - 1];
                         range.ShowDialog();
 
-                        //startYear = int.Parse(range.from);
-                        //endYear = int.Parse(range.to);
-                        startYear = networkRealIdList.IndexOf(range.from);
-                        if (startYear == -1)
+                        startYear = int.Parse(range.from);
+                        endYear = int.Parse(range.to);
+                        endYearIndex = networkRealIdList.Count - 1;
+                        startYearIndex = networkRealIdList.IndexOf(range.from);
+                        if (startYearIndex == -1)
                         {
                             MessageBox.Show("The year " + range.from + " does not exist!", "Error!");
                             return;
                         }
-                        endYear = networkRealIdList.IndexOf(range.to);
-                        if (endYear == -1)
+                        if(loadFrom != "Random")
                         {
-                            MessageBox.Show("The year " + range.to + " does not exist!", "Error!");
-                            return;
+                            endYearIndex = networkRealIdList.IndexOf(range.to);
+                            if (endYearIndex == -1)
+                            {
+                                MessageBox.Show("The year " + range.to + " does not exist!", "Error!");
+                                return;
+                            }
+                        } else
+                        {
+                            endYearIndex = int.Parse(range.to) - int.Parse(range.from);
                         }
-                        if (startYear > endYear)
+                        if (startYearIndex > endYearIndex)
                         {
                             MessageBox.Show("The start network ID must appear before the end network ID in the input order!", "Error!");
                             return;
@@ -1911,11 +1920,11 @@ namespace NetworkGUI
                     }
                 }
 
-                ProgressForm p = new ProgressForm(startYear, endYear, 0);
+                ProgressForm p = new ProgressForm(startYearIndex, endYearIndex, 0);
                 p.Show();
 
                 int previousYear = -1;
-                for (int year = startYear; year <= endYear; ++year)
+                for (int year = startYearIndex; year <= endYearIndex; ++year)
                 {
                     switch (loadFrom)
                     {
@@ -1935,11 +1944,11 @@ namespace NetworkGUI
                             year = net.LoadFromAffiliationFile(openFileDialog.FileName, year);
                             break;
                         case "Random":
-                            if (year != startYear)
-                                net.LoadRandom(_randomForm.N, "Data", _randomSymmetric, _randomForm.ProbRange, _randomForm.MinProb, _randomForm.MaxProb, _randomForm.RandomN, _randomForm.RandomMinN, _randomForm.RandomMaxN, _randomForm.RandomIntN, _randomForm.Year);
+                            if (year != startYearIndex)
+                                net.LoadRandom(_randomForm.N, "Data", _randomSymmetric, _randomForm.ProbRange, _randomForm.MinProb, _randomForm.MaxProb, _randomForm.RandomN, _randomForm.RandomMinN, _randomForm.RandomMaxN, _randomForm.RandomIntN, startYear);
                             break;
                         case "ValuedRandom":
-                            if (year != startYear)
+                            if (year != startYearIndex)
                                 net.LoadValuedRandom(_vrandomForm.N, "Data", _randomSymmetric, _vrandomForm.vmin, _vrandomForm.vmax, _vrandomForm.datatype, _vrandomForm.zerodiagonalized, _vrandomForm.ProbRange, _vrandomForm.MinProb, _vrandomForm.MaxProb, _vrandomForm.RandomN, _vrandomForm.RandomMinN, _vrandomForm.RandomMaxN, _vrandomForm.RandomIntN, _vrandomForm.Year);
                             break;
                         case "GlobalRandom":
@@ -1952,7 +1961,7 @@ namespace NetworkGUI
                             year = net.LoadFromMonadicFile(openFileDialog.FileName, year);
                             break;
                     }
-
+                    startYear++;
                     // Should we standardize?
                     if (byRowToolStripMenuItem.Checked == true)
                         net.StandardizeByRow(displayMatrix);
@@ -1967,7 +1976,7 @@ namespace NetworkGUI
                     else if (maximumToolStripMenuItem.Checked == true)
                         net.StandardizeByDiagonalMaximum(displayMatrix);
 
-                    if (year != previousYear && year <= endYear)
+                    if (year != previousYear && year <= endYearIndex)
                     {
                         if (net.CohesionFilename != null)
                             net.CohesionMatrix = MatrixReader.ReadMatrixFromFile(net.CohesionFilename, year);
@@ -1977,23 +1986,24 @@ namespace NetworkGUI
 
 
                         string s = net.MakeDefaultDyadicLabel(displayMatrix);
-                        if (year != startYear)
+                        if (year != startYearIndex)
                             s = null;
                         //Yushan
                         if (loadFrom == "GlobalRandom" || loadFrom == "ConfigModel")
                         {
                             net.SaveMatrixToMatrixFile(saveFileDialog.FileName, year, displayMatrix, displayMatrix != "Characteristics",
-displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwrite && year == startYear);
+displayMatrix != "Characteristics" || year == startYearIndex, _optionsForm.SaveOverwrite && year == startYearIndex);
                         }
                         else
-                            net.SaveMatrixToDyadicFile(saveFileDialog.FileName, year, displayMatrix, s, _optionsForm.SaveOverwrite && year == startYear);
+                            net.SaveMatrixToDyadicFile(saveFileDialog.FileName, year, displayMatrix, s, _optionsForm.SaveOverwrite && year == startYearIndex);
 
                     }
                     p.curYear = year;
                     previousYear = year;
+                    SetFormTitle();
                 }
 
-                if (currentYearIndex != endYear)
+                if (currentYearIndex != endYearIndex)
                 {
                     switch (loadFrom)
                     {
@@ -2034,7 +2044,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
             }
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                int startYear, endYear;
+                int startYearIndex = 0, endYearIndex = 0, startYear = 0, endYear = 0;
                 YearRangeForm range = new YearRangeForm();
 
                 if (displayMatrix == "Affiliation")
@@ -2049,9 +2059,9 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                     range.ShowDialog();
                     try
                     {
-                        startYear = netID.FindIndex(x => x == range.from);
-                        endYear = netID.FindIndex(x => x == range.to);
-                        if (startYear > endYear)
+                        startYearIndex = netID.FindIndex(x => x == range.from);
+                        endYearIndex = netID.FindIndex(x => x == range.to);
+                        if (startYearIndex > endYearIndex)
                         {
                             MessageBox.Show("The end year must be less than or equal to the start year!", "Error!");
                             return;
@@ -2070,9 +2080,9 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                     range.ShowDialog();
                     try
                     {
-                        startYear = int.Parse(range.from);
-                        endYear = int.Parse(range.to);
-                        if (startYear > endYear)
+                        startYearIndex = int.Parse(range.from);
+                        endYearIndex = int.Parse(range.to);
+                        if (startYearIndex > endYearIndex)
                         {
                             MessageBox.Show("The start network ID must appear before the end network ID in the input order!", "Error!");
                             return;
@@ -2089,25 +2099,33 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                 {
                     //range.from = currentYearIndex.ToString();
                     //range.to = currentYearIndex.ToString();
-                    range.from = networkRealIdList[currentYearIndex];
+                    range.from = networkRealIdList[0];
                     range.to = networkRealIdList[networkRealIdList.Count - 1];
                     range.ShowDialog();
 
-                    //startYear = int.Parse(range.from);
-                    //endYear = int.Parse(range.to);
-                    startYear = networkRealIdList.IndexOf(range.from);
-                    if (startYear == -1)
+                    startYear = int.Parse(range.from);
+                    endYear = int.Parse(range.to);
+                    endYearIndex = networkRealIdList.Count - 1;
+                    startYearIndex = networkRealIdList.IndexOf(range.from);
+                    if (startYearIndex == -1)
                     {
                         MessageBox.Show("The year " + range.from + " does not exist!", "Error!");
                         return;
                     }
-                    endYear = networkRealIdList.IndexOf(range.to);
-                    if (endYear == -1)
+                    if (loadFrom != "Random")
                     {
-                        MessageBox.Show("The year " + range.to + " does not exist!", "Error!");
-                        return;
+                        endYearIndex = networkRealIdList.IndexOf(range.to);
+                        if (endYearIndex == -1)
+                        {
+                            MessageBox.Show("The year " + range.to + " does not exist!", "Error!");
+                            return;
+                        }
                     }
-                    if (startYear > endYear)
+                    else
+                    {
+                        endYearIndex = int.Parse(range.to) - int.Parse(range.from);
+                    }
+                    if (startYearIndex > endYearIndex)
                     {
                         MessageBox.Show("The start network ID must appear before the end network ID in the input order!", "Error!");
                         return;
@@ -2120,8 +2138,8 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                 }
 
                 ProgressForm progress = new ProgressForm();
-                progress.endYear = endYear;
-                progress.startYear = startYear;
+                progress.endYear = endYearIndex;
+                progress.startYear = startYearIndex;
                 progress.curYear = 0;
 
                 progress.Show();
@@ -2141,13 +2159,13 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                 else if (maximumToolStripMenuItem.Checked == true)
                     net.StandardizeByDiagonalMaximum(displayMatrix);*/
 
-                //int year = startYear;
+                //int year = startYearIndex;
                 // Yushan
-                bool currentEqualsStart = (currentYearIndex == startYear);
+                bool currentEqualsStart = (currentYearIndex == startYearIndex);
 
-                currentYearIndex = startYear;
+                currentYearIndex = startYearIndex;
                 int previousYear = -1;
-                for (int year = startYear; year <= endYear; ++year)
+                for (int year = startYearIndex; year <= endYearIndex; ++year)
                 {
                     switch (loadFrom)
                     {
@@ -2167,11 +2185,11 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                             year = net.LoadFromAffiliationFile(openFileDialog.FileName, year);
                             break;
                         case "Random":
-                            if (year != startYear)
-                                net.LoadRandom(_randomForm.N, "Data", _randomSymmetric, _randomForm.ProbRange, _randomForm.MinProb, _randomForm.MaxProb, _randomForm.RandomN, _randomForm.RandomMinN, _randomForm.RandomMaxN, _randomForm.RandomIntN, _randomForm.Year);
+                            if (year != startYearIndex)
+                                net.LoadRandom(_randomForm.N, "Data", _randomSymmetric, _randomForm.ProbRange, _randomForm.MinProb, _randomForm.MaxProb, _randomForm.RandomN, _randomForm.RandomMinN, _randomForm.RandomMaxN, _randomForm.RandomIntN, startYear);
                             break;
                         case "ValuedRandom":
-                            if (year != startYear)
+                            if (year != startYearIndex)
                                 net.LoadValuedRandom(_vrandomForm.N, "Data", _randomSymmetric, _vrandomForm.vmin, _vrandomForm.vmax, _vrandomForm.datatype, _vrandomForm.zerodiagonalized, _vrandomForm.ProbRange, _vrandomForm.MinProb, _vrandomForm.MaxProb, _vrandomForm.RandomN, _vrandomForm.RandomMinN, _vrandomForm.RandomMaxN, _vrandomForm.RandomIntN, _vrandomForm.Year);
                             break;
                         case "GlobalRandom":
@@ -2184,7 +2202,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                             year = net.LoadFromMonadicFile(openFileDialog.FileName, year);
                             break;
                     }
-
+                    startYear++;
                     // Should we standardize?
                     if (byRowToolStripMenuItem.Checked == true)
                         net.StandardizeByRow(displayMatrix);
@@ -2199,7 +2217,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                     else if (maximumToolStripMenuItem.Checked == true)
                         net.StandardizeByDiagonalMaximum(displayMatrix);
 
-                    if (year != previousYear && year <= endYear)
+                    if (year != previousYear && year <= endYearIndex)
                     {
                         if (net.CohesionFilename != null)
                             net.CohesionMatrix = MatrixReader.ReadMatrixFromFile(net.CohesionFilename, year);
@@ -2211,23 +2229,23 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                             if (displayMatrix == "Affiliation")
                                 net.SaveAffiliationToMatrixFile(saveFileDialog.FileName, year, _optionsForm.Cutoff[currentYearIndex], _optionsForm.InputType != "None", _optionsForm.InputType == "StructEquiv",
                                                                 _optionsForm.FileName, _optionsForm.InputType == "Dyadic", _optionsForm.Density, _optionsForm.SumMean, _optionsForm.SumMeanFilename,
-                                                                _optionsForm.svcFile, _optionsForm.SaveOverwrite && year == startYear,
+                                                                _optionsForm.svcFile, _optionsForm.SaveOverwrite && year == startYearIndex,
                                                                 cliqueSizeToolStripMenuItem1.Checked, cliqueCohesionToolStripMenuItem1.Checked, estebanRayIndexToolStripMenuItem1.Checked, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
                             else if (displayMatrix == "Affil" && loadFrom == "Affil")
-                                net.SaveAffiliationMatrixToMatrixFile(saveFileDialog.FileName, year, _optionsForm.SaveOverwrite && year == startYear);
+                                net.SaveAffiliationMatrixToMatrixFile(saveFileDialog.FileName, year, _optionsForm.SaveOverwrite && year == startYearIndex);
                             else if (displayMatrix == "NatDep")
-                                net.SaveNationalDependencyToMatrixFile(saveFileDialog.FileName, year, _optionsForm.SaveOverwrite && year == startYear);
+                                net.SaveNationalDependencyToMatrixFile(saveFileDialog.FileName, year, _optionsForm.SaveOverwrite && year == startYearIndex);
                             else if (displayMatrix == "CONCOR")
-                                net.SaveBlocAffiliationToMatrixFile(saveFileDialog.FileName, year, _blocForm.pos, _optionsForm.SaveOverwrite && year == startYear, openFileDialog.Multiselect);
+                                net.SaveBlocAffiliationToMatrixFile(saveFileDialog.FileName, year, _blocForm.pos, _optionsForm.SaveOverwrite && year == startYearIndex, openFileDialog.Multiselect);
                             else if (displayMatrix == "Clustering")
-                                net.SaveBlocAffiliationToMatrixFile(saveFileDialog.FileName, year, _blocForm.pos, _optionsForm.SaveOverwrite && year == startYear, openFileDialog.Multiselect);
+                                net.SaveBlocAffiliationToMatrixFile(saveFileDialog.FileName, year, _blocForm.pos, _optionsForm.SaveOverwrite && year == startYearIndex, openFileDialog.Multiselect);
                             else if (displayMatrix == "CBCO" || displayMatrix == "CBCODiag")
                                 net.SaveCBCOverlapToFile(saveFileDialog.FileName, year, displayMatrix != "Characteristics",
-                                    displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwrite && year == startYear, diag);
+                                    displayMatrix != "Characteristics" || year == startYearIndex, _optionsForm.SaveOverwrite && year == startYearIndex, diag);
                             else
                             {
                                 net.SaveMatrixToMatrixFile(saveFileDialog.FileName, year, displayMatrix, displayMatrix != "Characteristics",
-                                    displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwrite && year == startYear);
+                                    displayMatrix != "Characteristics" || year == startYearIndex, _optionsForm.SaveOverwrite && year == startYearIndex);
                             }
                         }
                         catch (Exception er)
@@ -2238,9 +2256,10 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                     }
                     progress.curYear = year;
                     previousYear = year;
+                    SetFormTitle();
                 }
 
-                if (currentYearIndex != endYear)
+                if (currentYearIndex != endYearIndex)
                 {
                     switch (loadFrom)
                     {
@@ -2273,19 +2292,19 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                     if (displayMatrix == "Affiliation")
                         net.SaveAffiliationToMatrixFile(saveFileDialog.FileName, year, _optionsForm.Cutoff[currentYearIndex], _optionsForm.InputType != "None", _optionsForm.InputType == "StructEquiv",
                                                         _optionsForm.FileName, _optionsForm.InputType == "Dyadic", _optionsForm.Density, _optionsForm.SumMean, _optionsForm.SumMeanFilename,
-                                                        _optionsForm.svcFile, _optionsForm.SaveOverwrite && year == startYear,
+                                                        _optionsForm.svcFile, _optionsForm.SaveOverwrite && year == startYearIndex,
                                                         cliqueSizeToolStripMenuItem1.Checked, cliqueCohesionToolStripMenuItem1.Checked, estebanRayIndexToolStripMenuItem1.Checked, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
                     else if (displayMatrix == "Affil" && loadFrom == "Affil")
-                        net.SaveAffiliationMatrixToMatrixFile(saveFileDialog.FileName, year, _optionsForm.SaveOverwrite && year == startYear);
+                        net.SaveAffiliationMatrixToMatrixFile(saveFileDialog.FileName, year, _optionsForm.SaveOverwrite && year == startYearIndex);
                     else if (displayMatrix == "NatDep")
-                        net.SaveNationalDependencyToMatrixFile(saveFileDialog.FileName, year, _optionsForm.SaveOverwrite && year == startYear);
+                        net.SaveNationalDependencyToMatrixFile(saveFileDialog.FileName, year, _optionsForm.SaveOverwrite && year == startYearIndex);
                     else if (displayMatrix == "CONCOR")
-                        net.SaveBlocAffiliationToMatrixFile(saveFileDialog.FileName, year, _blocForm.pos, _optionsForm.SaveOverwrite && year == startYear, openFileDialog.Multiselect);
+                        net.SaveBlocAffiliationToMatrixFile(saveFileDialog.FileName, year, _blocForm.pos, _optionsForm.SaveOverwrite && year == startYearIndex, openFileDialog.Multiselect);
                     else if (displayMatrix == "Clustering")
-                        net.SaveBlocAffiliationToMatrixFile(saveFileDialog.FileName, year, _blocForm.pos, _optionsForm.SaveOverwrite && year == startYear, openFileDialog.Multiselect);
+                        net.SaveBlocAffiliationToMatrixFile(saveFileDialog.FileName, year, _blocForm.pos, _optionsForm.SaveOverwrite && year == startYearIndex, openFileDialog.Multiselect);
                     else if (displayMatrix == "CBCO" || displayMatrix == "CBCODiag")
                         net.SaveCBCOverlapToFile(saveFileDialog.FileName, year, displayMatrix != "Characteristics",
-                            displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwrite && year == startYear, diag);
+                            displayMatrix != "Characteristics" || year == startYearIndex, _optionsForm.SaveOverwrite && year == startYearIndex, diag);
                     //Yushan
                     else if (loadFrom == "GlobalRandom")
                     {
@@ -2295,7 +2314,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                             RemoveIsolatesLoadData();
                         }
                         net.SaveMatrixToMatrixFile(saveFileDialog.FileName, year, displayMatrix, displayMatrix != "Characteristics",
-    displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwrite && year == startYear);
+    displayMatrix != "Characteristics" || year == startYearIndex, _optionsForm.SaveOverwrite && year == startYearIndex);
                     }
                     else if (loadFrom == "ConfigModel")
                     {
@@ -2305,19 +2324,19 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                             RemoveIsolatesLoadData();
                         }
                         net.SaveMatrixToMatrixFile(saveFileDialog.FileName, year, displayMatrix, displayMatrix != "Characteristics",
-    displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwrite && year == startYear);
+    displayMatrix != "Characteristics" || year == startYearIndex, _optionsForm.SaveOverwrite && year == startYearIndex);
                     }
                     //
                     else
                     {
                         RemoveIsolatesLoadData();
                         net.SaveMatrixToMatrixFile(saveFileDialog.FileName, year, displayMatrix, displayMatrix != "Characteristics",
-                            displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwrite && year == startYear);
+                            displayMatrix != "Characteristics" || year == startYearIndex, _optionsForm.SaveOverwrite && year == startYearIndex);
                     }
                         
 
 
-                    if (year < endYear)
+                    if (year < endYearIndex)
                     {
                         switch (loadFrom)
                         {
@@ -2452,8 +2471,8 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                     range.ShowDialog();
                     try
                     {
-                        //startYear = int.Parse(range.from);
-                        //endYear = int.Parse(range.to);
+                        //startYearIndex = int.Parse(range.from);
+                        //endYearIndex = int.Parse(range.to);
                         startYear = networkRealIdList.IndexOf(range.from);
                         endYear = networkRealIdList.IndexOf(range.to);
                         if (startYear > endYear)
@@ -2476,7 +2495,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                 progress.Show();
 
                 int previousYear = -1;
-                for (int year = startYear; year <= endYear; ++year) // used to be year = startYear
+                for (int year = startYear; year <= endYear; ++year) // used to be year = startYearIndex
                 {
 
                     if (_rmvIsolatesForm.RemoveIsolates)
@@ -2584,8 +2603,8 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                     range.ShowDialog();
                     try
                     {
-                        //startYear = int.Parse(range.from);
-                        //endYear = int.Parse(range.to);
+                        //startYearIndex = int.Parse(range.from);
+                        //endYearIndex = int.Parse(range.to);
                         startYear = networkRealIdList.IndexOf(range.from);
                         endYear = networkRealIdList.IndexOf(range.to);
                         if (startYear > endYear)
@@ -2613,7 +2632,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                 //create a list of ids
                 List<int> netIDs = getNetIDs(openFileDialog.FileName);
 
-                // for (int year = startYear; year <= endYear; ++year)
+                // for (int year = startYearIndex; year <= endYearIndex; ++year)
                 for (int i = 0; i < netIDs.Count; i++)
                 {
                     int year = netIDs[i];
@@ -2728,8 +2747,8 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                 range.ShowDialog();
                 try
                 {
-                    //startYear = int.Parse(range.from);
-                    //endYear = int.Parse(range.to);
+                    //startYearIndex = int.Parse(range.from);
+                    //endYearIndex = int.Parse(range.to);
                     startYear = networkRealIdList.IndexOf(range.from);
                     endYear = networkRealIdList.IndexOf(range.to);
                     if (startYear > endYear)
@@ -2782,7 +2801,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                 _optionsForm.CMinMembers = _rmvIsolatesForm.MinGroupSize;
                 _rmvdIsolates = true;
             }
-            //for (int year = startYear; year <= endYear; ++year)
+            //for (int year = startYearIndex; year <= endYearIndex; ++year)
             for (int i = 0; i < netIDs.Count; i++)
             {
                 int year = netIDs[i];
@@ -2833,8 +2852,8 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                     range.ShowDialog();
                     try
                     {
-                        //startYear = int.Parse(range.from);
-                        //endYear = int.Parse(range.to);
+                        //startYearIndex = int.Parse(range.from);
+                        //endYearIndex = int.Parse(range.to);
                         startYear = networkRealIdList.IndexOf(range.from);
                         endYear = networkRealIdList.IndexOf(range.to);
                         if (startYear > endYear)
@@ -2915,8 +2934,8 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                     range.ShowDialog();
                     try
                     {
-                        //startYear = int.Parse(range.from);
-                        //endYear = int.Parse(range.to);
+                        //startYearIndex = int.Parse(range.from);
+                        //endYearIndex = int.Parse(range.to);
                         startYear = networkRealIdList.IndexOf(range.from);
                         endYear = networkRealIdList.IndexOf(range.to);
                         if (startYear > endYear)
@@ -3071,8 +3090,8 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                     range.ShowDialog();
                     try
                     {
-                        //startYear = int.Parse(range.from);
-                        //endYear = int.Parse(range.to);
+                        //startYearIndex = int.Parse(range.from);
+                        //endYearIndex = int.Parse(range.to);
                         startYear = networkRealIdList.IndexOf(range.from);
                         endYear = networkRealIdList.IndexOf(range.to);
                         if (startYear > endYear)
@@ -3190,7 +3209,7 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                         //bbflag
                         net.SavePathBased(openFileDialog.FileName, saveFileDialog.FileName, _optionsForm.SaveOverwrite, pathBasedOrder, pathBasedNull, startYear, endYear, networkRealIdList);
                         progress.Close();
-                        // net.SaveAsTableToFile(saveFileDialog.FileName, year == startYear, _optionsForm.SaveOverwrite && year == startYear, displayMatrix,year, endYear);
+                        // net.SaveAsTableToFile(saveFileDialog.FileName, year == startYearIndex, _optionsForm.SaveOverwrite && year == startYearIndex, displayMatrix,year, endYearIndex);
                         return;
                     }
                     //Yushan
@@ -4609,8 +4628,8 @@ displayMatrix != "Characteristics" || year == startYear, _optionsForm.SaveOverwr
                     range.ShowDialog();
                     try
                     {
-                        //startYear = int.Parse(range.from);
-                        //endYear = int.Parse(range.to);
+                        //startYearIndex = int.Parse(range.from);
+                        //endYearIndex = int.Parse(range.to);
                         startYear = networkRealIdList.IndexOf(range.from);
                         endYear = networkRealIdList.IndexOf(range.to);
                         if (startYear > endYear)

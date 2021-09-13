@@ -70,40 +70,37 @@ namespace NetworkGUI
         // Yushan
         private void goButton_Click(object sender, EventArgs e)
         {
-            //int fromYear, toYear;
-            //try
-            //{
-            //    fromYear = int.Parse(fromText.Text);
-            //    toYear = int.Parse(toText.Text);
-            //    if (toYear < fromYear)
-            //    {
-            //        MessageBox.Show("The start year must be less than or equal to the end year!", "Error!");
-            //        return;
-            //    }
-            //}
-            //catch (Exception)
-            //{
-            //    MessageBox.Show("The years entered are invalid!", "Error!");
-            //    return;
-            //}
+            int fromYear = 0, toYear = 0;
+            if(!int.TryParse(fromText.Text, out fromYear))
+            {
+                MessageBox.Show("The start year " + fromText.Text + " entered is not a valid year!", "Error!");
+                return;
+            }
+            if (!int.TryParse(toText.Text, out toYear))
+            {
+                MessageBox.Show("The end year " + fromText.Text + " entered is not a valid year!", "Error!");
+                return;
+            }
+            if (toYear < fromYear)
+            {
+                MessageBox.Show("The start year must be less than or equal to the end year!", "Error!");
+                return;
+            }
 
-            if (toText.Text == "")
-            {
-                MessageBox.Show("Please enter the start", "Error!");
-                return;
-            }
-            else if (toText.Text == "")
-            {
-                MessageBox.Show("Please enter the end", "Error!");
-                return;
-            }
-            else
-            {
-                this.Close();
-            }
+            this.Close();
         }
 
         private void cohesionCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void fromText_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toText_TextChanged(object sender, EventArgs e)
         {
 
         }
