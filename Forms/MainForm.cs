@@ -703,7 +703,7 @@ namespace NetworkGUI
                     break;
 
                 case "Louvain":
-                    net.LouvainCommunitiesExtraction(dataGrid, communityType, louvainForm.Precision, louvainForm.MaxIterations, louvainForm.UnlimitedIterations, currentYear, _optionsForm.Density);
+                    net.LouvainCommunitiesExtraction(dataGrid, communityType, louvainForm.Precision, louvainForm.MaxIterations, louvainForm.UnlimitedIterations, currentYear, networkRealIdList[currentYear], _optionsForm.Density);
                     break;
             }
         }
@@ -7039,6 +7039,16 @@ displayMatrix != "Characteristics" || year == startYearIndex, _optionsForm.SaveO
         private void louvainModCoeffToolStripMenuItem_Click(object sender, EventArgs e)
         {
             communityType = CommunityType.louvainMod;
+            SetNewDisplayMatrix("Louvain");
+            louvainForm.ShowDialog();
+            CheckRemoveIsolates();
+            LoadData();
+            SetChecked();
+        }
+
+        private void louvainComCoeffToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            communityType = CommunityType.louvainComCoeff;
             SetNewDisplayMatrix("Louvain");
             louvainForm.ShowDialog();
             CheckRemoveIsolates();
