@@ -716,7 +716,7 @@ namespace NetworkGUI
                     this.Text = "Matrix Manipulator v" + versionString + " - Random Data - " + (_randomForm.Year + currentYearIndex).ToString();
                     break;
                 case "ValuedRandom":
-                    this.Text = "Matrix Manipulator v" + versionString + " - Value Random Data - " + _vrandomForm.Year.ToString();
+                    this.Text = "Matrix Manipulator v" + versionString + " - Value Random Data - " + (_vrandomForm.Year + currentYearIndex).ToString();
                     break;
                 case "ABMModel":
                     this.Text = "Matrix Manipulator v" + versionString + " - Agent-Based Shocks Model Simulation";
@@ -1851,8 +1851,7 @@ namespace NetworkGUI
             {
                 int startYearIndex = 0, endYearIndex = 0, startYear = 0, endYear = 0;
                 YearRangeForm range = new YearRangeForm();
-                // Yushan
-                // Temporary, needed until all functions allow input network IDs to be strings
+
                 if (displayMatrix == "GlobalRandom" || displayMatrix == "ConfigModel")
                 {
                     range.from = netID[0];
@@ -1895,7 +1894,7 @@ namespace NetworkGUI
                             MessageBox.Show("The year " + range.from + " does not exist!", "Error!");
                             return;
                         }
-                        if(loadFrom != "Random")
+                        if(loadFrom != "Random" && loadFrom != "ValuedRandom")
                         {
                             endYearIndex = networkRealIdList.IndexOf(range.to);
                             if (endYearIndex == -1)
@@ -1949,7 +1948,7 @@ namespace NetworkGUI
                             break;
                         case "ValuedRandom":
                             if (year != startYearIndex)
-                                net.LoadValuedRandom(_vrandomForm.N, "Data", _randomSymmetric, _vrandomForm.vmin, _vrandomForm.vmax, _vrandomForm.datatype, _vrandomForm.zerodiagonalized, _vrandomForm.ProbRange, _vrandomForm.MinProb, _vrandomForm.MaxProb, _vrandomForm.RandomN, _vrandomForm.RandomMinN, _vrandomForm.RandomMaxN, _vrandomForm.RandomIntN, _vrandomForm.Year);
+                                net.LoadValuedRandom(_vrandomForm.N, "Data", _randomSymmetric, _vrandomForm.vmin, _vrandomForm.vmax, _vrandomForm.datatype, _vrandomForm.zerodiagonalized, _vrandomForm.ProbRange, _vrandomForm.MinProb, _vrandomForm.MaxProb, _vrandomForm.RandomN, _vrandomForm.RandomMinN, _vrandomForm.RandomMaxN, _vrandomForm.RandomIntN, startYear);
                             break;
                         case "GlobalRandom":
                             net.LoadGlobalRandom(dataGrid, mRandList, displayMatrix, netID[year]);
@@ -2050,51 +2049,6 @@ displayMatrix != "Characteristics" || year == startYearIndex, _optionsForm.SaveO
                 if (displayMatrix == "Affiliation")
                     range.SetMode(true);
 
-                /*Yushan
-                Temporary, needed until all functions allow input network IDs to be strings
-                if (displayMatrix == "GlobalRandom" || displayMatrix == "ConfigModel")
-                {
-                    range.from = netID[currentYearIndex];
-                    range.to = netID[netID.Count - 1];
-                    range.ShowDialog();
-                    try
-                    {
-                        startYearIndex = netID.FindIndex(x => x == range.from);
-                        endYearIndex = netID.FindIndex(x => x == range.to);
-                        if (startYearIndex > endYearIndex)
-                        {
-                            MessageBox.Show("The end year must be less than or equal to the start year!", "Error!");
-                            return;
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        MessageBox.Show("The network IDs entered are invalid!", "Error!");
-                        return;
-                    }
-                }
-                else
-                {
-                    range.from = currentYearIndex.ToString();
-                    range.to = currentYearIndex.ToString();
-                    range.ShowDialog();
-                    try
-                    {
-                        startYearIndex = int.Parse(range.from);
-                        endYearIndex = int.Parse(range.to);
-                        if (startYearIndex > endYearIndex)
-                        {
-                            MessageBox.Show("The start network ID must appear before the end network ID in the input order!", "Error!");
-                            return;
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        MessageBox.Show("The years entered are invalid!", "Error!");
-                        return;
-                    }
-                }*/
-
                 try
                 {
                     //range.from = currentYearIndex.ToString();
@@ -2112,7 +2066,7 @@ displayMatrix != "Characteristics" || year == startYearIndex, _optionsForm.SaveO
                         MessageBox.Show("The year " + range.from + " does not exist!", "Error!");
                         return;
                     }
-                    if (loadFrom != "Random")
+                    if (loadFrom != "Random" && loadFrom != "ValuedRandom")
                     {
                         endYearIndex = networkRealIdList.IndexOf(range.to);
                         if (endYearIndex == -1)
@@ -2190,7 +2144,7 @@ displayMatrix != "Characteristics" || year == startYearIndex, _optionsForm.SaveO
                             break;
                         case "ValuedRandom":
                             if (year != startYearIndex)
-                                net.LoadValuedRandom(_vrandomForm.N, "Data", _randomSymmetric, _vrandomForm.vmin, _vrandomForm.vmax, _vrandomForm.datatype, _vrandomForm.zerodiagonalized, _vrandomForm.ProbRange, _vrandomForm.MinProb, _vrandomForm.MaxProb, _vrandomForm.RandomN, _vrandomForm.RandomMinN, _vrandomForm.RandomMaxN, _vrandomForm.RandomIntN, _vrandomForm.Year);
+                                net.LoadValuedRandom(_vrandomForm.N, "Data", _randomSymmetric, _vrandomForm.vmin, _vrandomForm.vmax, _vrandomForm.datatype, _vrandomForm.zerodiagonalized, _vrandomForm.ProbRange, _vrandomForm.MinProb, _vrandomForm.MaxProb, _vrandomForm.RandomN, _vrandomForm.RandomMinN, _vrandomForm.RandomMaxN, _vrandomForm.RandomIntN, startYear);
                             break;
                         case "GlobalRandom":
                             net.LoadGlobalRandom(dataGrid, mRandList, displayMatrix, netID[year]);
@@ -2286,6 +2240,8 @@ displayMatrix != "Characteristics" || year == startYearIndex, _optionsForm.SaveO
                 }
                 SetFormTitle();
 
+                //Commented Old Deprecated Code left just in case top code breaks stuff
+                #region
                 /*while (true)
                 {
                     progress.curYear = year;
@@ -2333,7 +2289,7 @@ displayMatrix != "Characteristics" || year == startYearIndex, _optionsForm.SaveO
                         net.SaveMatrixToMatrixFile(saveFileDialog.FileName, year, displayMatrix, displayMatrix != "Characteristics",
                             displayMatrix != "Characteristics" || year == startYearIndex, _optionsForm.SaveOverwrite && year == startYearIndex);
                     }
-                        
+
 
 
                     if (year < endYearIndex)
@@ -2424,7 +2380,8 @@ displayMatrix != "Characteristics" || year == startYearIndex, _optionsForm.SaveO
                     _optionsForm.CMinMembers = _rmvIsolatesForm.MinGroupSize;
                     net.RemoveIsolates(_optionsForm.Cutoff[currentYearIndex], _optionsForm.InputType != "None", _optionsForm.Density, currentYearIndex, _rmvIsolatesForm.MinGroupSize, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
                     _rmvdIsolates = true;
-                } */
+                }*/
+                #endregion
             }
         }
 
