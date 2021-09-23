@@ -117,45 +117,45 @@ namespace Network.Matrices
 
                 case Type.RandomDiagonal:
                     m = RandomMatrix.LoadDiagonal(_rows, true);
-                    m.NetworkId = _networkId;
+                    m.NetworkIdIndex = _networkId;
                     break;
 
                 case Type.RandomSymmetric:
                     m = RandomMatrix.LoadSymmetric(_rows, range, pmin, pmax);
-                    m.NetworkId = _networkId;
+                    m.NetworkIdIndex = _networkId;
                     break;
                     
                 case Type.RandomNonSymmetric:
                     m = RandomMatrix.LoadNonSymmetric(_rows, range, pmin, pmax);
-                    m.NetworkId = _networkId;
+                    m.NetworkIdIndex = _networkId;
                     break;
 
                 case Type.RandomVector:
                     m = RandomMatrix.LoadVector(_rows);
-                    m.NetworkId = _networkId;
+                    m.NetworkIdIndex = _networkId;
                     break;
 
                 case Type.RandomWithProbRange:
                     m = RandomMatrix.LoadWithProbabilisticRange(_rows, _cols, _min, _max);
-                    m.NetworkId = _networkId;
+                    m.NetworkIdIndex = _networkId;
                     break;
 
                 case Type.NullFile:
                     return null;
             }
 
-            _networkId = m.NetworkId + 1;
+            _networkId = m.NetworkIdIndex + 1;
             
             if (!string.IsNullOrEmpty(_outputFile) && _type != Type.NullFile)
                 WriteMatrixToFile(m, _isdyadic, overwrite);
 
             /*
-            if (m.NetworkId < 1000)
-                m.NetworkId = int.Parse("1" + m.NetworkId);
+            if (m.NetworkIdIndex < 1000)
+                m.NetworkIdIndex = int.Parse("1" + m.NetworkIdIndex);
             */
             //else
-              //  m.NetworkId = int.Parse("2" + m.NetworkId);
-            //m.NetworkId = int.Parse("1" + m.NetworkId);
+              //  m.NetworkIdIndex = int.Parse("2" + m.NetworkIdIndex);
+            //m.NetworkIdIndex = int.Parse("1" + m.NetworkIdIndex);
             return m;
         }
 
@@ -194,11 +194,11 @@ namespace Network.Matrices
 
         private void WriteMatrixToFile(Matrix m, bool isDyadic, bool overwrite)
         { 
-            int oldID = m.NetworkId;
+            int oldID = m.NetworkIdIndex;
             for (int i = 0; i < _writeRepeatCount; ++i)
             {
                 if (_writeRepeatCount > 1)
-                    m.NetworkId = int.Parse(oldID.ToString() + (i + 1).ToString());
+                    m.NetworkIdIndex = int.Parse(oldID.ToString() + (i + 1).ToString());
                 if (m is Vector)
                     MatrixWriter.WriteVectorToVectorFile(m as Vector, _outputFile, overwrite);
                 else if (_forceVector)
@@ -209,7 +209,7 @@ namespace Network.Matrices
                     MatrixWriter.WriteMatrixToDyadicFile(m, _outputFile, overwrite);
 
             }
-            m.NetworkId = oldID;
+            m.NetworkIdIndex = oldID;
         }
     }
 }

@@ -370,7 +370,7 @@ namespace NetworkGUI
                 if (inputTypeAtt.Checked) //attribute vector
                 {
                     //obtains the Network Id from the main Matrix
-                    net.CohesionMatrix = MatrixReader.ReadAttributeVector(CohesionFilename, net.GetMatrix("Data").NetworkId);
+                    net.CohesionMatrix = MatrixReader.ReadAttributeVector(CohesionFilename, net.GetMatrix("Data").NetworkIdIndex);
                     
                 }
 

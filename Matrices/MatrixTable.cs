@@ -20,7 +20,7 @@ namespace Network.Matrices
             string[] orderedNetIds = new string[this.Count];
             foreach (KeyValuePair <string, Matrix> kvp in this)
             {
-                orderedNetIds[kvp.Value.NetworkId] = kvp.Key;
+                orderedNetIds[kvp.Value.NetworkIdIndex] = kvp.Key;
             }
             return orderedNetIds;
         }

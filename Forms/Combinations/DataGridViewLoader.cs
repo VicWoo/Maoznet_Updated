@@ -33,7 +33,7 @@ namespace Network.GUI
                 {
                     if (col == 0 && (string.Equals(m.ColLabels[0], "Year") || string.Equals(m.ColLabels[0], "Network ID")))
                     {
-                        newRow[col] = m.NetworkIdStr;
+                        newRow[col] = m.ActualNetworkIdStr;
                     }
                     else
                         newRow[col] = m[row, col].ToString();

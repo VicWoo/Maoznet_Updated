@@ -148,8 +148,8 @@ namespace Network.IO
             }
 
             Matrix m = new Matrix(d.Count, d.Count);  //transpose matrix
-            m.NetworkId = netID;
-            m.NetworkIdStr = reader.GetNetworkRealId(netID);
+            m.NetworkIdIndex = netID;
+            m.ActualNetworkIdStr = reader.GetNetworkRealId(netID);
 
 
             //calculation
@@ -169,8 +169,8 @@ namespace Network.IO
             networkId = reader.JumpToNetworkId(networkId, true);
 
             Matrix m = new Matrix(reader.CountLines(networkId));
-            m.NetworkId = networkId;
-            m.NetworkIdStr = reader.GetNetworkRealId(networkId);
+            m.NetworkIdIndex = networkId;
+            m.ActualNetworkIdStr = reader.GetNetworkRealId(networkId);
             for (int i = 0; i < m.Rows; ++i)
             {
                 string s = reader.ReadLine();
@@ -187,8 +187,8 @@ namespace Network.IO
             networkId = reader.JumpToNetworkId(networkId, true);
 
             Vector v = new Vector(reader.CountLines(networkId));
-            v.NetworkId = networkId;
-            v.NetworkIdStr = reader.GetNetworkRealId(networkId);
+            v.NetworkIdIndex = networkId;
+            v.ActualNetworkIdStr = reader.GetNetworkRealId(networkId);
             for (int i = 0; i < v.Size; ++i)
             {
                 string s = reader.ReadLine();
@@ -244,8 +244,8 @@ namespace Network.IO
             int rows = rowLabels.Count;
             int cols = colLabels.Count;
             Matrix matrix = new Matrix(rows, cols);
-            matrix.NetworkId = networkId;
-            matrix.NetworkIdStr = reader.GetNetworkRealId(networkId);
+            matrix.NetworkIdIndex = networkId;
+            matrix.ActualNetworkIdStr = reader.GetNetworkRealId(networkId);
             matrix.RowLabels.SetLabels(rowLabels);
             matrix.ColLabels.SetLabels(colLabels);
             for (int i = 0; i < rows; i++)
@@ -280,7 +280,7 @@ namespace Network.IO
                 //for (int var = 0; var < reader.CountVarsInDyadicFile(); var++)
                 //{
                 //    Matrix matrix = new Matrix(rows, rows);
-                //    matrix.NetworkId = networkId;
+                //    matrix.NetworkIdIndex = networkId;
                 //    matrix.Name = topLabels[var + 3];
                 //    matrix.RowLabels.SetLabels(labels.Keys);
                 //    matrix.ColLabels.SetLabels(labels.Keys);
@@ -315,8 +315,8 @@ namespace Network.IO
                     Matrix matrix = new Matrix(rows, cols);
                     matrix.RowLabels.SetLabels(rowLabels);
                     matrix.ColLabels.SetLabels(colLabels);
-                    matrix.NetworkId = networkId;
-                    matrix.NetworkIdStr = reader.GetNetworkRealId(networkId);
+                    matrix.NetworkIdIndex = networkId;
+                    matrix.ActualNetworkIdStr = reader.GetNetworkRealId(networkId);
                     multipleMatrices.Add(matrix);
                 }
 
@@ -359,8 +359,8 @@ namespace Network.IO
             int cols = colLabels.Length - 1;
 
             Matrix matrix = new Matrix(rows, cols);
-            matrix.NetworkId = networkId;
-            matrix.NetworkIdStr = reader.GetNetworkRealId(networkId);
+            matrix.NetworkIdIndex = networkId;
+            matrix.ActualNetworkIdStr = reader.GetNetworkRealId(networkId);
             matrix.ColLabels.SetLabels(colLabels);
 
             for (int row = 0; row < rows; ++row)
@@ -372,10 +372,10 @@ namespace Network.IO
                 string[] parts = temp.Split(',');
 
                 if (parts.Length > cols + 1) // one extra for header
-                    throw new FileLoadException("Matrix file has too many entries for network id: " + matrix.NetworkIdStr + ", row " + parts[0]);
+                    throw new FileLoadException("Matrix file has too many entries for network id: " + matrix.ActualNetworkIdStr + ", row " + parts[0]);
 
                 if (parts.Length == 0)
-                    throw new FileLoadException("Matrix file has no entries for network id: " + matrix.NetworkIdStr);
+                    throw new FileLoadException("Matrix file has no entries for network id: " + matrix.ActualNetworkIdStr);
 
                 //matrix.RowLabels[row] = parts[0];
                 rowLabels.Add(parts[0]);

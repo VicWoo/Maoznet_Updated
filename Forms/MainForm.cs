@@ -1491,7 +1491,7 @@ namespace NetworkGUI
                     networkRealIdList = BufferedFileTable.GetFile(openFileDialog.FileName).NetworkRealIdList;
                     for (int i = 0; i < networkRealIdList.Count; i++)
                     {
-                        //Console.WriteLine("network[{0:d}] real ID: {1:s}", i, networkRealIdList[i]);
+                        Console.WriteLine("network[{0:d}] real ID: {1:s}", i, networkRealIdList[i]);
                     }
                     SetFormTitle();
 
@@ -1706,7 +1706,7 @@ namespace NetworkGUI
             netID = new List<string>();
             foreach (Matrix m in networkSpec_data)
             {
-                netID.Add(m.NetworkIdStr);
+                netID.Add(m.ActualNetworkIdStr);
             }
             currentNetwork = netID[0];
             currentYearIndex = 0;
@@ -1737,7 +1737,7 @@ namespace NetworkGUI
             netID = new List<string>();
             foreach (Matrix m in networkSpec_data)
             {
-                netID.Add(m.NetworkIdStr);
+                netID.Add(m.ActualNetworkIdStr);
             }
             currentNetwork = netID[0];
             currentYearIndex = 0;
@@ -1772,8 +1772,8 @@ namespace NetworkGUI
             nodeLabels = new Dictionary<string, MatrixLabels>();
             foreach (Matrix m in networkSpec_data)
             {
-                netID.Add(m.NetworkIdStr);
-                nodeLabels.Add(m.NetworkIdStr, m.RowLabels);
+                netID.Add(m.ActualNetworkIdStr);
+                nodeLabels.Add(m.ActualNetworkIdStr, m.RowLabels);
             }
 
             loadFrom = "ConfigModel";
@@ -1807,8 +1807,8 @@ namespace NetworkGUI
             nodeLabels = new Dictionary<string, MatrixLabels>();
             foreach (Matrix m in networkSpec_data)
             {
-                netID.Add(m.NetworkIdStr);
-                nodeLabels.Add(m.NetworkIdStr, m.RowLabels);
+                netID.Add(m.ActualNetworkIdStr);
+                nodeLabels.Add(m.ActualNetworkIdStr, m.RowLabels);
             }
 
             loadFrom = "ConfigModel";

@@ -771,8 +771,8 @@ namespace Network
             //R.CloneTo(OriginalR);
             Matrix BEA2 = UpdateSimplifiedRealistStageTwo(C, R, M, BEA, outputFile, br);
             BEA2.CopyLabelsFrom(C);
-            BEA2.NetworkId = int.Parse(networkID + "02");
-            R.NetworkId = BEA2.NetworkId;
+            BEA2.NetworkIdIndex = int.Parse(networkID + "02");
+            R.NetworkIdIndex = BEA2.NetworkIdIndex;
 
             while (!BEA2.IsSameAs(Temp) && (stage <= maxIter))
             {
@@ -790,8 +790,8 @@ namespace Network
                 BEA2.CloneTo(BEA);
                 BEA2 = UpdateSimplifiedRealistStageTwo(C, R, M, BEA, outputFile, br);
                 stage++;
-                BEA2.NetworkId = int.Parse(networkID + "" + (stage >= 10 ? stage + "" : "0" + stage + ""));
-                R.NetworkId = BEA2.NetworkId;
+                BEA2.NetworkIdIndex = int.Parse(networkID + "" + (stage >= 10 ? stage + "" : "0" + stage + ""));
+                R.NetworkIdIndex = BEA2.NetworkIdIndex;
                 BEA2.CopyLabelsFrom(C);
             }
             return BEA2;
@@ -806,8 +806,8 @@ namespace Network
             //R.CloneTo(OriginalR);
             Matrix BEA2 = UpdateSimplifiedLiberalStageTwo(C, R, M, D, JCC, BEA, outputFile, br);
             BEA2.CopyLabelsFrom(C);
-            BEA2.NetworkId = int.Parse(networkID + "02");
-            R.NetworkId = BEA2.NetworkId;
+            BEA2.NetworkIdIndex = int.Parse(networkID + "02");
+            R.NetworkIdIndex = BEA2.NetworkIdIndex;
             
             while (!BEA2.IsSameAs(Temp) && (stage <= maxIter))
             {
@@ -828,8 +828,8 @@ namespace Network
                 BEA2.CloneTo(BEA);
                 BEA2 = UpdateSimplifiedLiberalStageTwo(C, R, M, D, JCC, BEA, outputFile, br);
                 stage++;
-                BEA2.NetworkId = int.Parse(networkID + "" + (stage >= 10 ? stage + "" : "0" + stage + ""));
-                R.NetworkId = BEA2.NetworkId;
+                BEA2.NetworkIdIndex = int.Parse(networkID + "" + (stage >= 10 ? stage + "" : "0" + stage + ""));
+                R.NetworkIdIndex = BEA2.NetworkIdIndex;
                 BEA2.CopyLabelsFrom(C);
 
             }
@@ -1659,8 +1659,8 @@ namespace Network
             // 33. Save output
             Matrix Output = new Matrix(FA1.Rows, 9);
             string[] colNames = {"Node", "DEF", "NAG", "CAP", "CAL", "AOC0", "AOC1", "ATC", "REC"};
-            //Output.NetworkId = 101 + stage;
-            Output.NetworkId = int.Parse(networkid + "0" + stage);
+            //Output.NetworkIdIndex = 101 + stage;
+            Output.NetworkIdIndex = int.Parse(networkid + "0" + stage);
             for (int i = 0; i < colNames.Length; i++)
                 Output.ColLabels[i] = colNames[i];
             for (int i = 0; i < Output.Rows; i++)
@@ -1686,7 +1686,7 @@ namespace Network
         private static Matrix SimulateNAPTStageOne(Matrix CAP, Matrix SRG, Matrix CONT, Matrix MID, Matrix DEMO, Matrix JC, Matrix CS, Matrix REL, ref Matrix SRGOutput, ref Matrix EAOutput, string EAOutputFile, string outputfile, bool overwrite, bool EADyadic, bool outputDyadic, int networkid)
         {
             int stage = 1;
-            //int networkid = SRG.NetworkId;
+            //int networkid = SRG.NetworkIdIndex;
             // 1. Transpose vectors Cap, Demo, and Rel
             // No need to since the vectors are just the diagonals of the matrices
             
@@ -1784,8 +1784,8 @@ namespace Network
             NAPTStageOneHelper1(CAP, SRG, SRGC, PAN, UA11, CUA11, AOC, ref DP1, ref FA1, stage, null);
             
             // write FA1 to matrix file
-            FA1.NetworkId = int.Parse(networkid + "0" + stage);
-            //FA1.NetworkId = SRG.NetworkId + 1;
+            FA1.NetworkIdIndex = int.Parse(networkid + "0" + stage);
+            //FA1.NetworkIdIndex = SRG.NetworkIdIndex + 1;
             //int.Parse(editedNetworkId + "01");
             for (int i = 0; i < SRG.Rows; i++)
             {
@@ -1817,7 +1817,7 @@ namespace Network
 
         private static Matrix SimulateNAPTStageTwo(Matrix FA1, Matrix SRG1, Matrix DP1, Matrix CAP, Matrix REL, Matrix UA11, int rowColSize, Matrix output, ref Matrix SRGOutput, ref Matrix EAOutput, int stage, string EAOutputFile, string outputfile, bool overwrite, bool EADyadic, bool outputDyadic, int networkid)
         {
-            //int networkid = SRG1.NetworkId;
+            //int networkid = SRG1.NetworkIdIndex;
             // 2. Generate Allies of Enemies matrix AE2 = SRG1 x DP1
             Matrix AE2 = SRG1 * DP1;
             
@@ -1920,9 +1920,9 @@ namespace Network
             NAPTStageOneHelper1(CAP, SRG2, SRGC20, PAN2, UA21, CUA21, AOC20, ref DP2, ref FA2, stage, AC20);
 
             if (stage >= 10)
-                FA2.NetworkId = int.Parse(networkid + "" + stage);
+                FA2.NetworkIdIndex = int.Parse(networkid + "" + stage);
             else
-                FA2.NetworkId = int.Parse(networkid + "0" + stage);
+                FA2.NetworkIdIndex = int.Parse(networkid + "0" + stage);
             for (int i = 0; i < FA1.Rows; i++)
             {
                 FA2.RowLabels[i] = FA1.RowLabels[i];
@@ -1969,7 +1969,7 @@ namespace Network
                 for (int i = 0; i < SRG2.Rows; i++)
                     for (int j = 0; j < SRG2.Cols; j++)
                         SRGOutput[i, j] = SRG2[i, j];
-                SRGOutput.NetworkId = new_output.NetworkId;
+                SRGOutput.NetworkIdIndex = new_output.NetworkIdIndex;
                 FA2.Clear();
                 Temp.CloneTo(FA2);
                 return SimulateNAPTStageTwo(FA2, SRG1, DP2, CAP, REL, UA11, rowColSize, new_output, ref SRGOutput, ref EAOutput, stage + 1, EAOutputFile, outputfile, overwrite, EADyadic, outputDyadic, networkid);
@@ -2141,7 +2141,7 @@ namespace Network
             Matrix CS = csProvider.ReadNext(overwrite);
             Matrix REL = relProvider.ReadNext(overwrite);
 
-            //int tryIntVar1 = srg.NetworkId;
+            //int tryIntVar1 = srg.NetworkIdIndex;
             Matrix P = null;
 
             if (randomConflict)
@@ -2212,7 +2212,7 @@ namespace Network
             {
                 Matrix SRGOutput = new Matrix(srg);
                 Matrix EAOutput = null;
-                networkID = srg.NetworkId;
+                networkID = srg.NetworkIdIndex;
                 //expectedAlliance = SimulateNAPTStageOne(capabilities, srg, contiguity, MID, D, JCC, CS, REL, ref SRGOutput, ref EAOutput, expectedAllianceFile, outputFile, overwrite, expectedAllianceDyadic, outputDyadic, networkID);
                 SimulateNAPTStageOne(capabilities, srg, contiguity, MID, D, JCC, CS, REL, ref SRGOutput, ref EAOutput, expectedAllianceFile, outputFile, overwrite, expectedAllianceDyadic, outputDyadic, networkID);
                 
@@ -2242,11 +2242,11 @@ namespace Network
                 expectedAlliance = SimulateLiberalStageOne(contiguity, capabilities, srg, majorPowers, D, JCC, br);
 
             //if (outputDyadic) MatrixWriter.WriteDyadicHeader(outputFile);
-            int editedNetworkId = srg.NetworkId;
+            int editedNetworkId = srg.NetworkIdIndex;
             
-            expectedAlliance.NetworkId = int.Parse(editedNetworkId + "01");   // Problem encountered 2/15/11
+            expectedAlliance.NetworkIdIndex = int.Parse(editedNetworkId + "01");   // Problem encountered 2/15/11
             expectedAlliance.CopyLabelsFrom(capabilities);
-            srg.NetworkId = int.Parse(editedNetworkId + "01");
+            srg.NetworkIdIndex = int.Parse(editedNetworkId + "01");
             srg.CopyLabelsFrom(capabilities);
             
             if (!outputDyadic)
@@ -2262,7 +2262,7 @@ namespace Network
             }
             if (conflict != null)
             {
-                conflict.NetworkId = expectedAlliance.NetworkId;
+                conflict.NetworkIdIndex = expectedAlliance.NetworkIdIndex;
                 if (!string.IsNullOrEmpty(conflictOutputFile) && !conflictProvider.IsFromFile)
                 {
                     
@@ -2284,7 +2284,7 @@ namespace Network
 
             if (MID == null) //if not simplified version
             {
-                expectedAlliance.NetworkId = int.Parse(editedNetworkId + "02");
+                expectedAlliance.NetworkIdIndex = int.Parse(editedNetworkId + "02");
                 expectedAlliance.CopyLabelsFrom(capabilities);
                 
                 if (!outputDyadic)
@@ -2323,7 +2323,7 @@ namespace Network
                 else
                     expectedAlliance = SimulateLiberalStageTwo(conflict, expectedAlliance, capabilities, D, JCC, br);
 
-                expectedAlliance.NetworkId = int.Parse(editedNetworkId + "03");
+                expectedAlliance.NetworkIdIndex = int.Parse(editedNetworkId + "03");
                 expectedAlliance.CopyLabelsFrom(capabilities);
                 
                 if (!outputDyadic)
@@ -2331,7 +2331,7 @@ namespace Network
                 else
                     MatrixWriter.WriteMatrixToDyadicFile(expectedAlliance, outputFile, overwrite);
 
-                conflict.NetworkId = expectedAlliance.NetworkId;
+                conflict.NetworkIdIndex = expectedAlliance.NetworkIdIndex;
                 if (!string.IsNullOrEmpty(conflictOutputFile) && !conflictProvider.IsFromFile)
                 {
                     

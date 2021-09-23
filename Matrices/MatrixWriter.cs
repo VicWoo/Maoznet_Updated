@@ -27,9 +27,9 @@ namespace Network.IO
                 using (StreamWriter writer = new StreamWriter(filename, !overwrite))
                 {
                     if (writeNetworkId)
-                        //writer.WriteLine(m.NetworkId);
+                        //writer.WriteLine(m.NetworkIdIndex);
                         // Yushan
-                        writer.WriteLine(m.NetworkIdStr);
+                        writer.WriteLine(m.ActualNetworkIdStr);
 
                     if (writeColLabels)
                     {
@@ -88,8 +88,8 @@ namespace Network.IO
                 {
                     for (int j = 0; j < m.Cols; ++j)
                     {
-                        //string line = m.NetworkId + "," + m.RowLabels[i].ToString() + ","; // modified
-                        string line = m.NetworkIdStr + "," + m.RowLabels[i].ToString() + ",";
+                        //string line = m.NetworkIdIndex + "," + m.RowLabels[i].ToString() + ","; // modified
+                        string line = m.ActualNetworkIdStr + "," + m.RowLabels[i].ToString() + ",";
                         line += m.RowLabels[j].ToString() + "," + m[i, j].ToString();
                         writer.WriteLine(line);
                     }
@@ -115,8 +115,8 @@ namespace Network.IO
             {
                 for (int i = 0; i < v.Size; ++i)
                 {
-                    //writer.WriteLine("{0},{1},{2}", v.NetworkId, v.Labels[i], v[i]);
-                    writer.WriteLine("{0},{1},{2}", v.NetworkIdStr, v.Labels[i], v[i]);
+                    //writer.WriteLine("{0},{1},{2}", v.NetworkIdIndex, v.Labels[i], v[i]);
+                    writer.WriteLine("{0},{1},{2}", v.ActualNetworkIdStr, v.Labels[i], v[i]);
                 }
             }
         }
