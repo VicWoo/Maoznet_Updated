@@ -38,12 +38,15 @@ namespace NetworkGUI
             progressBar.Value = cur >= start && cur <= end ? cur : start;
 
             //Yushan
-            if (start == end && start == 0)
+            //if (start == end && start == 0)
+            if (start == end)
                 this.Hide();
             else
             {
-                if (cur == end)
+                if(cur == end)
+                {
                     this.Close();
+                }
             }
         }
 

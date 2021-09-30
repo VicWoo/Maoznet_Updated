@@ -968,8 +968,8 @@ namespace Network
                     groupCount = Blocks.Count;
                     break;
             }
-            Matrix partitioned = new Matrix(partitionedNodeList.Count, partitionedNodeList.Count);
-            Matrix partitionedCohesion = new Matrix(partitionedNodeList.Count, partitionedNodeList.Count);
+            Matrix partitioned = new Matrix(partitionedNodeList.Count, partitionedNodeList.Count, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
+            Matrix partitionedCohesion = new Matrix(partitionedNodeList.Count, partitionedNodeList.Count, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
             for (int i = 0; i < partitionedNodeList.Count; i++)
             {
                 for (int j = 0; j < partitionedNodeList.Count; j++)
@@ -1110,8 +1110,8 @@ namespace Network
                 cohtotaldegree += d;
             }
 
-            Matrix seprandpart = new Matrix(partitionedNodeList.Count, partitionedNodeList.Count);
-            Matrix cohrandpart = new Matrix(partitionedNodeList.Count, partitionedNodeList.Count);
+            Matrix seprandpart = new Matrix(partitionedNodeList.Count, partitionedNodeList.Count, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
+            Matrix cohrandpart = new Matrix(partitionedNodeList.Count, partitionedNodeList.Count, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
 
             for (int i = 0; i < sepoutdegrees.Count; i++)
             {
@@ -1137,8 +1137,8 @@ namespace Network
                 }
             }
 
-            Matrix nulldensity = new Matrix(groupCount, groupCount);
-            Matrix nullcohesion = new Matrix(groupCount, groupCount);
+            Matrix nulldensity = new Matrix(groupCount, groupCount, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
+            Matrix nullcohesion = new Matrix(groupCount, groupCount, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
 
             for (int q = 0; q < groupCount; q++)
             {
@@ -1172,7 +1172,7 @@ namespace Network
                     else
                     {
                         _cliques.LoadCliqueByCliqueOverlap();
-                        Matrix cliqueOverlap = new Matrix(_cliques.Count, _cliques.Count);
+                        Matrix cliqueOverlap = new Matrix(_cliques.Count, _cliques.Count, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
                         for (int i = 0; i < _cliques.Count; i++)
                         {
                             for (int j = 0; j < _cliques.Count; j++)
@@ -1924,33 +1924,33 @@ namespace Network
             double sigmaTot, kiin, ki;
 
             //Modularity Delta(Source Community --> Node) Removing node from Source Community
-            printF($"Removing node {node} from Source Community {srcComId}");
+            //printF($"Removing node {node} from Source Community {srcComId}");
             double rmvMod = 0.0;
             if (srcCommmunity.Count != 0)
             {
                 TotIn = LouvainSigmaTotIn(srcComId, srcCommmunity, outEdges, node2Com);
                 sigmaTot = TotIn[0];
-                printF($"sigmaTot = {sigmaTot} \t sigmaIn = {TotIn[1]}");
+                //printF($"sigmaTot = {sigmaTot} \t sigmaIn = {TotIn[1]}");
                 kInI = LouvainKInI(node, srcComId, srcCommmunity, outEdges, node2Com);
                 kiin = kInI[0];
                 ki = kInI[1];
-                printF($"kiin = {kiin} \t ki = {ki}");
+                //printF($"kiin = {kiin} \t ki = {ki}");
                 if (m != 0.0)
                     rmvMod = ((sigmaTot * ki) / (2 * m)) - kiin;
             }
 
             //Modularity Delta(Node --> Destination Community) Adding node to Destination Community
-            printF($"Adding node {node} to Destination Community {destComId}");
+            //printF($"Adding node {node} to Destination Community {destComId}");
             double mergeMod = 0.0;
             if(destCommmunity.Count != 0)
             {
                 TotIn = LouvainSigmaTotIn(destComId, destCommmunity, outEdges, node2Com);
                 sigmaTot = TotIn[0];
-                printF($"sigmaTot = {sigmaTot} \t sigmaIn = {TotIn[1]}");
+                //printF($"sigmaTot = {sigmaTot} \t sigmaIn = {TotIn[1]}");
                 kInI = LouvainKInI(node, destComId, destCommmunity, outEdges, node2Com);
                 kiin = kInI[0];
                 ki = kInI[1];
-                printF($"kiin = {kiin} \t ki = {ki}");
+                //printF($"kiin = {kiin} \t ki = {ki}");
                 if (m != 0.0)
                     mergeMod = kiin - ((sigmaTot * ki) / (2 * m));
             }
@@ -2000,7 +2000,7 @@ namespace Network
             int it = 1;
             do
             {
-                printF("ITERATION " + it.ToString());
+                //printF("ITERATION " + it.ToString());
                 changed = false;
                 //NOTE: Since Louvain algorithm is non-deterministic, it can give different answers for
                 //the same input graph if the vertex order is randomized, which is why randomization of
@@ -2010,9 +2010,9 @@ namespace Network
                 foreach (var vertex in vvertices)
                 {
                     //int vertex = vvertices[r.Next(0, vvertices.Count)];
-                    printF("Moving vertex " + vertex.ToString());
+                    //printF("Moving vertex " + vertex.ToString());
                     double maxModIncr = 0.0;
-                    printF("Source Community " + node2Com[vertex].ToString());
+                    //printF("Source Community " + node2Com[vertex].ToString());
                     int srcCom = node2Com[vertex];
                     int destCom = srcCom;    //by default it is source community
                     C[srcCom].Remove(vertex);
@@ -2029,23 +2029,23 @@ namespace Network
                     neighboringCommunities.Remove(-1);
                     foreach (var comId in neighboringCommunities)
                     {
-                        printF("\nTo Neighboring Community " + comId.ToString());
+                        //printF("\nTo Neighboring Community " + comId.ToString());
                         double mod = 0.0;
                         mod = LouvainModularityGain(vertex, srcCom, C[srcCom], comId, C[comId], m, outEdges, node2Com);
-                        printF("mod " + mod.ToString() + " > maxMod " + maxModIncr.ToString() + " ?");
+                        //printF("mod " + mod.ToString() + " > maxMod " + maxModIncr.ToString() + " ?");
                         if (mod > maxModIncr)
                         {
-                            printF("Assigning new max mod " + mod.ToString() + " new destComId = " + comId.ToString());
+                            //printF("Assigning new max mod " + mod.ToString() + " new destComId = " + comId.ToString());
                             destCom = comId;
                             maxModIncr = mod;
                             changed = true;
                         }
                     }
-                    printF("Moving vertex " + vertex.ToString() + " from community " + srcCom.ToString() + " to community " + destCom.ToString() + "\n\n");
+                    //printF("Moving vertex " + vertex.ToString() + " from community " + srcCom.ToString() + " to community " + destCom.ToString() + "\n\n");
                     C[destCom].Add(vertex);
                     node2Com[vertex] = destCom;
                 }
-                printF("\n\n\n\n");
+                //printF("\n\n\n\n");
                 it++;
             } while (changed);
         }
@@ -2182,13 +2182,13 @@ namespace Network
         //MAIN LOUVAIN ALGO BODY
         //Use Louvain Algorithm to find communities
         //https://towardsdatascience.com/louvain-algorithm-93fde589f58c
-        public void LouvainCommunitiesExtraction(DataGridView data, CommunityType commType, double precision, int maxIterations, bool unlimitedIterations, int yearIndex, string year, double density)
+        public void LouvainCommunitiesExtraction(DataGridView data, CommunityType commType, double precision, int maxIterations, bool unlimitedIterations, int yearIndex, string year, double density, string m_name)
         {
             //Initialize vars
             List<int> vvertices = new List<int>();  //name is vvertices because didnt want to break any other variable if it is also called vertices
-            Dictionary<int, Dictionary<int, double>> outEdges = new Dictionary<int, Dictionary<int, double>>();    //List[i][j] where i = current vertice, j = destination vertice i is connected to, List[i][j] = weight of connection
+            Dictionary<int, Dictionary<int, double>> outEdges = new Dictionary<int, Dictionary<int, double>>();    //outEdges[i][j] where i = current vertice, j = destination vertice i is connected to, outEdges[i][j] = weight of connection
             Dictionary<int, Dictionary<int, double>> ogOutEdges = new Dictionary<int, Dictionary<int, double>>();   //original matrix outgoing edges
-            List<List<int>> C = new List<List<int>>();
+            List<List<int>> C = new List<List<int>>();  //List of vertices in a given community, C[0] = vertices in community 0
             Dictionary<int, int> node2Com = new Dictionary<int, int>(); //vertice --> community id at higher level
             Dictionary<int, List<int>> com2Node = new Dictionary<int, List<int>>(); //community id --> vertice at base level
             double m = 0.0; //sum of the weights of all edges in the graph
@@ -2227,7 +2227,7 @@ namespace Network
             int nvertices = vvertices.Count;    //number of vertices
             List<double> modularityCoeff = new List<double>();  //keeping track of modularity value over iterations
 
-            printF("m " + m.ToString());
+            //printF("m " + m.ToString());
 
 
             //Main method
@@ -2235,10 +2235,9 @@ namespace Network
             double newMod = LouvainModularity(m, C, outEdges, node2Com);
             do
             {
-                printF("\nnewMod " + newMod.ToString());
+                //printF("\nnewMod " + newMod.ToString());
                 double curMod = newMod;
                 modularityCoeff.Add(curMod);
-                //Working till here
 
                 //Check new mod of vertice i going from original community to 
                 //neighboring communities and put i in community with max mod increase
@@ -2283,7 +2282,6 @@ namespace Network
             }
             
             //Output Stuff
-            string m_name = "Community";
             int nrows = comm.GetLength(0);
             int ncoms = comm.GetLength(1);
             
@@ -2293,7 +2291,7 @@ namespace Network
             switch (commType)
             {
                 case CommunityType.louvainAffil:
-                    mTable[m_name] = new Matrix(nrows, ncoms); // may not need
+                    mTable[m_name] = new Matrix(nrows, ncoms);
                     mTable[m_name].ActualNetworkIdStr = year;
                     mTable[m_name].NetworkIdIndex = yearIndex;
                     // add the labels to the columns of the grid
@@ -2319,7 +2317,7 @@ namespace Network
                     break;
 
                 case CommunityType.louvainDensity:
-                    mTable[m_name] = new Matrix(ncoms); // may not need
+                    mTable[m_name] = new Matrix(ncoms);
                     mTable[m_name].ActualNetworkIdStr = year;
                     mTable[m_name].NetworkIdIndex = yearIndex;
                     //Add columns of table
@@ -2369,20 +2367,30 @@ namespace Network
 
                 case CommunityType.louvainSepCof:
                     double sepCof = LouvainSepCof(ncoms, descComs, ogOutEdges);
+                    mTable[m_name] = new Matrix(1);
+                    mTable[m_name].ActualNetworkIdStr = year;
+                    mTable[m_name].NetworkIdIndex = yearIndex;
+                    mTable[m_name][0, 0] = sepCof;
+                    mTable[m_name].ColLabels[0] = "Separation Coefficient";
+                    mTable[m_name].RowLabels[0] = "1";
                     data.Columns.Add("1", "Separation Coefficient");
                     data.Rows.Add(sepCof);
                     break;
 
                 case CommunityType.louvainMod:
                     data.Columns.Add("1", "Modularity Coefficient");
+                    mTable[m_name] = new Matrix(modularityCoeff.Count, 1);
+                    mTable[m_name].ColLabels[0] = "Modularity Coefficient";
                     for (int i = 0; i < modularityCoeff.Count; i++)
                     {
                         data.Rows.Add(modularityCoeff[i]);
                         data.Rows[i].HeaderCell.Value = "Iteration " + (i).ToString();
+                        mTable[m_name].RowLabels[i] = "Iteration " + (i).ToString();
                     }
                     break;
                 //bbflag
                 case CommunityType.louvainComCoeff:
+                    mTable[m_name] = new Matrix(1, 9);
                     data.Columns.Add("1", "Year");
                     data.Columns.Add("2", "Row");
                     data.Columns.Add("3", "Separation Coefficient");
@@ -2392,6 +2400,16 @@ namespace Network
                     data.Columns.Add("7", "Null Coh. Coeff.");
                     data.Columns.Add("8", "T-Cohesion");
                     data.Columns.Add("9", "Modularity Coefficient");
+                    mTable[m_name].ColLabels[0] = "Year";
+                    mTable[m_name].ColLabels[1] = "Row";
+                    mTable[m_name].ColLabels[2] = "Separation Coefficient";
+                    mTable[m_name].ColLabels[3] = "Null Sep. Coeff.";
+                    mTable[m_name].ColLabels[4] = "T-Separation";
+                    mTable[m_name].ColLabels[5] = "Cohesion Coefficient";
+                    mTable[m_name].ColLabels[6] = "Null Coh. Coeff.";
+                    mTable[m_name].ColLabels[7] = "T-Cohesion";
+                    mTable[m_name].ColLabels[8] = "Modularity Coefficient";
+                    mTable[m_name].RowLabels[0] = "1";
                     LoadStructEquiv(density, yearIndex, "Data");
                     string[] comCoeffs = new string[data.Columns.Count];
                     comCoeffs[0] = year; //Year
@@ -2404,6 +2422,15 @@ namespace Network
                     comCoeffs[7] = "NA";    //T-Cohesion
                     comCoeffs[8] = modularityCoeff[modularityCoeff.Count - 1].ToString();    //Final Modularity Coeff
                     data.Rows.Add(comCoeffs);
+                    mTable[m_name][0, 0] = Convert.ToDouble(year);
+                    mTable[m_name][0, 1] = 1;
+                    mTable[m_name][0, 2] = LouvainSepCof(ncoms, descComs, ogOutEdges);
+                    mTable[m_name][0, 3] = double.NaN;
+                    mTable[m_name][0, 4] = double.NaN;
+                    mTable[m_name][0, 5] = CalculateCommGC();
+                    mTable[m_name][0, 6] = double.NaN;
+                    mTable[m_name][0, 7] = double.NaN;
+                    mTable[m_name][0, 8] = modularityCoeff[modularityCoeff.Count - 1];
                     break;
             }
         }
@@ -3019,7 +3046,7 @@ namespace Network
             }
 
             int cliqueNum = cliques.Count;
-            Matrix Density = new Matrix(cliqueNum, cliqueNum);
+            Matrix Density = new Matrix(cliqueNum, cliqueNum, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
 
             for (int i = 0; i < cliqueNum; i++)
             {
@@ -3081,7 +3108,7 @@ namespace Network
             }
 
             int B = Blocks.Count;
-            Matrix Density = new Matrix(B, B);
+            Matrix Density = new Matrix(B, B, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
 
             for (int i = 0; i < B; ++i)
             {
@@ -3142,7 +3169,7 @@ namespace Network
                 }
             }
 
-            Matrix Density = new Matrix(comNum, comNum);
+            Matrix Density = new Matrix(comNum, comNum, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
             for (int i = 0; i < comNum; i++)
             {
                 for (int j = 0; j < comNum; j++)
@@ -3329,7 +3356,7 @@ namespace Network
         //
         public Matrix computeCliqueCohesiveMatrix()
         {
-            Matrix cohesiveMatrix = new Matrix(_cliques.Count, _cliques.Count);
+            Matrix cohesiveMatrix = new Matrix(_cliques.Count, _cliques.Count, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
 
             // for external files
             if (cohesionFilename != null)
@@ -3404,7 +3431,7 @@ namespace Network
 
         public Matrix computeBlockCohesiveMatrix()
         {
-            Matrix cohesiveMatrix = new Matrix(_blocks.Count, _blocks.Count);
+            Matrix cohesiveMatrix = new Matrix(_blocks.Count, _blocks.Count, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
 
             // for external files
             if (cohesionFilename != null)
@@ -3475,7 +3502,7 @@ namespace Network
         //bbflag
         public Matrix computeCommCohesiveMatrix()
         {
-            Matrix cohesiveMatrix = new Matrix(comNum);
+            Matrix cohesiveMatrix = new Matrix(comNum, mTable["Data"].ActualNetworkIdStr, mTable["Data"].NetworkIdIndex);
 
             // for external files
             if (cohesionFilename != null)
@@ -4235,9 +4262,9 @@ namespace Network
             if (maxik >= 0.0)
             {
                 mTable["SESE"] = MatrixComputations.StructuralEquivalenceStandardizedEuclidean(mTable[m], maxik);
-                SESEmatrix = new Matrix(mTable["SESE"]);
                 mTable["SESE"].ActualNetworkIdStr = mTable[m].ActualNetworkIdStr;
                 mTable["SESE"].NetworkIdIndex = year;
+                SESEmatrix = new Matrix(mTable["SESE"]);
             }
         }
 
@@ -10096,7 +10123,7 @@ namespace Network
             sw.Close();
         }
 
-        public void SaveCommAffiliationToAffiliationFile(string fileName, int year, bool label, bool Overwrite)
+        public void SaveCommAffiliationToAffiliationFile(string fileName, int year, bool label, bool Overwrite, string tableName)
         {
 
             bool topLabels = true;
@@ -10121,21 +10148,21 @@ namespace Network
             if (topLabels)
             {
                 sw.Write("year,state");
-                for (int i = 0; i < mTable["Community"].Cols; ++i)
+                for (int i = 0; i < mTable[tableName].Cols; ++i)
                 {
                     sw.Write(",R" + (i + 1).ToString());
                 }
                 sw.WriteLine("");
             }
-            for (int row = 0; row < mTable["Community"].Rows; ++row)
+            for (int row = 0; row < mTable[tableName].Rows; ++row)
             {
                 //string line = yearIndex.ToString() + "," + mTable["Data"].RowLabels[row] + ",";
                 // Yushan
                 string line = mTable["Data"].ActualNetworkIdStr + "," + mTable["Data"].RowLabels[row] + ",";
-                for (int col = 0; col < mTable["Community"].Cols; ++col)
+                for (int col = 0; col < mTable[tableName].Cols; ++col)
                 {
-                    line += mTable["Community"][row, col].ToString();
-                    if (col + 1 != mTable["Community"].Cols)
+                    line += mTable[tableName][row, col].ToString();
+                    if (col + 1 != mTable[tableName].Cols)
                         line += ",";
                 }
                 Application.DoEvents();
@@ -10181,7 +10208,7 @@ namespace Network
             {
                 //string line = yearIndex.ToString() + "," + mTable["Data"].RowLabels[row] + ",";
                 // Yushan
-                string line = mTable["Data"] + "," + mTable["Data"].RowLabels[row] + ",";
+                string line = mTable["OverlappingCommunity"].ActualNetworkIdStr + "," + mTable["OverlappingCommunity"].RowLabels[row] + ",";
                 for (int col = 0; col < mTable["OverlappingCommunity"].Cols; ++col)
                 {
                     line += mTable["OverlappingCommunity"][row, col].ToString();
@@ -13190,7 +13217,7 @@ namespace Network
                 // group is the vector that produces the community affiliaton matrix
                 data.Columns.Clear(); // Clear data grid and prep for affliation matrix
                 
-                mTable[m_name] = new Matrix(group.Length, comNum); // may not need
+                mTable[m_name] = new Matrix(group.Length, comNum, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr); // may not need
                 //mTable["Community"].CloneTo(mTable[m_name]);
 
                 // add the labels to the columns of the grid
@@ -13383,7 +13410,8 @@ namespace Network
                 data.Columns.Add("1", "Community Modularity");
 
                 // matrix needs comNum + 1 rows since it needs an extra row for the final q value
-                mTable[m_name] = new Matrix(q_size + 1, 1);
+                mTable[m_name] = new Matrix(q_size + 1, 1, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
+                mTable[m_name].ColLabels[0] = "Community Modularity";
                 mTable["Community"].CloneTo(mTable[m_name]); // may not need
 
                 // create the communities
@@ -13397,12 +13425,14 @@ namespace Network
                 {
                     // Generate an array to hold this row
                     newRow = mTable[m_name][row, 0].ToString();
+                    mTable[m_name].RowLabels[row] = "Comm " + row.ToString();
                     data.Rows.Add(newRow);
                     data.Rows[row].HeaderCell.Value = "Comm " + row.ToString();
                 }
                 newRow = mTable[m_name][q_size, 0].ToString();
                 data.Rows.Add(newRow);
                 data.Rows[q_size].HeaderCell.Value = "Final ";
+                mTable[m_name].RowLabels[q_size] = "Final";
             }
 
             else if (commType == CommunityType.Coefficients || commType == CommunityType.newCoefficients || commType == CommunityType.ovCoefficients)
@@ -13421,11 +13451,11 @@ namespace Network
 
                 if (true)//commType == CommunityType.Coefficients)
                 {
-                    mTable[m_name] = new Matrix(comm_SC_list.Count, 9);
+                    mTable[m_name] = new Matrix(comm_SC_list.Count, 9, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
                 }
                 else if (commType == CommunityType.newCoefficients)
                 {
-                    mTable[m_name] = new Matrix(comm_SC_list.Count, 9);
+                    mTable[m_name] = new Matrix(comm_SC_list.Count, 9, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
                 }
                 
                 for (int i = 0; i < comm_SC_list.Count - 1; i++)
@@ -14154,8 +14184,8 @@ namespace Network
         {
             // Convert overlapComm into a matrix to be able to show in GUI
             mTable.AddMatrix("OverlappingCommunity", cliqueSize, overlapComm.Count);
-            mTable["OverLappingCommunity"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
-            mTable["OverLappingCommunity"].NetworkIdIndex = mTable["Data"].NetworkIdIndex;
+            mTable["OverlappingCommunity"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable["OverlappingCommunity"].NetworkIdIndex = mTable["Data"].NetworkIdIndex;
             for (int i = 0; i < overlapComm.Count; i++)
                 for (int j = 0; j < cliqueSize; j++)
                     mTable["OverlappingCommunity"][j, i] = overlapComm[i].IntContains(j);

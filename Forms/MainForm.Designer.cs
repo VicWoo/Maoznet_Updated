@@ -271,7 +271,7 @@ namespace NetworkGUI
             this.helpToolStripMenuItem});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
-            this.menuStrip.Size = new System.Drawing.Size(1582, 30);
+            this.menuStrip.Size = new System.Drawing.Size(1582, 28);
             this.menuStrip.TabIndex = 0;
             this.menuStrip.Text = "menuStrip1";
             // 
@@ -284,7 +284,7 @@ namespace NetworkGUI
             this.resetToolStripMenuItem,
             this.exitToolStripMenuItem});
             this.filesToolStripMenuItem.Name = "filesToolStripMenuItem";
-            this.filesToolStripMenuItem.Size = new System.Drawing.Size(46, 26);
+            this.filesToolStripMenuItem.Size = new System.Drawing.Size(46, 24);
             this.filesToolStripMenuItem.Text = "File";
             // 
             // loadFromToolStripMenuItem
@@ -300,7 +300,7 @@ namespace NetworkGUI
             this.globalRandomMatrixToolStripMenuItem,
             this.configureModelMatrixToolStripMenuItem});
             this.loadFromToolStripMenuItem.Name = "loadFromToolStripMenuItem";
-            this.loadFromToolStripMenuItem.Size = new System.Drawing.Size(189, 26);
+            this.loadFromToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.loadFromToolStripMenuItem.Text = "Load From";
             this.loadFromToolStripMenuItem.Click += new System.EventHandler(this.loadFromToolStripMenuItem_Click);
             // 
@@ -449,7 +449,7 @@ namespace NetworkGUI
             this.affiliationFileToolStripMenuItem1,
             this.tableToolStripMenuItem});
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(189, 26);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.saveAsToolStripMenuItem.Text = "Save As";
             // 
             // dyadicFileToolStripMenuItem1
@@ -511,21 +511,21 @@ namespace NetworkGUI
             // closeFileToolStripMenuItem
             // 
             this.closeFileToolStripMenuItem.Name = "closeFileToolStripMenuItem";
-            this.closeFileToolStripMenuItem.Size = new System.Drawing.Size(189, 26);
+            this.closeFileToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.closeFileToolStripMenuItem.Text = "Close File";
             this.closeFileToolStripMenuItem.Click += new System.EventHandler(this.closeFileToolStripMenuItem_Click);
             // 
             // resetToolStripMenuItem
             // 
             this.resetToolStripMenuItem.Name = "resetToolStripMenuItem";
-            this.resetToolStripMenuItem.Size = new System.Drawing.Size(189, 26);
+            this.resetToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.resetToolStripMenuItem.Text = "Reset Program";
             this.resetToolStripMenuItem.Click += new System.EventHandler(this.resetToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(189, 26);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -539,7 +539,7 @@ namespace NetworkGUI
             this.elementwiseMultiplicationToolStripMenuItem1,
             this.matrixMultSaveToolStripMenuItem});
             this.DataManagementToolStripMenuItem.Name = "DataManagementToolStripMenuItem";
-            this.DataManagementToolStripMenuItem.Size = new System.Drawing.Size(147, 26);
+            this.DataManagementToolStripMenuItem.Size = new System.Drawing.Size(147, 24);
             this.DataManagementToolStripMenuItem.Text = "Data Management";
             // 
             // dichotomizeToolStripMenuItem
@@ -694,7 +694,7 @@ namespace NetworkGUI
             this.firstToolStripMenuItem,
             this.lastToolStripMenuItem});
             this.yearToolStripMenuItem.Name = "yearToolStripMenuItem";
-            this.yearToolStripMenuItem.Size = new System.Drawing.Size(60, 26);
+            this.yearToolStripMenuItem.Size = new System.Drawing.Size(60, 24);
             this.yearToolStripMenuItem.Text = "Scroll";
             // 
             // nextToolStripMenuItem
@@ -745,7 +745,7 @@ namespace NetworkGUI
             this.byColumnToolStripMenuItem,
             this.byDiagonalToolStripMenuItem});
             this.standardizeToolStripMenuItem.Name = "standardizeToolStripMenuItem";
-            this.standardizeToolStripMenuItem.Size = new System.Drawing.Size(102, 26);
+            this.standardizeToolStripMenuItem.Size = new System.Drawing.Size(102, 24);
             this.standardizeToolStripMenuItem.Text = "Standardize";
             // 
             // noneToolStripMenuItem
@@ -814,7 +814,7 @@ namespace NetworkGUI
             // optionsToolStripMenuItem
             // 
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(75, 26);
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(75, 24);
             this.optionsToolStripMenuItem.Text = "Options";
             this.optionsToolStripMenuItem.Click += new System.EventHandler(this.optionsToolStripMenuItem_Click);
             // 
@@ -842,7 +842,7 @@ namespace NetworkGUI
             this.networkSpilloverToolStripMenuItem,
             this.ndStatsToolStripMenuItem});
             this.matrixToolStripMenuItem.Name = "matrixToolStripMenuItem";
-            this.matrixToolStripMenuItem.Size = new System.Drawing.Size(156, 26);
+            this.matrixToolStripMenuItem.Size = new System.Drawing.Size(156, 24);
             this.matrixToolStripMenuItem.Text = "Network Operations";
             // 
             // dataMatrixToolStripMenuItem
@@ -1093,7 +1093,7 @@ namespace NetworkGUI
             this.dichotomizedMatrixToolStripMenuItem,
             this.removeIsolatesToolStripMenuItem});
             this.blockmodelsToolStripMenuItem.Name = "blockmodelsToolStripMenuItem";
-            this.blockmodelsToolStripMenuItem.Size = new System.Drawing.Size(165, 26);
+            this.blockmodelsToolStripMenuItem.Size = new System.Drawing.Size(165, 24);
             this.blockmodelsToolStripMenuItem.Text = "Subgroup Operations";
             this.blockmodelsToolStripMenuItem.Click += new System.EventHandler(this.blockmodelsToolStripMenuItem_Click);
             // 
@@ -1768,7 +1768,7 @@ namespace NetworkGUI
             this.dyadicMultiplexImbalanceToolStripMenuItem,
             this.pathBasedImbalanceToolStripMenuItem});
             this.signedNetworkOperationsToolStripMenuItem.Name = "signedNetworkOperationsToolStripMenuItem";
-            this.signedNetworkOperationsToolStripMenuItem.Size = new System.Drawing.Size(206, 26);
+            this.signedNetworkOperationsToolStripMenuItem.Size = new System.Drawing.Size(206, 24);
             this.signedNetworkOperationsToolStripMenuItem.Text = "Signed Network Operations";
             // 
             // dataMatrixToolStripMenuItem1
@@ -1914,7 +1914,7 @@ namespace NetworkGUI
             this.coalitionStructureToolStripMenuItem,
             this.nPIToolStripMenuItem});
             this.coalitionAnalysisToolStripMenuItem.Name = "coalitionAnalysisToolStripMenuItem";
-            this.coalitionAnalysisToolStripMenuItem.Size = new System.Drawing.Size(140, 26);
+            this.coalitionAnalysisToolStripMenuItem.Size = new System.Drawing.Size(140, 24);
             this.coalitionAnalysisToolStripMenuItem.Text = "Coalition Analysis";
             // 
             // protoCoalitionsToolStripMenuItem
@@ -1964,7 +1964,7 @@ namespace NetworkGUI
             this.nAPTSimulationToolStripMenuItem,
             this.agentBasedModelToolStripMenuItem});
             this.networkFormationSimulationToolStripMenuItem.Name = "networkFormationSimulationToolStripMenuItem";
-            this.networkFormationSimulationToolStripMenuItem.Size = new System.Drawing.Size(226, 26);
+            this.networkFormationSimulationToolStripMenuItem.Size = new System.Drawing.Size(226, 24);
             this.networkFormationSimulationToolStripMenuItem.Text = "Network Formation Simulation";
             this.networkFormationSimulationToolStripMenuItem.Click += new System.EventHandler(this.networkFormationSimulationToolStripMenuItem_Click);
             // 
@@ -2013,7 +2013,7 @@ namespace NetworkGUI
             // multipleCliqueAnalysisToolStripMenuItem
             // 
             this.multipleCliqueAnalysisToolStripMenuItem.Name = "multipleCliqueAnalysisToolStripMenuItem";
-            this.multipleCliqueAnalysisToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
+            this.multipleCliqueAnalysisToolStripMenuItem.Size = new System.Drawing.Size(181, 24);
             this.multipleCliqueAnalysisToolStripMenuItem.Text = "Multiple Clique Analysis";
             this.multipleCliqueAnalysisToolStripMenuItem.Click += new System.EventHandler(this.multipleCliqueAnalysisToolStripMenuItem_Click);
             // 
@@ -2023,7 +2023,7 @@ namespace NetworkGUI
             this.contentsToolStripMenuItem,
             this.aboutToolStripMenuItem});
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(55, 26);
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(55, 24);
             this.helpToolStripMenuItem.Text = "Help";
             this.helpToolStripMenuItem.Click += new System.EventHandler(this.helpToolStripMenuItem_Click);
             // 
@@ -2047,12 +2047,12 @@ namespace NetworkGUI
             this.dataGrid.AllowUserToDeleteRows = false;
             this.dataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGrid.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGrid.Location = new System.Drawing.Point(0, 30);
+            this.dataGrid.Location = new System.Drawing.Point(0, 28);
             this.dataGrid.Margin = new System.Windows.Forms.Padding(4);
             this.dataGrid.Name = "dataGrid";
             this.dataGrid.ReadOnly = true;
             this.dataGrid.RowHeadersWidth = 80;
-            this.dataGrid.Size = new System.Drawing.Size(1582, 493);
+            this.dataGrid.Size = new System.Drawing.Size(1582, 495);
             this.dataGrid.TabIndex = 1;
             this.dataGrid.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGrid_CellContentClick);
             // 

@@ -18,7 +18,7 @@ namespace Network.Cliques
         public CliqueCollection(SymmetricBinaryMatrix m,int cmin)
         {
             _cliques = new List<Clique>();
-            _cliqueOverlap = new Matrix(m.Rows);
+            _cliqueOverlap = new Matrix(m.Rows, m.ActualNetworkIdStr, m.NetworkIdIndex);
             _cliqueOverlap.CopyLabelsFrom(m);
            _minCliqueSize = cmin;
 
