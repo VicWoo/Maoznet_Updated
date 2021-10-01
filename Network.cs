@@ -3968,7 +3968,7 @@ namespace Network
             if (m == "ClosenessDistance")
             {
                 m = "Temp";
-                mTable[m] = new Matrix(mTable["ClosenessDistance"].Rows);
+                mTable[m] = new Matrix(mTable["ClosenessDistance"].Rows, mTable["ClosenessDistance"].ActualNetworkIdStr, mTable["ClosenessDistance"].NetworkIdIndex);
                 mTable["ClosenessDistance"].CloneTo(mTable[m]);
                 for (int i = 0; i < mTable[m].Rows; ++i)
                     mTable[m].RowLabels[i] = mTable[m].ColLabels[i] = mTable["ClosenessDistance"].ColLabels[i];
@@ -3979,7 +3979,7 @@ namespace Network
 
             bool isBinary = mTable[m].IsBinaryMatrix;
 
-            mTable["ClosenessDistance"] = new Matrix(mTable[m].Rows);
+            mTable["ClosenessDistance"] = new Matrix(mTable[m].Rows, mTable[m].ActualNetworkIdStr, mTable[m].NetworkIdIndex);
             mTable["ClosenessDistance"].Clear();
 
             Queue<int> q = new Queue<int>();
@@ -10158,7 +10158,7 @@ namespace Network
             {
                 //string line = yearIndex.ToString() + "," + mTable["Data"].RowLabels[row] + ",";
                 // Yushan
-                string line = mTable["Data"].ActualNetworkIdStr + "," + mTable["Data"].RowLabels[row] + ",";
+                string line = mTable[tableName].ActualNetworkIdStr + "," + mTable[tableName].RowLabels[row] + ",";
                 for (int col = 0; col < mTable[tableName].Cols; ++col)
                 {
                     line += mTable[tableName][row, col].ToString();
@@ -11145,7 +11145,7 @@ namespace Network
         // Needs to be here because it uses the row/col labels
         public void LoadCentralityIndices(string m, int year, double sijmax, bool countMember, bool zeroDiagonal)
         {
-            mTable["Centrality"] = new Matrix(mTable["Data"].Rows, 10);
+            mTable["Centrality"] = new Matrix(mTable["Data"].Rows, 10, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
             mTable["Centrality"].ColLabels.SetLabels("Year,State,DO,DI,CO,CI,BO,BI,EO,EI");
             mTable["Centrality"].RowLabels.CopyFrom(mTable["Data"].RowLabels);
 
@@ -12817,6 +12817,19 @@ namespace Network
                 }
                 data.Rows.Add(newRow);
                 data.Rows[data.Rows.Count - 1].HeaderCell.Value = "ER1";
+            }
+            mTable.AddMatrix("Components", data.RowCount, data.ColumnCount);
+            mTable["Components"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable["Components"].NetworkIdIndex = mTable["Data"].NetworkIdIndex;
+            for (int i = 0; i < data.RowCount; i++)
+            {
+                mTable["Components"].RowLabels[i] = data.Rows[i].HeaderCell.Value.ToString();
+                for (int j = 0; j < data.ColumnCount; j++) {
+                    mTable["Components"].ColLabels[j] = data.Columns[j].HeaderText;
+                    double dataVal = double.NaN;
+                    double.TryParse(data.Rows[i].Cells[j].Value.ToString(), out dataVal);
+                    mTable["Components"][i, j] = dataVal;
+                }
             }
 
         }

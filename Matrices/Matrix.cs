@@ -944,7 +944,7 @@ namespace Network.Matrices
         {
             if (!IsSquareMatrix)
                 throw new MatrixException("Cannot get diagonal matrix from non-square matrix.");
-            Matrix tmp = new Matrix(this.Rows);
+            Matrix tmp = new Matrix(this.Rows, this.ActualNetworkIdStr, this.NetworkIdIndex);
             tmp.Clear();
 
             for (int i = 0; i < _rows; ++i)

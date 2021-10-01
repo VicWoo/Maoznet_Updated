@@ -394,7 +394,7 @@ namespace NetworkGUI
             dataGrid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
         }
 
-        private void DoLoadCorrect(int currentYear)
+        private void DoLoadCorrect(int currentYearIdx)
         {
             switch (displayMatrix)
             {
@@ -402,10 +402,10 @@ namespace NetworkGUI
                     net.LoadMatrixIntoDataGridView(dataGrid, "Data");
                     break;
                 case "Counter":
-                    DetermineCounter(currentYear);
+                    DetermineCounter(currentYearIdx);
                     break;
                 case "Affiliation":
-                    net.FindCliques(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                    net.FindCliques(_optionsForm.Cutoff[currentYearIdx], _optionsForm.InputType != "None", _optionsForm.Density, currentYearIdx, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
                     break;
                 case "Cheapest":
                     net.generateLowestCostMatrix();
@@ -416,63 +416,63 @@ namespace NetworkGUI
                     net.LoadMatrixIntoDataGridView(dataGrid, "Strength");
                     break;
                 case "CliqueDensity":
-                    net.FindCliques(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                    net.FindCliques(_optionsForm.Cutoff[currentYearIdx], _optionsForm.InputType != "None", _optionsForm.Density, currentYearIdx, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
                     net.LoadCliqueDensity();
                     break;
                 case "CliqueRelativeDensity":
-                    net.FindCliques(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                    net.FindCliques(_optionsForm.Cutoff[currentYearIdx], _optionsForm.InputType != "None", _optionsForm.Density, currentYearIdx, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
                     net.LoadCliqueRelativeDensity(_optionsForm.Density);
                     break;
                 case "Overlap":
-                    net.FindCliques(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                    net.FindCliques(_optionsForm.Cutoff[currentYearIdx], _optionsForm.InputType != "None", _optionsForm.Density, currentYearIdx, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
                     break;
                 case "OverlapDiag":
-                    net.FindCliques(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                    net.FindCliques(_optionsForm.Cutoff[currentYearIdx], _optionsForm.InputType != "None", _optionsForm.Density, currentYearIdx, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
                     break;
                 case "CBCO":
-                    net.FindCliques(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _optionsForm.CMinMembers, true, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                    net.FindCliques(_optionsForm.Cutoff[currentYearIdx], _optionsForm.InputType != "None", _optionsForm.Density, currentYearIdx, _optionsForm.CMinMembers, true, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
                     break;
                 case "CBCODiag":
-                    net.FindCliques(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _optionsForm.CMinMembers, true, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                    net.FindCliques(_optionsForm.Cutoff[currentYearIdx], _optionsForm.InputType != "None", _optionsForm.Density, currentYearIdx, _optionsForm.CMinMembers, true, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
                     break;
                 case "Community":
-                    net.calculateCommunities(dataGrid, communityType, currentYear, _comForm.SVC, _comForm.DVC, _comForm.attrMatrix, _optionsForm.getCutOff(currentYear), _optionsForm.Density);
+                    net.calculateCommunities(dataGrid, communityType, currentYearIdx, _comForm.SVC, _comForm.DVC, _comForm.attrMatrix, _optionsForm.getCutOff(currentYearIdx), _optionsForm.Density);
                     break;
                 case "Dependency":
-                    net.LoadDependency(prevDisplayMatrix, _optionsForm.ReachNumMatrices, _optionsForm.Density, currentYear, _optionsForm.reachZero, _optionsForm.reachSum);
+                    net.LoadDependency(prevDisplayMatrix, _optionsForm.ReachNumMatrices, _optionsForm.Density, currentYearIdx, _optionsForm.reachZero, _optionsForm.reachSum);
                     break;
                 case "Reachability":
-                    net.LoadReachability(_optionsForm.ReachNumMatrices, _optionsForm.reachSum, _optionsForm.reachZero, prevDisplayMatrix, currentYear, reachBinary);
+                    net.LoadReachability(_optionsForm.ReachNumMatrices, _optionsForm.reachSum, _optionsForm.reachZero, prevDisplayMatrix, currentYearIdx, reachBinary);
                     break;
                 case "CognitiveReachability":
-                    net.LoadCognitiveReachability(_optionsForm.ReachNumMatrices, _optionsForm.reachSum, _optionsForm.reachZero, prevDisplayMatrix, currentYear, reachBinary);
+                    net.LoadCognitiveReachability(_optionsForm.ReachNumMatrices, _optionsForm.reachSum, _optionsForm.reachZero, prevDisplayMatrix, currentYearIdx, reachBinary);
                     break;
                 case "SEE":
                     if (!openFileDialog.Multiselect)
-                        net.LoadStructEquiv(_optionsForm.Density, currentYear, prevDisplayMatrix);
+                        net.LoadStructEquiv(_optionsForm.Density, currentYearIdx, prevDisplayMatrix);
                     break;
                 case "SEC":
                     if (!openFileDialog.Multiselect)
-                        net.LoadStructEquiv(_optionsForm.Density, currentYear, prevDisplayMatrix);
+                        net.LoadStructEquiv(_optionsForm.Density, currentYearIdx, prevDisplayMatrix);
                     break;
                 case "SESE":
                     if (!openFileDialog.Multiselect)
-                        net.LoadStructEquiv(_optionsForm.Density, currentYear, prevDisplayMatrix);
+                        net.LoadStructEquiv(_optionsForm.Density, currentYearIdx, prevDisplayMatrix);
                     break;
                 case "Centrality":
-                    net.LoadCentralityIndices(prevDisplayMatrix, currentYear, _centralityForm.Sijmax, _centralityForm.CountMember, _centralityForm.ZeroDiagonal);
+                    net.LoadCentralityIndices(prevDisplayMatrix, currentYearIdx, _centralityForm.Sijmax, _centralityForm.CountMember, _centralityForm.ZeroDiagonal);
                     break;
                 case "Characteristics":
-                    net.FindCliques(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
-                    net.LoadCliqueCharacteristics(_cliqueForm.SVC, _cliqueForm.DVC, _cliqueForm.attrMatrix, currentYear, _optionsForm.CutoffValue);
+                    net.FindCliques(_optionsForm.Cutoff[currentYearIdx], _optionsForm.InputType != "None", _optionsForm.Density, currentYearIdx, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                    net.LoadCliqueCharacteristics(_cliqueForm.SVC, _cliqueForm.DVC, _cliqueForm.attrMatrix, currentYearIdx, _optionsForm.CutoffValue);
                     break;
                 case "NatDep":
-                    net.LoadDependency(prevDisplayMatrix, _optionsForm.ReachNumMatrices, _optionsForm.Density, currentYear, _optionsForm.reachZero, _optionsForm.reachSum);
+                    net.LoadDependency(prevDisplayMatrix, _optionsForm.ReachNumMatrices, _optionsForm.Density, currentYearIdx, _optionsForm.reachZero, _optionsForm.reachSum);
                     break;
                 case "Multiplication":
                     try
                     {
-                        net.LoadMultiplicationMatrix(_multiplicationForm.fileName, _multiplicationForm.dyadic, currentYear, "Multiplication", prevDisplayMatrix);
+                        net.LoadMultiplicationMatrix(_multiplicationForm.fileName, _multiplicationForm.dyadic, currentYearIdx, "Multiplication", prevDisplayMatrix);
                     }
                     catch (Exception E)
                     {
@@ -484,16 +484,16 @@ namespace NetworkGUI
                     net.CONCOR(_blocForm.pos, openFileDialog.Multiselect, GetCONCORConvergenceFunction(), _blocForm.MaxNoSteps);
                     break;
                 case "ICD":
-                    net.LoadIntercliqueDistance(_optionsForm.Density, currentYear);
+                    net.LoadIntercliqueDistance(_optionsForm.Density, currentYearIdx);
                     break;
                 case "Elementwise":
-                    net.LoadElementwiseMultiplication(openFileDialog2.FileName, currentYear, "Elementwise", ef);
+                    net.LoadElementwiseMultiplication(openFileDialog2.FileName, currentYearIdx, "Elementwise", ef);
                     break;
                 case "BinaryComplement":
                     net.LoadBinaryComplement(displayMatrix);
                     break;
                 case "Triadic":
-                    net.LoadTriadic(dataGrid, currentYear);
+                    net.LoadTriadic(dataGrid, currentYearIdx);
                     break;
                 case "RoleEquiv":
                     if (!openFileDialog.Multiselect)
@@ -517,7 +517,7 @@ namespace NetworkGUI
                     break;
                 case "BlockCohesionMatrix":
                     net.CONCOR(_blocForm.pos, openFileDialog.Multiselect, GetCONCORConvergenceFunction(), _blocForm.MaxNoSteps);
-                    net.LoadBlockCohesionMatrix(_blocForm2.pos, _optionsForm.Density, currentYear, displayMatrix);
+                    net.LoadBlockCohesionMatrix(_blocForm2.pos, _optionsForm.Density, currentYearIdx, displayMatrix);
                     break;
 
                 case "BlockCharacteristics":
@@ -526,75 +526,75 @@ namespace NetworkGUI
                     //
                     // may not need 
                     //
-                    net.LoadBlockMatrices(_optionsForm.Density, currentYear);
+                    net.LoadBlockMatrices(_optionsForm.Density, currentYearIdx);
 
-                    net.LoadBlockCharacteristics(_blockForm.SVC, _blockForm.DVC, _blockForm.attrMatrix, currentYear, false);
+                    net.LoadBlockCharacteristics(_blockForm.SVC, _blockForm.DVC, _blockForm.attrMatrix, currentYearIdx, false);
                     break;
                 case "ClusterPartition":
-                    net.LoadClustering(_clusterForm.ClusteringMethod, _clusterForm.MaxNoClusters, currentYear, _optionsForm.Density);
+                    net.LoadClustering(_clusterForm.ClusteringMethod, _clusterForm.MaxNoClusters, currentYearIdx, _optionsForm.Density);
                     net.LoadClusterPartitionMatrix();
                     break;
                 case "DensityClusterMatrix":
-                    net.LoadClustering(_clusterForm.ClusteringMethod, _clusterForm.MaxNoClusters, currentYear, _optionsForm.Density);
+                    net.LoadClustering(_clusterForm.ClusteringMethod, _clusterForm.MaxNoClusters, currentYearIdx, _optionsForm.Density);
                     net.LoadBlockDensity(displayMatrix);
                     break;
                 case "RelativeDensityClusterMatrix":
-                    net.LoadClustering(_clusterForm.ClusteringMethod, _clusterForm.MaxNoClusters, currentYear, _optionsForm.Density);
+                    net.LoadClustering(_clusterForm.ClusteringMethod, _clusterForm.MaxNoClusters, currentYearIdx, _optionsForm.Density);
                     net.LoadRelativeBlockDensity(_optionsForm.Density, displayMatrix);
                     break;
                 case "ClusterCohesivenessMatrix":
-                    net.LoadClustering(_clusterForm.ClusteringMethod, _clusterForm.MaxNoClusters, currentYear, _optionsForm.Density);
-                    net.LoadBlockCohesionMatrix(_blocForm2.pos, _optionsForm.Density, currentYear, displayMatrix);
+                    net.LoadClustering(_clusterForm.ClusteringMethod, _clusterForm.MaxNoClusters, currentYearIdx, _optionsForm.Density);
+                    net.LoadBlockCohesionMatrix(_blocForm2.pos, _optionsForm.Density, currentYearIdx, displayMatrix);
                     break;
                 case "ClusterCharacteristics":
                     net.CONCOR(_blocForm.pos, openFileDialog.Multiselect, GetCONCORConvergenceFunction(), _blocForm.MaxNoSteps);
-                    net.LoadClustering(_clusterForm.ClusteringMethod, _clusterForm.MaxNoClusters, currentYear, _optionsForm.Density);
-                    net.LoadBlockCharacteristics(_blockForm.SVC, _blockForm.DVC, _blockForm.attrMatrix, currentYear, true);
+                    net.LoadClustering(_clusterForm.ClusteringMethod, _clusterForm.MaxNoClusters, currentYearIdx, _optionsForm.Density);
+                    net.LoadBlockCharacteristics(_blockForm.SVC, _blockForm.DVC, _blockForm.attrMatrix, currentYearIdx, true);
                     break;
                 case "CommunityCharacteristics":
-                    net.LoadBlockCharacteristics(_comForm.SVC, _comForm.DVC, _comForm.attrMatrix, currentYear, false);
+                    net.LoadBlockCharacteristics(_comForm.SVC, _comForm.DVC, _comForm.attrMatrix, currentYearIdx, false);
                     break;
                 case "ViableCoalitions":
-                    net.FindCliques(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
-                    net.LoadViableCoalitions(_optionsForm.ViableCoalitionCutoff, currentYear, _optionsForm.svcCoalitionFile);
+                    net.FindCliques(_optionsForm.Cutoff[currentYearIdx], _optionsForm.InputType != "None", _optionsForm.Density, currentYearIdx, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                    net.LoadViableCoalitions(_optionsForm.ViableCoalitionCutoff, currentYearIdx, _optionsForm.svcCoalitionFile);
                     break;
                 case "CoalitionStructure":
-                    net.FindCliques(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
-                    net.LoadViableCoalitions(_optionsForm.ViableCoalitionCutoff, currentYear, _optionsForm.svcCoalitionFile);
+                    net.FindCliques(_optionsForm.Cutoff[currentYearIdx], _optionsForm.InputType != "None", _optionsForm.Density, currentYearIdx, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                    net.LoadViableCoalitions(_optionsForm.ViableCoalitionCutoff, currentYearIdx, _optionsForm.svcCoalitionFile);
                     break;
                 case "ViableNPI":
-                    net.FindCliques(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
-                    net.LoadViableCoalitions(_optionsForm.ViableCoalitionCutoff, currentYear, _optionsForm.svcCoalitionFile);
+                    net.FindCliques(_optionsForm.Cutoff[currentYearIdx], _optionsForm.InputType != "None", _optionsForm.Density, currentYearIdx, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                    net.LoadViableCoalitions(_optionsForm.ViableCoalitionCutoff, currentYearIdx, _optionsForm.svcCoalitionFile);
                     break;
                 case "Distance":
-                    net.LoadDistanceMatrix(_optionsForm.Cutoff.GetValue(currentYear));
+                    net.LoadDistanceMatrix(_optionsForm.Cutoff.GetValue(currentYearIdx));
                     break;
                 case "Components":
-                    net.LoadComponents(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _optionsForm.CMinMembers, _optionsForm.ReachNumMatrices, _optionsForm.reachSum, _optionsForm.reachZero, true);
+                    net.LoadComponents(_optionsForm.Cutoff[currentYearIdx], _optionsForm.InputType != "None", _optionsForm.Density, currentYearIdx, _optionsForm.CMinMembers, _optionsForm.ReachNumMatrices, _optionsForm.reachSum, _optionsForm.reachZero, true);
                     break;
                 case "NetworkPower":
-                    net.FindCliques(_optionsForm.Cutoff[currentYear], _optionsForm.InputType == "None" || _optionsForm.InputType == "StructEquiv", _optionsForm.Density, currentYear, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                    net.FindCliques(_optionsForm.Cutoff[currentYearIdx], _optionsForm.InputType == "None" || _optionsForm.InputType == "StructEquiv", _optionsForm.Density, currentYearIdx, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
                     if (!_npForm.CliquePower && !_npForm.CommPower)
                         net.CONCOR(_npForm.pos, openFileDialog.Multiselect, GetCONCORConvergenceFunctionnp(), _npForm.MaxNoSteps);
                     else if (_npForm.CommPower)
-                        net.calculateCommunities(dataGrid, communityType, currentYear, _comForm.SVC, _comForm.DVC, _comForm.attrMatrix, _optionsForm.getCutOff(currentYear), _optionsForm.Density);
+                        net.calculateCommunities(dataGrid, communityType, currentYearIdx, _comForm.SVC, _comForm.DVC, _comForm.attrMatrix, _optionsForm.getCutOff(currentYearIdx), _optionsForm.Density);
                     if (_npForm.useattributefile)
                         net.LoadattributeVector(_npForm.attributefilename);
-                    net.LoadNetworkpower(_npForm.useattributefile, currentYear, _npForm.CliquePower, _npForm.CommPower, _npForm.showSP, _optionsForm.InputType, _optionsForm.FileName, _optionsForm.Density);
+                    net.LoadNetworkpower(_npForm.useattributefile, currentYearIdx, _npForm.CliquePower, _npForm.CommPower, _npForm.showSP, _optionsForm.InputType, _optionsForm.FileName, _optionsForm.Density);
                     break;
                 case "Clustering":
-                    net.LoadClustering(_clusterForm.ClusteringMethod, _clusterForm.MaxNoClusters, currentYear, _optionsForm.Density);
+                    net.LoadClustering(_clusterForm.ClusteringMethod, _clusterForm.MaxNoClusters, currentYearIdx, _optionsForm.Density);
                     break;
 
 
                 case "LocalTransitivity":
-                    net.LoadLocalTransitivityMatrix(dataGrid, currentYear, _optionsForm.CutoffValue);
+                    net.LoadLocalTransitivityMatrix(dataGrid, currentYearIdx, _optionsForm.CutoffValue);
                     break;
                 case "DyadicTransitivity":
-                    net.LoadDyadicTransitiviyMatrix(dataGrid, currentYear, _optionsForm.CutoffValue);
+                    net.LoadDyadicTransitiviyMatrix(dataGrid, currentYearIdx, _optionsForm.CutoffValue);
                     break;
                 case "LocalBalance":
-                    net.LoadLocalBalanceMatrix(dataGrid, currentYear);
+                    net.LoadLocalBalanceMatrix(dataGrid, currentYearIdx);
                     break;
                 // Yushan
                 case "PathBased":
@@ -609,7 +609,7 @@ namespace NetworkGUI
                     }
 
                 case "SignedNetwork":
-                    net.LoadSignedNetworkCharacteristics(dataGrid, _optionsForm.ReachNumMatrices, _optionsForm.reachSum, _optionsForm.reachZero, prevDisplayMatrix, currentYear, reachBinary);
+                    net.LoadSignedNetworkCharacteristics(dataGrid, _optionsForm.ReachNumMatrices, _optionsForm.reachSum, _optionsForm.reachZero, prevDisplayMatrix, currentYearIdx, reachBinary);
                     break;
 
                 // Deprecated code
@@ -627,83 +627,83 @@ namespace NetworkGUI
                     break;
 
                 case "NewOverlappingCommunity":
-                    net.calculateCommunities(dataGrid, communityType, currentYear, _comForm.SVC, _comForm.DVC, _comForm.attrMatrix, _optionsForm.getCutOff(currentYear), _optionsForm.Density);
+                    net.calculateCommunities(dataGrid, communityType, currentYearIdx, _comForm.SVC, _comForm.DVC, _comForm.attrMatrix, _optionsForm.getCutOff(currentYearIdx), _optionsForm.Density);
                     break;
                 // For Overlapping Communities
                 case "OverlappingCommunity":
-                    net.FindCliques(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                    net.FindCliques(_optionsForm.Cutoff[currentYearIdx], _optionsForm.InputType != "None", _optionsForm.Density, currentYearIdx, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
                     net.CalculateOverlapComm();
                     net.LoadOverlapCommAffilMatrix();
                     break;
                 case "OverlapCommDensity":
-                    net.FindCliques(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                    net.FindCliques(_optionsForm.Cutoff[currentYearIdx], _optionsForm.InputType != "None", _optionsForm.Density, currentYearIdx, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
                     net.CalculateOverlapComm();
                     net.LoadOverlapCommDensity();
                     break;
                 case "OverlapCommRelativeDensity":
-                    net.FindCliques(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                    net.FindCliques(_optionsForm.Cutoff[currentYearIdx], _optionsForm.InputType != "None", _optionsForm.Density, currentYearIdx, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
                     net.CalculateOverlapComm();
                     net.LoadOverlapCommRelativeDensity(_optionsForm.Density);
                     break;
                 case "OverlapCommCohesiveMatrix":
-                    net.FindCliques(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                    net.FindCliques(_optionsForm.Cutoff[currentYearIdx], _optionsForm.InputType != "None", _optionsForm.Density, currentYearIdx, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
                     net.CalculateOverlapComm();
-                    net.LoadOverlapCommCohesiveMatrix(_optionsForm.Density, currentYear);
+                    net.LoadOverlapCommCohesiveMatrix(_optionsForm.Density, currentYearIdx);
                     break;
                 case "OverlapCommCharacteristics":
-                    net.FindCliques(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                    net.FindCliques(_optionsForm.Cutoff[currentYearIdx], _optionsForm.InputType != "None", _optionsForm.Density, currentYearIdx, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
                     net.CalculateOverlapComm();
-                    net.LoadOverlapCommCharacteristics(_overlapCommForm.SVC, _overlapCommForm.DVC, _overlapCommForm.attrMatrix, currentYear, _optionsForm.getCutOff(currentYear));
+                    net.LoadOverlapCommCharacteristics(_overlapCommForm.SVC, _overlapCommForm.DVC, _overlapCommForm.attrMatrix, currentYearIdx, _optionsForm.getCutOff(currentYearIdx));
                     break;
                 case "OverlapCommModularityEQ":
-                    net.FindCliques(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                    net.FindCliques(_optionsForm.Cutoff[currentYearIdx], _optionsForm.InputType != "None", _optionsForm.Density, currentYearIdx, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
                     net.LoadOverlapModifiedModularity();
                     break;
 
 
                 // For Cohesion (only cliques)
                 case "CliqueCohesionMatrix":
-                    net.FindCliques(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
-                    net.LoadCliqueCohesionMatrix(_optionsForm.Density, currentYear);
+                    net.FindCliques(_optionsForm.Cutoff[currentYearIdx], _optionsForm.InputType != "None", _optionsForm.Density, currentYearIdx, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                    net.LoadCliqueCohesionMatrix(_optionsForm.Density, currentYearIdx);
                     break;
 
                 // For statistics
                 case "CliqueCoefficients":
-                    net.FindCliques(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
-                    net.LoadCliqueCoefficients(_optionsForm.Density, currentYear, displayMatrix);
+                    net.FindCliques(_optionsForm.Cutoff[currentYearIdx], _optionsForm.InputType != "None", _optionsForm.Density, currentYearIdx, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                    net.LoadCliqueCoefficients(_optionsForm.Density, currentYearIdx, displayMatrix);
                     break;
                 case "BlockCoefficients":
                     net.CONCOR(_blocForm.pos, openFileDialog.Multiselect, GetCONCORConvergenceFunction(), _blocForm.MaxNoSteps);
-                    net.LoadBlockCoefficients(_blocForm2.pos, _optionsForm.Density, currentYear, displayMatrix);
+                    net.LoadBlockCoefficients(_blocForm2.pos, _optionsForm.Density, currentYearIdx, displayMatrix);
                     break;
                 case "ClusterCoefficients":
-                    net.LoadClustering(_clusterForm.ClusteringMethod, _clusterForm.MaxNoClusters, currentYear, _optionsForm.Density);
-                    net.LoadBlockCoefficients(_blocForm2.pos, _optionsForm.Density, currentYear, displayMatrix);
+                    net.LoadClustering(_clusterForm.ClusteringMethod, _clusterForm.MaxNoClusters, currentYearIdx, _optionsForm.Density);
+                    net.LoadBlockCoefficients(_blocForm2.pos, _optionsForm.Density, currentYearIdx, displayMatrix);
                     break;
                 case "OverlapCommCoefficients":
-                    net.FindCliques(_optionsForm.Cutoff[currentYear], _optionsForm.InputType != "None", _optionsForm.Density, currentYear, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
-                    net.LoadOverlapCommCoefficients(_optionsForm.Density, currentYear, displayMatrix);
+                    net.FindCliques(_optionsForm.Cutoff[currentYearIdx], _optionsForm.InputType != "None", _optionsForm.Density, currentYearIdx, _optionsForm.CMinMembers, false, _optionsForm.KCliqueValue, _optionsForm.KCliqueDiag);
+                    net.LoadOverlapCommCoefficients(_optionsForm.Density, currentYearIdx, displayMatrix);
                     break;
 
                 // For Single Network Expectations
                 case "SingleNetworkExpectations":
-                    net.LoadSingleNetworkExpectations(dataGrid, currentYear);
+                    net.LoadSingleNetworkExpectations(dataGrid, currentYearIdx);
                     break;
                 case "NetworkSpilloverStatistics":
-                    net.LoadNetworkSpilloverStatistics(dataGrid, currentYear, _spilloverForm.Indices);
+                    net.LoadNetworkSpilloverStatistics(dataGrid, currentYearIdx, _spilloverForm.Indices);
                     break;
 
 
                 // dyadic multiplex
                 case "Multiplex":
                     if (!MultiplexNullModel)
-                        net.LoadMultiplex(dataGrid, currentYear, fileNames, openFileDialog.FileName, loadFrom, FirstOrder);
+                        net.LoadMultiplex(dataGrid, currentYearIdx, fileNames, openFileDialog.FileName, loadFrom, FirstOrder);
                     else
-                        net.LoadMultiplexNull(dataGrid, currentYear, fileNames, openFileDialog.FileName, loadFrom, FirstOrder);
+                        net.LoadMultiplexNull(dataGrid, currentYearIdx, fileNames, openFileDialog.FileName, loadFrom, FirstOrder);
                     break;
 
                 case "Louvain":
-                    net.LouvainCommunitiesExtraction(dataGrid, communityType, louvainForm.Precision, louvainForm.MaxIterations, louvainForm.UnlimitedIterations, currentYear, networkRealIdList[currentYear], _optionsForm.Density, displayMatrix);
+                    net.LouvainCommunitiesExtraction(dataGrid, communityType, louvainForm.Precision, louvainForm.MaxIterations, louvainForm.UnlimitedIterations, currentYearIdx, networkRealIdList[currentYearIdx], _optionsForm.Density, displayMatrix);
                     break;
             }
         }
@@ -3125,6 +3125,8 @@ displayMatrix != "Characteristics" || yearIdx == startYearIndex, _optionsForm.Sa
                                         net.SaveBlocAffiliationToAffiliationFile(saveFileDialog.FileName, yearIdx, _blocForm.pos, _optionsForm.SaveOverwrite && yearIdx == startYearIndex, openFileDialog.Multiselect, true);
                                         break;
                                     case "Community":
+                                    case "Louvain":
+                                    case "Components":
                                         //net.calculateCommunities(dataGrid, communityType, currentYearIndex, _comForm.SVC, _comForm.DVC, _comForm.attrMatrix, _optionsForm.getCutOff(currentYearIndex), _optionsForm.Density);
                                         net.SaveCommAffiliationToAffiliationFile(saveFileDialog.FileName, yearIdx, yearIdx == startYearIndex, _optionsForm.SaveOverwrite && yearIdx == startYearIndex, displayMatrix);
                                         break;
@@ -3133,9 +3135,6 @@ displayMatrix != "Characteristics" || yearIdx == startYearIndex, _optionsForm.Sa
                                         //net.CalculateOverlapComm();
                                         //net.LoadOverlapCommAffilMatrix();
                                         net.SaveOverlapCommAffiliationToAffiliationFile(saveFileDialog.FileName, yearIdx, yearIdx == startYearIndex, _optionsForm.SaveOverwrite && yearIdx == startYearIndex);
-                                        break;
-                                    case "Louvain":
-                                        net.SaveCommAffiliationToAffiliationFile(saveFileDialog.FileName, yearIdx, yearIdx == startYearIndex, _optionsForm.SaveOverwrite && yearIdx == startYearIndex, displayMatrix);
                                         break;
                                 }
                             }
