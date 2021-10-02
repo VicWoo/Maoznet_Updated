@@ -1,24 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.IO;
-using System.Windows.Forms;
-using CH.Combinations;
-using Network.Matrices;
-using Network.IO;
-using Network.Cliques;
+﻿using CH.Combinations;
+using DotNumerics.LinearAlgebra.CSLapack;
 using Network.Blocks;
+using Network.Cliques;
 using Network.Communities;
-using System.Threading;
-using RandomUtilities;
-using Community;
+using Network.IO;
+using Network.Matrices;
+using NetworkGUI;
+using NetworkGUI.Forms;
 using NetworkGUI.Sets;
 using NetworkGUI.Triads;
-using NetworkGUI;
-using DotNumerics.FortranLibrary;
-using DotNumerics.LinearAlgebra.CSLapack;
-using NetworkGUI.Forms;
+using RandomUtilities;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Windows.Forms;
 
 
 
@@ -55,8 +51,15 @@ namespace Network
         Coefficients,
         Separation,
         newCoefficients,
-        ovCoefficients
-        
+        ovCoefficients,
+        louvainAffil,
+        louvainDensity,
+        louvainSepCof,
+        louvainCohesion,
+        louvainChar,
+        louvainMod,
+        louvainCoeff,
+        louvainComCoeff
     }
 
     public enum ElementwiseFormat { Matrix, Dyadic, Monadic };
@@ -965,8 +968,8 @@ namespace Network
                     groupCount = Blocks.Count;
                     break;
             }
-            Matrix partitioned = new Matrix(partitionedNodeList.Count, partitionedNodeList.Count);
-            Matrix partitionedCohesion = new Matrix(partitionedNodeList.Count, partitionedNodeList.Count);
+            Matrix partitioned = new Matrix(partitionedNodeList.Count, partitionedNodeList.Count, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
+            Matrix partitionedCohesion = new Matrix(partitionedNodeList.Count, partitionedNodeList.Count, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
             for (int i = 0; i < partitionedNodeList.Count; i++)
             {
                 for (int j = 0; j < partitionedNodeList.Count; j++)
@@ -1107,8 +1110,8 @@ namespace Network
                 cohtotaldegree += d;
             }
 
-            Matrix seprandpart = new Matrix(partitionedNodeList.Count, partitionedNodeList.Count);
-            Matrix cohrandpart = new Matrix(partitionedNodeList.Count, partitionedNodeList.Count);
+            Matrix seprandpart = new Matrix(partitionedNodeList.Count, partitionedNodeList.Count, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
+            Matrix cohrandpart = new Matrix(partitionedNodeList.Count, partitionedNodeList.Count, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
 
             for (int i = 0; i < sepoutdegrees.Count; i++)
             {
@@ -1134,8 +1137,8 @@ namespace Network
                 }
             }
 
-            Matrix nulldensity = new Matrix(groupCount, groupCount);
-            Matrix nullcohesion = new Matrix(groupCount, groupCount);
+            Matrix nulldensity = new Matrix(groupCount, groupCount, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
+            Matrix nullcohesion = new Matrix(groupCount, groupCount, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
 
             for (int q = 0; q < groupCount; q++)
             {
@@ -1169,7 +1172,7 @@ namespace Network
                     else
                     {
                         _cliques.LoadCliqueByCliqueOverlap();
-                        Matrix cliqueOverlap = new Matrix(_cliques.Count, _cliques.Count);
+                        Matrix cliqueOverlap = new Matrix(_cliques.Count, _cliques.Count, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
                         for (int i = 0; i < _cliques.Count; i++)
                         {
                             for (int j = 0; j < _cliques.Count; j++)
@@ -1852,6 +1855,588 @@ namespace Network
             }
         }
 
+        //Baadal
+        //===========================LOUVAIN===========================
+        //Find and return [𝛴𝑡𝑜𝑡, 𝛴𝑖𝑛]
+        private List<double> LouvainSigmaTotIn(int communityId, List<int> community, Dictionary<int, Dictionary<int, double>> outEdges, Dictionary<int, int> node2Com)
+        {
+            double sigmaTot = 0.0;  //𝛴𝑡𝑜𝑡 the sum of the weights of all links to nodes in 𝐶
+            double sigmaIn = 0.0;   //𝛴𝑖𝑛 be the sum of the weights of the links inside 𝐶
+            foreach(var node in community)
+            {
+                List<int> destNodes = new List<int>(outEdges[node].Keys);
+                foreach(var dn in destNodes)
+                {
+                    sigmaTot += outEdges[node][dn]; //add weight of connection
+                    if (node2Com[dn] == communityId)
+                    {
+                        sigmaIn += outEdges[node][dn]; //add weight of connection
+                    }
+                }
+            }
+            List<double> TotIn = new List<double>();
+            TotIn.Add(sigmaTot);
+            TotIn.Add(sigmaIn);
+            return TotIn;
+        }
+
+        //Find and return [𝑘𝑖 𝑖𝑛, 𝑘𝑖]
+        private List<double> LouvainKInI(int node, int destComId, List<int> destCommunity, Dictionary<int, Dictionary<int, double>> outEdges, Dictionary<int, int> node2Com)
+        {
+            List<double> kInI = new List<double>();
+            double kiin = 0.0;  //𝑘𝑖,𝑖𝑛 the sum of the weights of links from node 𝑖 to nodes in the community 𝐶
+            double ki = 0.0;    //𝑘𝑖 the sum of the weights of all links incident in node 𝑖
+            List<int> destNodes = new List<int>(outEdges[node].Keys);
+            foreach (var dn in destNodes)
+            {
+                ki += outEdges[node][dn];
+                if (node2Com[dn] == destComId)
+                {
+                    kiin += outEdges[node][dn];
+                }
+            }
+
+            foreach(var vertice in destCommunity)
+            {
+                List<int> tDestNodes = new List<int>(outEdges[vertice].Keys);
+                if(tDestNodes.Contains(node))
+                {
+                    kiin += outEdges[vertice][node];
+                }
+            }
+
+            kInI.Add(kiin);
+            kInI.Add(ki);
+
+            return kInI;
+        }
+
+        private void printF(string message)
+        {
+            Console.WriteLine(message);
+        }
+
+        //Find delta Mod using accelerated Louvain Algo
+        //http://www.ijcee.org/vol8/927-A023.pdf
+        private double LouvainModularityGain(int node, int srcComId, List<int> srcCommmunity, int destComId, List<int> destCommmunity, double m, Dictionary<int, Dictionary<int, double>> outEdges, Dictionary<int, int> node2Com)
+        {
+            List<double> TotIn, kInI;
+            double sigmaTot, kiin, ki;
+
+            //Modularity Delta(Source Community --> Node) Removing node from Source Community
+            //printF($"Removing node {node} from Source Community {srcComId}");
+            double rmvMod = 0.0;
+            if (srcCommmunity.Count != 0)
+            {
+                TotIn = LouvainSigmaTotIn(srcComId, srcCommmunity, outEdges, node2Com);
+                sigmaTot = TotIn[0];
+                //printF($"sigmaTot = {sigmaTot} \t sigmaIn = {TotIn[1]}");
+                kInI = LouvainKInI(node, srcComId, srcCommmunity, outEdges, node2Com);
+                kiin = kInI[0];
+                ki = kInI[1];
+                //printF($"kiin = {kiin} \t ki = {ki}");
+                if (m != 0.0)
+                    rmvMod = ((sigmaTot * ki) / (2 * m)) - kiin;
+            }
+
+            //Modularity Delta(Node --> Destination Community) Adding node to Destination Community
+            //printF($"Adding node {node} to Destination Community {destComId}");
+            double mergeMod = 0.0;
+            if(destCommmunity.Count != 0)
+            {
+                TotIn = LouvainSigmaTotIn(destComId, destCommmunity, outEdges, node2Com);
+                sigmaTot = TotIn[0];
+                //printF($"sigmaTot = {sigmaTot} \t sigmaIn = {TotIn[1]}");
+                kInI = LouvainKInI(node, destComId, destCommmunity, outEdges, node2Com);
+                kiin = kInI[0];
+                ki = kInI[1];
+                //printF($"kiin = {kiin} \t ki = {ki}");
+                if (m != 0.0)
+                    mergeMod = kiin - ((sigmaTot * ki) / (2 * m));
+            }
+            return rmvMod + mergeMod;
+        }
+
+        //Find Total Modularity of graph
+        private double LouvainModularity(double m, List<List<int>> communityList, Dictionary<int, Dictionary<int, double>> outEdges, Dictionary<int, int> node2Com)
+        {
+            double q = 0.0;
+            double m2 = 2 * m;
+            int id = 0;
+            foreach(var community in communityList)
+            {
+                List<double> TotIn = LouvainSigmaTotIn(id, community, outEdges, node2Com);
+                double sigmaTot = TotIn[0];
+                double sigmaIn = TotIn[1];
+                q += (sigmaIn / m2) - ((sigmaTot / m2) * (sigmaTot / m2));
+                id++;
+            }
+            return q;
+        }
+
+        private void randomizeVertices(ref List<int> vvertices)
+        {
+            // Creating a object for Random class
+            Random r = new Random();
+            int n = vvertices.Count;
+            // Start from the last element and swap one by one. We don't need to
+            // run for the first element that's why i > 0
+            for (int i = n - 1; i > 0; i--)
+            {
+                // Pick a random index from 0 to i
+                int j = r.Next(0, i + 1);
+
+                // Swap arr[i] with the element at random index
+                int temp = vvertices[i];
+                vvertices[i] = vvertices[j];
+                vvertices[j] = temp;
+            }
+        }
+
+        //Find best community for given vertex to move into
+        private void LouvainMoveNodes(List<int> vvertices, ref List<List<int>> C, ref Dictionary<int, int> node2Com, Dictionary<int, Dictionary<int, double>> outEdges, double m)
+        {
+            bool changed = false;
+            int it = 1;
+            do
+            {
+                //printF("ITERATION " + it.ToString());
+                changed = false;
+                //NOTE: Since Louvain algorithm is non-deterministic, it can give different answers for
+                //the same input graph if the vertex order is randomized, which is why randomization of
+                //vertices is not currently done so that the software can give the same answer every time
+                //for a given input.
+                //randomizeVertices(ref vvertices);
+                foreach (var vertex in vvertices)
+                {
+                    //int vertex = vvertices[r.Next(0, vvertices.Count)];
+                    //printF("Moving vertex " + vertex.ToString());
+                    double maxModIncr = 0.0;
+                    //printF("Source Community " + node2Com[vertex].ToString());
+                    int srcCom = node2Com[vertex];
+                    int destCom = srcCom;    //by default it is source community
+                    C[srcCom].Remove(vertex);
+                    node2Com[vertex] = -1;    //vertex currently does not belong to any community
+                    List<int> neighbors = new List<int>(outEdges[vertex].Keys);
+                    //Get neighboring communities
+                    HashSet<int> neighboringCommunities = new HashSet<int>();
+                    foreach (var n in neighbors)
+                    {
+                        neighboringCommunities.Add(node2Com[n]);
+                    }
+                    //Dont need to repeat checking in source community if self loop
+                    neighboringCommunities.Remove(srcCom);
+                    neighboringCommunities.Remove(-1);
+                    foreach (var comId in neighboringCommunities)
+                    {
+                        //printF("\nTo Neighboring Community " + comId.ToString());
+                        double mod = 0.0;
+                        mod = LouvainModularityGain(vertex, srcCom, C[srcCom], comId, C[comId], m, outEdges, node2Com);
+                        //printF("mod " + mod.ToString() + " > maxMod " + maxModIncr.ToString() + " ?");
+                        if (mod > maxModIncr)
+                        {
+                            //printF("Assigning new max mod " + mod.ToString() + " new destComId = " + comId.ToString());
+                            destCom = comId;
+                            maxModIncr = mod;
+                            changed = true;
+                        }
+                    }
+                    //printF("Moving vertex " + vertex.ToString() + " from community " + srcCom.ToString() + " to community " + destCom.ToString() + "\n\n");
+                    C[destCom].Add(vertex);
+                    node2Com[vertex] = destCom;
+                }
+                //printF("\n\n\n\n");
+                it++;
+            } while (changed);
+        }
+
+        // This function will add the weighted connections/links between different
+        // newly aggregated communities from individual vertices.
+        private void LouvainBuildNewGraph(ref Dictionary<int, Dictionary<int, double>> outEdges, Dictionary<int, int> node2Com)
+        {
+            Dictionary<int, Dictionary<int, double>> newOutEdges = new Dictionary<int, Dictionary<int, double>>();
+            List<int> sourceNodes = new List<int>(outEdges.Keys);
+            foreach(var sn in sourceNodes)
+            {
+                if(!newOutEdges.ContainsKey(node2Com[sn]))
+                {
+                    newOutEdges[node2Com[sn]] = new Dictionary<int, double>();
+                }
+                List<int> destinationNodes = new List<int>(outEdges[sn].Keys);
+                foreach(var dn in destinationNodes)
+                {
+                    if(newOutEdges[node2Com[sn]].ContainsKey(node2Com[dn]))
+                        newOutEdges[node2Com[sn]][node2Com[dn]] += outEdges[sn][dn];
+                    else
+                        newOutEdges[node2Com[sn]][node2Com[dn]] = outEdges[sn][dn];
+                }
+            }
+
+            outEdges.Clear();
+            sourceNodes = new List<int>(newOutEdges.Keys);
+            foreach (var sn in sourceNodes)
+            {
+                outEdges[sn] = new Dictionary<int, double>(newOutEdges[sn]);
+            }
+            newOutEdges.Clear();
+        }
+
+        //Collapses all vertices into communities and treat communities as new single
+        //vertex/node and repeat algo.
+        private void LouvainRestructure(ref List<int> vvertices, ref Dictionary<int, int> node2Com, ref List<List<int>> C, ref Dictionary<int, Dictionary<int, double>> outEdges, ref Dictionary<int, List<int>> com2Node, int k)
+        {
+            vvertices.Clear();
+            if(k == 0)
+            {
+                com2Node.Clear();
+            }
+            Dictionary<int, List<int>> newCom2Node = new Dictionary<int, List<int>>();
+            for (int i = 0; i < C.Count; i++)
+            {
+                if (C[i].Count > 0)
+                {
+                    //Add new vertices
+                    vvertices.Add(i);
+                    //if we are at a higher iteration, com2Node will contain an overall community of vertices,
+                    //where the vertices are also communities from previous iterations, so we replace the previous
+                    //overall community vertex with the actual vertices of the original graph
+                    if (k > 0)  //if not first overall iteration
+                    {
+                        newCom2Node[i] = new List<int>();
+                        for (int j = 0; j < C[i].Count; j++)
+                        {
+                            newCom2Node[i].AddRange(com2Node[C[i][j]]);
+                        }
+                    }
+                    else
+                    {
+                        com2Node[i] = new List<int>(C[i]);
+                    }
+                }
+            }
+            //Reset com2Node to reflect updated community values
+            if (k > 0)
+            {
+                com2Node.Clear();
+                List<int> lkeys = new List<int>(newCom2Node.Keys);
+                foreach (var ky in lkeys)
+                {
+                    com2Node[ky] = new List<int>(newCom2Node[ky]);
+                }
+                newCom2Node.Clear();
+            }
+            //Build links and calulate link weights between new communities
+            LouvainBuildNewGraph(ref outEdges, node2Com);
+            //Reset C (community list) to reflect new single vertices in their own community
+            C.Clear();
+            node2Com.Clear();
+            for (int i = 0; i < vvertices.Count; i++)
+            {
+                C.Add(new List<int>());
+                C[i].Add(vvertices[i]);
+                //Add new vertice --> community pointer
+                node2Com[vvertices[i]] = i;
+            }
+        }
+
+        private double LouvainDensity(List<int> srcCom, List<int> destCom, Dictionary<int, Dictionary<int, double>> outEdges)
+        {
+            double totConnections = 0.0;
+            foreach(var src in srcCom)
+            {
+                foreach(var dest in destCom)
+                {
+                    if(outEdges[src].ContainsKey(dest))
+                        totConnections += outEdges[src][dest];
+                }
+            }
+            int nsrc = srcCom.Count;
+            int ndest = destCom.Count;
+            return (totConnections / (double)(nsrc * ndest));
+        }
+
+        private double LouvainSepCof(int ncoms, List<List<int>> descComs, Dictionary<int, Dictionary<int, double>> ogOutEdges)
+        {
+            //To find separation coefficient we need to find densities first
+            //if for eg there are 2 coms, sepCof = (density[1,1] - density[1,2] + density[2,2] - density[2,1]) / 2 * (2-1)
+            double sepCof = 0.0;
+            if(ncoms > 1)
+            {
+                for (int row = 0; row < ncoms; row++)
+                {
+                    double diagonal = 0.0;
+                    for (int col = 0; col < ncoms; col++)
+                    {
+                        double louvainDensity = LouvainDensity(descComs[row], descComs[col], ogOutEdges);
+                        sepCof -= louvainDensity;
+                        if (row == col)
+                            diagonal = louvainDensity;
+                    }
+                    sepCof += (ncoms * diagonal);
+                }
+                sepCof /= (double)(ncoms * (ncoms - 1));
+            }
+            return sepCof;
+        }
+
+        //MAIN LOUVAIN ALGO BODY
+        //Use Louvain Algorithm to find communities
+        //https://towardsdatascience.com/louvain-algorithm-93fde589f58c
+        public void LouvainCommunitiesExtraction(DataGridView data, CommunityType commType, double precision, int maxIterations, bool unlimitedIterations, int yearIndex, string year, double density, string m_name)
+        {
+            //Initialize vars
+            List<int> vvertices = new List<int>();  //name is vvertices because didnt want to break any other variable if it is also called vertices
+            Dictionary<int, Dictionary<int, double>> outEdges = new Dictionary<int, Dictionary<int, double>>();    //outEdges[i][j] where i = current vertice, j = destination vertice i is connected to, outEdges[i][j] = weight of connection
+            Dictionary<int, Dictionary<int, double>> ogOutEdges = new Dictionary<int, Dictionary<int, double>>();   //original matrix outgoing edges
+            List<List<int>> C = new List<List<int>>();  //List of vertices in a given community, C[0] = vertices in community 0
+            Dictionary<int, int> node2Com = new Dictionary<int, int>(); //vertice --> community id at higher level
+            Dictionary<int, List<int>> com2Node = new Dictionary<int, List<int>>(); //community id --> vertice at base level
+            double m = 0.0; //sum of the weights of all edges in the graph
+
+            //Assign values to vars from Data table
+            for(int i = 0; i < mTable["Data"].Rows; i++)
+            {
+                //adding vertices
+                vvertices.Add(i);
+                
+                //put each vertice into its own community
+                //keeping it in terms of vvertices so that we can change vertices and still program should work
+                C.Add(new List<int>());
+                C[i].Add(vvertices[i]);
+                node2Com[vvertices[i]] = i;
+                
+                //adding community to vertice dictionary
+                com2Node[i] = new List<int>();
+                com2Node[i].Add(i);
+
+                //adding edges/links going from vertex i to vertex j with edge weights
+                //basically, if edge between i and j then outEdges[i][j] = edge weight,
+                //if edge between i and k then outEdges[i][k] = edge weight, etc
+                outEdges[i] = new Dictionary<int, double>();
+                for (int j = 0; j < mTable["Data"].Cols; j++)
+                {
+                    if (mTable["Data"][i, j] > 0.0)
+                    {
+                        outEdges[i][j] = mTable["Data"][i, j];
+                        m += mTable["Data"][i, j];
+                    }
+                }
+                ogOutEdges[i] = new Dictionary<int, double>(outEdges[i]);
+            }
+
+            int nvertices = vvertices.Count;    //number of vertices
+            List<double> modularityCoeff = new List<double>();  //keeping track of modularity value over iterations
+
+            //printF("m " + m.ToString());
+
+
+            //Main method
+            int k = 0;  //iteration counter
+            double newMod = LouvainModularity(m, C, outEdges, node2Com);
+            do
+            {
+                //printF("\nnewMod " + newMod.ToString());
+                double curMod = newMod;
+                modularityCoeff.Add(curMod);
+
+                //Check new mod of vertice i going from original community to 
+                //neighboring communities and put i in community with max mod increase
+                LouvainMoveNodes(vvertices, ref C, ref node2Com, outEdges, m);
+
+                newMod = LouvainModularity(m, C, outEdges, node2Com);  //calulate new modularity value of entire network
+
+                //reset values for new iteration,
+                //i.e, construct new graph using communities
+                if(newMod - curMod > precision)
+                {
+                    LouvainRestructure(ref vvertices, ref node2Com, ref C, ref outEdges, ref com2Node, k);
+                } else
+                {
+                    break;
+                }
+                k++;
+            } while (unlimitedIterations || k < maxIterations);
+            //Louvain Algorithm Over
+
+            //Get Different Louvain Outputs Section
+            //sort communities in descending order according to number of members
+            List<List<int>> descComs = (from entry in com2Node orderby entry.Value.Count descending select entry.Value).ToList<List<int>>();
+            
+            //setting global variables that already exist in the program
+            communities = new List<int[]>();
+            comNum = descComs.Count;
+
+            //converting com2Node into community format the program needs
+            int[,] comm = new int[nvertices, com2Node.Count];
+            for (int col = 0; col < descComs.Count; col++)
+            {
+                int[] tempCom = new int[nvertices];
+                foreach (var member in descComs[col])
+                {
+                    comm[member, col] = 1;
+                    tempCom[member] = 1;
+                }
+                //adding data to relevant global variables to hopefully avoid breaking any
+                //preexisting code
+                communities.Add(tempCom);
+            }
+            
+            //Output Stuff
+            int nrows = comm.GetLength(0);
+            int ncoms = comm.GetLength(1);
+            
+            // Clear data grid and prep for matrix
+            data.Rows.Clear();
+            data.Columns.Clear();
+            switch (commType)
+            {
+                case CommunityType.louvainAffil:
+                    mTable[m_name] = new Matrix(nrows, ncoms);
+                    mTable[m_name].ActualNetworkIdStr = year;
+                    mTable[m_name].NetworkIdIndex = yearIndex;
+                    // add the labels to the columns of the grid
+                    for (int i = 0; i < ncoms; i++)
+                    {
+                        data.Columns.Add((i).ToString(), "Comm " + (i + 1).ToString());
+                        mTable[m_name].ColLabels[i] = "Comm " + (i + 1).ToString();
+                    }
+                    //Add row values to datagrid as well as new matrix
+                    for (int row = 0; row < nrows; row++)
+                    {
+                        string[] newRow = new string[ncoms];
+                        for (int col = 0; col < ncoms; col++)
+                        {
+                            mTable[m_name][row, col] = comm[row, col];
+                            newRow[col] = comm[row, col].ToString();
+                        }
+                        data.Rows.Add(newRow);
+                        data.Rows[row].HeaderCell.Value = mTable["Data"].RowLabels[row];
+                        mTable[m_name].RowLabels[row] = mTable["Data"].RowLabels[row]; //Add row labels
+                    }
+                    commAffil = new Matrix(mTable[m_name]);
+                    break;
+
+                case CommunityType.louvainDensity:
+                    mTable[m_name] = new Matrix(ncoms);
+                    mTable[m_name].ActualNetworkIdStr = year;
+                    mTable[m_name].NetworkIdIndex = yearIndex;
+                    //Add columns of table
+                    for (int col = 0; col < ncoms; col++)
+                    {
+                        data.Columns.Add((col).ToString(), "Comm " + (col + 1).ToString());
+                        mTable[m_name].ColLabels[col] = "Comm " + (col + 1).ToString();
+                    }
+                    //Add matrix values and data table values
+                    for (int row = 0; row < ncoms; row++)
+                    {
+                        string[] newRow = new string[descComs.Count];
+                        for (int col = 0; col < ncoms; col++)
+                        {
+                            mTable[m_name][row, col] = LouvainDensity(descComs[row], descComs[col], ogOutEdges);
+                            newRow[col] = mTable[m_name][row, col].ToString();
+                        }
+                        data.Rows.Add(newRow);
+                        data.Rows[row].HeaderCell.Value = "Comm " + (row + 1).ToString();
+                        mTable[m_name].RowLabels[row] = "Comm " + (row + 1).ToString();
+                    }
+                    break;
+
+                case CommunityType.louvainCohesion: //Copied from calculateCommunities()
+                    LoadStructEquiv(density, yearIndex, "Data");
+                    mTable[m_name] = computeCommCohesiveMatrix();
+                    mTable[m_name].ActualNetworkIdStr = year;
+                    mTable[m_name].NetworkIdIndex = yearIndex;
+                    for (int i = 0; i < mTable[m_name].Rows; ++i)
+                    {
+                        data.Columns.Add((i + 1).ToString(), "Comm " + (i + 1).ToString());
+                        mTable[m_name].ColLabels[i] = "Comm " + (i + 1).ToString();
+                    }
+
+                    for (int row = 0; row < mTable[m_name].Rows; row++)
+                    {
+                        // Generate an array to hold this row
+                        string[] newRow = new string[comNum];
+                        for (int col = 0; col < mTable[m_name].Cols; col++)
+                            newRow[col] = mTable[m_name][row, col].ToString();
+
+                        data.Rows.Add(newRow);
+                        data.Rows[row].HeaderCell.Value = "Comm " + (row + 1).ToString();
+                        mTable[m_name].RowLabels[row] = "Comm " + (row + 1).ToString();
+                    }
+                    break;
+
+                case CommunityType.louvainSepCof:
+                    double sepCof = LouvainSepCof(ncoms, descComs, ogOutEdges);
+                    mTable[m_name] = new Matrix(1);
+                    mTable[m_name].ActualNetworkIdStr = year;
+                    mTable[m_name].NetworkIdIndex = yearIndex;
+                    mTable[m_name][0, 0] = sepCof;
+                    mTable[m_name].ColLabels[0] = "Separation Coefficient";
+                    mTable[m_name].RowLabels[0] = "1";
+                    data.Columns.Add("1", "Separation Coefficient");
+                    data.Rows.Add(sepCof);
+                    break;
+
+                case CommunityType.louvainMod:
+                    data.Columns.Add("1", "Modularity Coefficient");
+                    mTable[m_name] = new Matrix(modularityCoeff.Count, 1);
+                    mTable[m_name].ColLabels[0] = "Modularity Coefficient";
+                    for (int i = 0; i < modularityCoeff.Count; i++)
+                    {
+                        data.Rows.Add(modularityCoeff[i]);
+                        data.Rows[i].HeaderCell.Value = "Iteration " + (i).ToString();
+                        mTable[m_name].RowLabels[i] = "Iteration " + (i).ToString();
+                    }
+                    break;
+                //bbflag
+                case CommunityType.louvainComCoeff:
+                    mTable[m_name] = new Matrix(1, 9);
+                    data.Columns.Add("1", "Year");
+                    data.Columns.Add("2", "Row");
+                    data.Columns.Add("3", "Separation Coefficient");
+                    data.Columns.Add("4", "Null Sep. Coeff.");
+                    data.Columns.Add("5", "T-Separation");
+                    data.Columns.Add("6", "Cohesion Coefficient");
+                    data.Columns.Add("7", "Null Coh. Coeff.");
+                    data.Columns.Add("8", "T-Cohesion");
+                    data.Columns.Add("9", "Modularity Coefficient");
+                    mTable[m_name].ColLabels[0] = "Year";
+                    mTable[m_name].ColLabels[1] = "Row";
+                    mTable[m_name].ColLabels[2] = "Separation Coefficient";
+                    mTable[m_name].ColLabels[3] = "Null Sep. Coeff.";
+                    mTable[m_name].ColLabels[4] = "T-Separation";
+                    mTable[m_name].ColLabels[5] = "Cohesion Coefficient";
+                    mTable[m_name].ColLabels[6] = "Null Coh. Coeff.";
+                    mTable[m_name].ColLabels[7] = "T-Cohesion";
+                    mTable[m_name].ColLabels[8] = "Modularity Coefficient";
+                    mTable[m_name].RowLabels[0] = "1";
+                    LoadStructEquiv(density, yearIndex, "Data");
+                    string[] comCoeffs = new string[data.Columns.Count];
+                    comCoeffs[0] = year; //Year
+                    comCoeffs[1] = "1";             //Row
+                    comCoeffs[2] = LouvainSepCof(ncoms, descComs, ogOutEdges).ToString();   //Sep Coeff
+                    comCoeffs[3] = "NA";    //Null Sep Coeff
+                    comCoeffs[4] = "NA";    //T-Sep
+                    comCoeffs[5] = CalculateCommGC().ToString();    //Coh Coeff
+                    comCoeffs[6] = "NA";    //Null Coh Coeff
+                    comCoeffs[7] = "NA";    //T-Cohesion
+                    comCoeffs[8] = modularityCoeff[modularityCoeff.Count - 1].ToString();    //Final Modularity Coeff
+                    data.Rows.Add(comCoeffs);
+                    mTable[m_name][0, 0] = Convert.ToDouble(year);
+                    mTable[m_name][0, 1] = 1;
+                    mTable[m_name][0, 2] = LouvainSepCof(ncoms, descComs, ogOutEdges);
+                    mTable[m_name][0, 3] = double.NaN;
+                    mTable[m_name][0, 4] = double.NaN;
+                    mTable[m_name][0, 5] = CalculateCommGC();
+                    mTable[m_name][0, 6] = double.NaN;
+                    mTable[m_name][0, 7] = double.NaN;
+                    mTable[m_name][0, 8] = modularityCoeff[modularityCoeff.Count - 1];
+                    break;
+            }
+        }
+
+        //=============================================================
+
         public void mainCommunityExtractionMethod(bool calcStats, bool newDiscrete, bool overlapping)
         {
             // Performs the actual algorithm for the community extraction
@@ -2242,7 +2827,7 @@ namespace Network
                 throw new Exception("You must find the blocks before you can partition them!");
 
             //LoadBlockPartitionMatrix();
-            //LoadStructEquiv(density, year, "Data");
+            //LoadStructEquiv(density, yearIndex, "Data");
 
             int B = Blocks.Count;
             mTable[m_name] = CalculateBlockDensity(Blocks);
@@ -2365,8 +2950,8 @@ namespace Network
             double T_coh = GC / SE_coh;
 
             Matrix Stats_vector = mTable.AddMatrix(m_name, 1, 7);
-            Stats_vector.NetworkIdStr = mTable["Data"].NetworkIdStr;
-            Stats_vector.NetworkId = year;
+            Stats_vector.ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            Stats_vector.NetworkIdIndex = year;
             Stats_vector[0, 0] = year;
             Stats_vector[0, 1] = SC;
             Stats_vector[0, 2] = nullCoefficients[0];
@@ -2416,8 +3001,8 @@ namespace Network
             double T_coh = GC / SE_coh;
 
             Matrix Stats_vector = mTable.AddMatrix(m_name, 1, 7);
-            mTable[m_name].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable[m_name].NetworkId = year;
+            mTable[m_name].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable[m_name].NetworkIdIndex = year;
 
             Stats_vector[0, 0] = year;
             Stats_vector[0, 1] = SC;
@@ -2461,7 +3046,7 @@ namespace Network
             }
 
             int cliqueNum = cliques.Count;
-            Matrix Density = new Matrix(cliqueNum, cliqueNum);
+            Matrix Density = new Matrix(cliqueNum, cliqueNum, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
 
             for (int i = 0; i < cliqueNum; i++)
             {
@@ -2523,7 +3108,7 @@ namespace Network
             }
 
             int B = Blocks.Count;
-            Matrix Density = new Matrix(B, B);
+            Matrix Density = new Matrix(B, B, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
 
             for (int i = 0; i < B; ++i)
             {
@@ -2584,7 +3169,7 @@ namespace Network
                 }
             }
 
-            Matrix Density = new Matrix(comNum, comNum);
+            Matrix Density = new Matrix(comNum, comNum, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
             for (int i = 0; i < comNum; i++)
             {
                 for (int j = 0; j < comNum; j++)
@@ -2771,7 +3356,7 @@ namespace Network
         //
         public Matrix computeCliqueCohesiveMatrix()
         {
-            Matrix cohesiveMatrix = new Matrix(_cliques.Count, _cliques.Count);
+            Matrix cohesiveMatrix = new Matrix(_cliques.Count, _cliques.Count, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
 
             // for external files
             if (cohesionFilename != null)
@@ -2846,7 +3431,7 @@ namespace Network
 
         public Matrix computeBlockCohesiveMatrix()
         {
-            Matrix cohesiveMatrix = new Matrix(_blocks.Count, _blocks.Count);
+            Matrix cohesiveMatrix = new Matrix(_blocks.Count, _blocks.Count, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
 
             // for external files
             if (cohesionFilename != null)
@@ -2914,10 +3499,10 @@ namespace Network
             return cohesiveMatrix;
         }
 
-
+        //bbflag
         public Matrix computeCommCohesiveMatrix()
         {
-            Matrix cohesiveMatrix = new Matrix(comNum, comNum);
+            Matrix cohesiveMatrix = new Matrix(comNum, mTable["Data"].ActualNetworkIdStr, mTable["Data"].NetworkIdIndex);
 
             // for external files
             if (cohesionFilename != null)
@@ -3170,7 +3755,7 @@ namespace Network
             if (_cliques.Count == 0)
             {
                 ogMatrixData = new Matrix(mTable["Data"]);
-                mTable["Data"] = new Matrix(1, 1, ogMatrixData.NetworkId, ogMatrixData.NetworkIdStr);
+                mTable["Data"] = new Matrix(1, 1, ogMatrixData.NetworkIdIndex, ogMatrixData.ActualNetworkIdStr);
                 return true;        //return true because it resultant matrix will be null
             }
             List<int> isolates = new List<int>();
@@ -3200,7 +3785,7 @@ namespace Network
                 //firstTimeRemoveIsolates = false;
             //}
             mTable["Data"] = new Matrix(mTable["Data"].SubmatrixWithRemovedRows(isolates));
-            mTable["Data"].NetworkIdStr = ogMatrixData.NetworkIdStr;
+            mTable["Data"].ActualNetworkIdStr = ogMatrixData.ActualNetworkIdStr;
             return false;       //return false because resultant matrix is not null
         }
 
@@ -3383,7 +3968,7 @@ namespace Network
             if (m == "ClosenessDistance")
             {
                 m = "Temp";
-                mTable[m] = new Matrix(mTable["ClosenessDistance"].Rows);
+                mTable[m] = new Matrix(mTable["ClosenessDistance"].Rows, mTable["ClosenessDistance"].ActualNetworkIdStr, mTable["ClosenessDistance"].NetworkIdIndex);
                 mTable["ClosenessDistance"].CloneTo(mTable[m]);
                 for (int i = 0; i < mTable[m].Rows; ++i)
                     mTable[m].RowLabels[i] = mTable[m].ColLabels[i] = mTable["ClosenessDistance"].ColLabels[i];
@@ -3394,7 +3979,7 @@ namespace Network
 
             bool isBinary = mTable[m].IsBinaryMatrix;
 
-            mTable["ClosenessDistance"] = new Matrix(mTable[m].Rows);
+            mTable["ClosenessDistance"] = new Matrix(mTable[m].Rows, mTable[m].ActualNetworkIdStr, mTable[m].NetworkIdIndex);
             mTable["ClosenessDistance"].Clear();
 
             Queue<int> q = new Queue<int>();
@@ -3457,9 +4042,9 @@ namespace Network
         {
             int n = mTable[m].Rows;
             int triadCount = n * (n - 1) * (n - 2) / 6;
-            mTable["Triadic"] = new Matrix(triadCount, 20); // year, triad id, ab, ac, bc
-            mTable["Triadic"].NetworkId = year;
-            mTable["Triadic"].NetworkIdStr = mTable[m].NetworkIdStr;
+            mTable["Triadic"] = new Matrix(triadCount, 20); // yearIndex, triad id, ab, ac, bc
+            mTable["Triadic"].NetworkIdIndex = year;
+            mTable["Triadic"].ActualNetworkIdStr = mTable[m].ActualNetworkIdStr;
             mTable["Triadic"].ColLabels[0] = "Year";
             mTable["Triadic"].ColLabels[1] = "Triad ID";
             mTable["Triadic"].ColLabels[2] = "A --> B";
@@ -3492,7 +4077,7 @@ namespace Network
                     {
                         mTable["Triadic"][row, 0] = year;
                         // Yushan
-                        //mTable["Triadic"][row, 0] = Int32.Parse(mTable[m].NetworkIdStr);
+                        //mTable["Triadic"][row, 0] = Int32.Parse(mTable[m].ActualNetworkIdStr);
                         mTable["Triadic"][row, 1] = double.Parse((i + 1).ToString() + "," + (j + 1).ToString() + "," + (k + 1).ToString());
                         mTable["Triadic"][row, 2] = mTable[m][i, j] > 0 ? 1 : 0;
                         mTable["Triadic"][row, 3] = mTable[m][i, k] > 0 ? 1 : 0;
@@ -3535,7 +4120,7 @@ namespace Network
                 {
                     if (col == 0)
                     {
-                        newRow[col] = mTable[ms].NetworkIdStr;
+                        newRow[col] = mTable[ms].ActualNetworkIdStr;
                     }
                     else
                         newRow[col] = mTable[ms][row, col].ToString();
@@ -3668,18 +4253,18 @@ namespace Network
             maxik = GetRealDensity(maxik, year, m);
 
             mTable["SEC"] = MatrixComputations.StructuralEquivalenceCorrelation(mTable[m]);
-            mTable["SEC"].NetworkIdStr = mTable[m].NetworkIdStr;
-            mTable["SEC"].NetworkId = year;
+            mTable["SEC"].ActualNetworkIdStr = mTable[m].ActualNetworkIdStr;
+            mTable["SEC"].NetworkIdIndex = year;
             mTable["SEE"] = MatrixComputations.StructuralEquivalenceEuclidean(mTable[m]);
-            mTable["SEE"].NetworkIdStr = mTable[m].NetworkIdStr;
-            mTable["SEE"].NetworkId = year;
+            mTable["SEE"].ActualNetworkIdStr = mTable[m].ActualNetworkIdStr;
+            mTable["SEE"].NetworkIdIndex = year;
 
             if (maxik >= 0.0)
             {
                 mTable["SESE"] = MatrixComputations.StructuralEquivalenceStandardizedEuclidean(mTable[m], maxik);
+                mTable["SESE"].ActualNetworkIdStr = mTable[m].ActualNetworkIdStr;
+                mTable["SESE"].NetworkIdIndex = year;
                 SESEmatrix = new Matrix(mTable["SESE"]);
-                mTable["SESE"].NetworkIdStr = mTable[m].NetworkIdStr;
-                mTable["SESE"].NetworkId = year;
             }
         }
 
@@ -3800,11 +4385,11 @@ namespace Network
                 throw new Exception("You must find the blocks before you can partition them!");
 
             Matrix BPI = mTable.AddMatrix("BlockPartitionI", mTable["Data"].Rows, mTable["Data"].Cols);
-            mTable["BlockPartitionI"].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable["BlockPartitionI"].NetworkId = mTable["Data"].NetworkId;
+            mTable["BlockPartitionI"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable["BlockPartitionI"].NetworkIdIndex = mTable["Data"].NetworkIdIndex;
             Matrix BPS = mTable.AddMatrix("BlockPartitionS", mTable["Data"].Rows, mTable["Data"].Cols);
-            mTable["BlockPartitionS"].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable["BlockPartitionS"].NetworkId = mTable["Data"].NetworkId;
+            mTable["BlockPartitionS"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable["BlockPartitionS"].NetworkIdIndex = mTable["Data"].NetworkIdIndex;
 
             int rowAdd = 0, colAdd = 0;
             for (int row = 0; row < Blocks.Count; ++row)
@@ -3839,8 +4424,8 @@ namespace Network
                 throw new Exception("You must find the blocks before you can partition them!");
 
             Matrix CP = mTable.AddMatrix("ClusterPartition", mTable["Data"].Rows, mTable["Data"].Cols);
-            mTable["ClusterPartition"].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable["ClusterPartition"].NetworkId = mTable["Data"].NetworkId;
+            mTable["ClusterPartition"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable["ClusterPartition"].NetworkIdIndex = mTable["Data"].NetworkIdIndex;
             int rowAdd = 0, colAdd = 0;
             for (int row = 0; row < Blocks.Count; ++row)
             {
@@ -3880,8 +4465,8 @@ namespace Network
             else
                 mTable["Temp"] = MatrixComputations.StructuralEquivalenceStandardizedEuclidean(mTable[m], maxik);
 
-            mTable["Temp"].NetworkIdStr = mTable[m].NetworkIdStr;
-            mTable["Temp"].NetworkId = mTable[m].NetworkId;
+            mTable["Temp"].ActualNetworkIdStr = mTable[m].ActualNetworkIdStr;
+            mTable["Temp"].NetworkIdIndex = mTable[m].NetworkIdIndex;
             if (method != "ED")
             {
                 for (int cluster = n; cluster > maxcluster; cluster--)
@@ -4109,14 +4694,14 @@ namespace Network
             int B = Blocks.Count;
             string m = "Data";
             Matrix D = mTable.AddMatrix("DensityBlockMatrix", B, B);
-            mTable["DensityBlockMatrix"].NetworkIdStr = mTable[m].NetworkIdStr;
-            mTable["DensityBlockMatrix"].NetworkId = year;
+            mTable["DensityBlockMatrix"].ActualNetworkIdStr = mTable[m].ActualNetworkIdStr;
+            mTable["DensityBlockMatrix"].NetworkIdIndex = year;
             Matrix RD = mTable.AddMatrix("RelativeDensityBlockMatrix", B, B);
-            mTable["RelativeDensityBlockMatrix"].NetworkIdStr = mTable[m].NetworkIdStr;
-            mTable["RelativeDensityBlockMatrix"].NetworkId = year;
+            mTable["RelativeDensityBlockMatrix"].ActualNetworkIdStr = mTable[m].ActualNetworkIdStr;
+            mTable["RelativeDensityBlockMatrix"].NetworkIdIndex = year;
             Matrix BC = mTable.AddMatrix("BlockCohesivenessMatrix", B, B);
-            mTable["BlockCohesivenessMatrix"].NetworkIdStr = mTable[m].NetworkIdStr;
-            mTable["BlockCohesivenessMatrix"].NetworkId = year;
+            mTable["BlockCohesivenessMatrix"].ActualNetworkIdStr = mTable[m].ActualNetworkIdStr;
+            mTable["BlockCohesivenessMatrix"].NetworkIdIndex = year;
 
             double d = MatrixComputations.Density(mTable["Data"], density);
 
@@ -4175,14 +4760,14 @@ namespace Network
             int B = Blocks.Count;
 
             Matrix CD = mTable.AddMatrix("DensityClusterMatrix", B, B);
-            mTable["DensityClusterMatrix"].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable["DensityClusterMatrix"].NetworkId = year;
+            mTable["DensityClusterMatrix"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable["DensityClusterMatrix"].NetworkIdIndex = year;
             Matrix CRD = mTable.AddMatrix("RelativeDensityClusterMatrix", B, B);
-            mTable["RelativeDensityClusterMatrix"].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable["RelativeDensityClusterMatrix"].NetworkId = year;
+            mTable["RelativeDensityClusterMatrix"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable["RelativeDensityClusterMatrix"].NetworkIdIndex = year;
             Matrix CC = mTable.AddMatrix("ClusterCohesivenessMatrix", B, B);
-            mTable["ClusterCohesivenessMatrix"].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable["ClusterCohesivenessMatrix"].NetworkId = year;
+            mTable["ClusterCohesivenessMatrix"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable["ClusterCohesivenessMatrix"].NetworkIdIndex = year;
 
             double d = MatrixComputations.Density(mTable["Data"], density);
             int rowCount = 0;
@@ -4210,8 +4795,8 @@ namespace Network
 
             LoadStructEquiv(maxik, year, "Data");
             mTable["ICD"] = new Matrix(_cliques.Count);
-            mTable["ICD"].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable["ICD"].NetworkId = year;
+            mTable["ICD"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable["ICD"].NetworkIdIndex = year;
             for (int i = 1; i <= _cliques.Count; ++i)
                 mTable["ICD"].RowLabels[i - 1] = mTable["ICD"].ColLabels[i - 1] = i.ToString();
 
@@ -4258,8 +4843,8 @@ namespace Network
 
             maxik = GetRealDensity(maxik, year, "Data");
 
-            mTable["Temp"].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable["Temp"].NetworkId = year;
+            mTable["Temp"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable["Temp"].NetworkIdIndex = year;
             if (zeroDiagonal)
             {
                 // Code for getting new maximum k value ignoring the diagonal
@@ -4272,8 +4857,8 @@ namespace Network
                 // Set up final matrix
                 int N = mTable["Data"].Rows;
                 mTable["Dependency"] = new Matrix(mTable["Data"].Rows + 1);
-                mTable["Dependency"].NetworkIdStr = mTable["Data"].NetworkIdStr;
-                mTable["Dependency"].NetworkId = year;
+                mTable["Dependency"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+                mTable["Dependency"].NetworkIdIndex = year;
                 for (int i = 0; i < mTable["Data"].Rows; ++i)
                     for (int j = 0; j < mTable["Data"].Cols; ++j)
                         mTable["Dependency"][i, j] = (N * maxik - 1) * mTable["Reachability"][i, j] /
@@ -4375,8 +4960,8 @@ namespace Network
             String m = "NatDep";
             int numNodes = mTable["Data"].Rows;
             mTable[m] = new Matrix(numNodes, 6);
-            mTable[m].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable[m].NetworkId = year;
+            mTable[m].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable[m].NetworkIdIndex = year;
 
             double OUT;
             double ON;
@@ -4707,8 +5292,8 @@ namespace Network
             //}
 
             mTable["Reachability"] = new Matrix(mTable["Data"]);
-            mTable["Reachability"].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable["Reachability"].NetworkId = year;
+            mTable["Reachability"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable["Reachability"].NetworkIdIndex = year;
             Matrix diag = mTable["Data"].GetDiagonalMatrix();
 
             if (!doSum)
@@ -4774,8 +5359,8 @@ namespace Network
                 throw new Exception("Data matrix required!");
 
             mTable["CognitiveReachability"] = new Matrix(mTable["Data"]);
-            mTable["CognitiveReachability"].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable["CognitiveReachability"].NetworkId = year;
+            mTable["CognitiveReachability"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable["CognitiveReachability"].NetworkIdIndex = year;
             Matrix diag = mTable["Data"].GetDiagonalMatrix();
 
             if (!doSum)
@@ -5259,8 +5844,8 @@ namespace Network
             }
 
             mTable.Add("Cheapest", best);
-            mTable["Cheapest"].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable["Cheapest"].NetworkId = mTable["Data"].NetworkId;
+            mTable["Cheapest"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable["Cheapest"].NetworkIdIndex = mTable["Data"].NetworkIdIndex;
         }
 
         /// <summary>
@@ -5335,8 +5920,8 @@ namespace Network
             }
 
             mTable.Add("Strength", best);
-            mTable["Strength"].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable["Strength"].NetworkId = mTable["Data"].NetworkId;
+            mTable["Strength"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable["Strength"].NetworkIdIndex = mTable["Data"].NetworkIdIndex;
         }
 
         //private List<double> findStrengthRow(int row)
@@ -6812,8 +7397,8 @@ namespace Network
                 if (WCA[n + 1, i] >= CCA[n + 1, i]) winning++;
 
             mTable["NetworkPower"] = new Matrix(mTable["Data"].Rows, calcSP ? 12 : 8);
-            mTable["NetworkPower"].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable["NetworkPower"].NetworkId = year;
+            mTable["NetworkPower"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable["NetworkPower"].NetworkIdIndex = year;
             for (int node = 0; node < n; node++)
             {
                 NPNode npNode = new NPNode();
@@ -7419,8 +8004,8 @@ namespace Network
             }
 
             mTable["Characteristics"] = new Matrix(_cliques.Count, 4 + svc.Count + totalAttrCount + attrMatrix.Count);
-            mTable["Characteristics"].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable["Characteristics"].NetworkId = year;
+            mTable["Characteristics"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable["Characteristics"].NetworkIdIndex = year;
             // Column labels
             mTable["Characteristics"].ColLabels[0] = "Year";
             mTable["Characteristics"].ColLabels[1] = "Clique Members";
@@ -7541,7 +8126,7 @@ namespace Network
             // Dyadic vector characteristics
             for (int i = 0; i < dvc.Count; ++i)
             {
-                //Matrix NC = MatrixReader.ReadMatrixFromFile(dvc[i].First, year);
+                //Matrix NC = MatrixReader.ReadMatrixFromFile(dvc[i].First, yearIndex);
                 for (int var = 0; var < multipleDyadicMatrices[i].Count; var++)
                 {
                     // For each clique
@@ -7716,8 +8301,8 @@ namespace Network
 
             // got all sets, now make the matrix
             mTable["CoalitionStructure"] = new Matrix(Math.Max(1, allSets.Count), 6);
-            mTable["CoalitionStructure"].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable["CoalitionStructure"].NetworkId = year;
+            mTable["CoalitionStructure"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable["CoalitionStructure"].NetworkIdIndex = year;
             mTable["CoalitionStructure"].ColLabels[0] = "Network ID";
             mTable["CoalitionStructure"].ColLabels[1] = "Coalition No.";
             mTable["CoalitionStructure"].ColLabels[2] = "No. of Units";
@@ -7726,8 +8311,8 @@ namespace Network
             mTable["CoalitionStructure"].ColLabels[5] = "Weighted Size";
 
             mTable["ViableCoalitions"] = new Matrix(mTable["Data"].Rows + 3, Math.Max(1, allSets.Count));
-            mTable["ViableCoalitions"].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable["ViableCoalitions"].NetworkId = year;
+            mTable["ViableCoalitions"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable["ViableCoalitions"].NetworkIdIndex = year;
             mTable["ViableCoalitions"].RowLabels.CopyFrom(mTable["Data"].RowLabels);
             mTable["ViableCoalitions"].RowLabels[mTable["ViableCoalitions"].RowLabels.Length - 3] = "Size";
             mTable["ViableCoalitions"].RowLabels[mTable["ViableCoalitions"].RowLabels.Length - 2] = "Cohesion";
@@ -7753,14 +8338,14 @@ namespace Network
             }
             if (allSets.Count == 0)
             {
-                //mTable["CoalitionStructure"][1, 0] = year;
+                //mTable["CoalitionStructure"][1, 0] = yearIndex;
             }
 
             mTable["ViableNPI"] = new Matrix(1, 1);
-            mTable["ViableNPI"].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable["ViableNPI"].NetworkId = year;
+            mTable["ViableNPI"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable["ViableNPI"].NetworkIdIndex = year;
             mTable["ViableNPI"].ColLabels[0] = "NPI";
-            mTable["ViableNPI"].RowLabels[0] = mTable["Data"].NetworkIdStr;
+            mTable["ViableNPI"].RowLabels[0] = mTable["Data"].ActualNetworkIdStr;
             mTable["ViableNPI"][0, 0] = ViableNPI;
         }
              
@@ -7791,8 +8376,8 @@ namespace Network
 
             Triads triad = new Triads(mTable["Data"], Triads.TriadType.NonBalance);
             Matrix BC = mTable.AddMatrix("BlockCharacteristics", _blocks.Count, svc.Count + totalAttrCount + attrMatrix.Count + 4);
-            mTable["BlockCharacteristics"].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable["BlockCharacteristics"].NetworkId = year;
+            mTable["BlockCharacteristics"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable["BlockCharacteristics"].NetworkIdIndex = year;
 
             //Read in Attribute matrix if there is one.
             //string s = null;
@@ -7916,7 +8501,7 @@ namespace Network
             // Dyadic vector characteristics
             for (int i = 0; i < dvc.Count; ++i)
             {
-                //Matrix NC = MatrixReader.ReadMatrixFromFile(dvc[i].First, year);
+                //Matrix NC = MatrixReader.ReadMatrixFromFile(dvc[i].First, yearIndex);
                 for (int var = 0; var < multipleDyadicMatrices[i].Count; var++)
                 {
                     //dyadicLabels[i][var] = multipleDyadicMatrices[i][var].Name;
@@ -8030,8 +8615,8 @@ namespace Network
             }
             
             Matrix ComC = mTable.AddMatrix(ms, numCom, svc.Count + totalAttrCount + attrMatrix.Count + 4);
-            mTable[ms].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable[ms].NetworkId = year;
+            mTable[ms].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable[ms].NetworkIdIndex = year;
             Triads triad = new Triads(mTable["Data"], Triads.TriadType.NonBalance, binaryCutoff);
             //Read in Attribute matrix if there is one.
             string s = "";      
@@ -8249,8 +8834,8 @@ namespace Network
             }
 
             Matrix ComC = mTable.AddMatrix(ms, overlapComm.Count, svc.Count + totalAttrCount + attrMatrix.Count + 4);
-            mTable[ms].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable[ms].NetworkId = year;
+            mTable[ms].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable[ms].NetworkIdIndex = year;
             Triads triad = new Triads(mTable["Data"], Triads.TriadType.NonBalance, binaryCutoff);
             //Read in Attribute matrix if there is one.
             string s = "";
@@ -8662,7 +9247,7 @@ namespace Network
             }
             
             // old code
-            //Vector vv = MatrixReader.ReadVectorFromFile(svcFile, year);
+            //Vector vv = MatrixReader.ReadVectorFromFile(svcFile, yearIndex);
 
             // new code
             BufferedFileTable.GetFile(svcFile).JumpToNetworkId(year); // may not need
@@ -8718,7 +9303,7 @@ namespace Network
             }
 
             // old code
-            //Vector av = MatrixReader.ReadVectorFromFile(svcFile, year);
+            //Vector av = MatrixReader.ReadVectorFromFile(svcFile, yearIndex);
 
             // new code
             BufferedFileTable.GetFile(svcFile).JumpToNetworkId(year); // may not need
@@ -8775,7 +9360,7 @@ namespace Network
             }
             
             // old code
-            //Vector av = MatrixReader.ReadVectorFromFile(svcFile, year);
+            //Vector av = MatrixReader.ReadVectorFromFile(svcFile, yearIndex);
 
             // new code
             BufferedFileTable.GetFile(svcFile).JumpToNetworkId(year); // may not need
@@ -8849,7 +9434,7 @@ namespace Network
             //Yushan
             mList = MatrixReader.ReadMatrixListFromFile(filename);
             tempDataMatrix = new Matrix(mTable["Data"]);
-            return mTable["Data"].NetworkId;
+            return mTable["Data"].NetworkIdIndex;
         }
 
         public int LoadFromDyadicFile(string fileName, int year)
@@ -8861,13 +9446,13 @@ namespace Network
                 Reset();
                 mTable["Data"] = new Matrix(tempMat);
             }
-            return mTable["Data"].NetworkId;
+            return mTable["Data"].NetworkIdIndex;
         }
 
         public int LoadFromMatrixFileIntoMatrix(string filename, int year, string m)
         {
             mTable[m] = MatrixReader.ReadMatrixFromFile(filename, year);
-            return mTable[m].NetworkId;
+            return mTable[m].NetworkIdIndex;
         }
 
         public int LoadFromMatrixFile(string fileName, int year)
@@ -8878,7 +9463,7 @@ namespace Network
                 Reset();
                 mTable["Data"] = new Matrix(tempMat);
             }
-            return mTable["Data"].NetworkId;
+            return mTable["Data"].NetworkIdIndex;
         }
 
         public void checkAndInit(string check, string initt)
@@ -9050,7 +9635,7 @@ namespace Network
             // Obtain a file buffer
             BufferedFileTable.AddFile(filename);
 
-            // Jump to the correct year
+            // Jump to the correct yearIndex
             int actualYear = BufferedFileTable.GetFile(filename).JumpToNetworkId(year, true);
             string networkRealId = BufferedFileTable.GetFile(filename).GetNetworkRealId(actualYear);
             string s = BufferedFileTable.GetFile(filename).ReadLine();
@@ -9063,8 +9648,8 @@ namespace Network
 
             mTable[m] = new Matrix(lines);
             // Yushan
-            mTable[m].NetworkId = actualYear;
-            mTable[m].NetworkIdStr = networkRealId;
+            mTable[m].NetworkIdIndex = actualYear;
+            mTable[m].ActualNetworkIdStr = networkRealId;
             //
             mTable[m].RowLabels.SetLabels(labels.Keys);
             mTable[m].ColLabels.SetLabels(labels.Keys);
@@ -9109,14 +9694,14 @@ namespace Network
             if (!mTable.ContainsKey(m) || mTable[m] == null)
                 throw new IOException("Attempting to write null matrix " + m);
 
-            // mTable[m].NetworkId = year;
+            // mTable[m].NetworkIdIndex = yearIndex;
             // Yushan
             if (m == "GlobalRandom" || m == "ConfigModel")
             {
                 using (StreamWriter writer = new StreamWriter(fileName, !Overwrite))
                 {
                     if (writeColLabels)
-                        writer.WriteLine(mTable[m].NetworkIdStr);
+                        writer.WriteLine(mTable[m].ActualNetworkIdStr);
 
                     if (writeColLabels)
                     {
@@ -9161,11 +9746,11 @@ namespace Network
             else
             {
                 // Yushan
-                if (mTable[m].NetworkId == 0)
+                if (mTable[m].NetworkIdIndex == 0)
                 {
-                    mTable[m].NetworkId = year;
+                    mTable[m].NetworkIdIndex = year;
                 }
-                //Console.WriteLine("mTable[m] Network Real ID: {0:s}", mTable[m].NetworkIdStr);
+                //Console.WriteLine("mTable[m] Network Real ID: {0:s}", mTable[m].ActualNetworkIdStr);
                 MatrixWriter.WriteMatrixToMatrixFile(mTable[m], fileName, Overwrite, writeYear, writeColLabels);
             }
         }
@@ -9239,9 +9824,9 @@ namespace Network
             }
 
             if (writeYear)
-                //sw.WriteLine(year.ToString());
+                //sw.WriteLine(yearIndex.ToString());
                 // Yushan
-                sw.WriteLine(mTable["Centrality"].NetworkIdStr);
+                sw.WriteLine(mTable["Centrality"].ActualNetworkIdStr);
 
             // Write out colLabels
             if (writeColLabels)
@@ -9307,9 +9892,9 @@ namespace Network
             }
             for (int row = 0; row < mTable["Affil"].Rows; ++row)
             {
-                //string line = year.ToString() + "," + mTable["Data"].RowLabels[row] + ",";
+                //string line = yearIndex.ToString() + "," + mTable["Data"].RowLabels[row] + ",";
                 // Yushan
-                string line = mTable["Data"].NetworkIdStr + "," + mTable["Data"].RowLabels[row] + ",";
+                string line = mTable["Data"].ActualNetworkIdStr + "," + mTable["Data"].RowLabels[row] + ",";
                 for (int col = 0; col < mTable["Affil"].Cols; ++col)
                 {
                     line += mTable["Affil"][row, col].ToString();
@@ -9350,9 +9935,9 @@ namespace Network
                 else
                     sw = File.AppendText(fileName);
             }
-            //sw.WriteLine(year.ToString());
+            //sw.WriteLine(yearIndex.ToString());
             // Yushan
-            sw.WriteLine(mTable["Data"].NetworkIdStr);
+            sw.WriteLine(mTable["Data"].ActualNetworkIdStr);
             // Column labels should be just numbers
             string s = ",";
             for (int j = 0; j < _cliques.Count; ++j)
@@ -9501,9 +10086,9 @@ namespace Network
 
             if (topLabels)
             {
-                //sw.WriteLine(year.ToString());
+                //sw.WriteLine(yearIndex.ToString());
                 // Yushan
-                sw.WriteLine(mTable["Data"].NetworkIdStr);
+                sw.WriteLine(mTable["Data"].ActualNetworkIdStr);
                 // Column labels should be just numbers
                 string s = ",";
                 for (int j = 0; j < Blocks.Count; ++j)
@@ -9538,7 +10123,7 @@ namespace Network
             sw.Close();
         }
 
-        public void SaveCommAffiliationToAffiliationFile(string fileName, int year, bool label, bool Overwrite)
+        public void SaveCommAffiliationToAffiliationFile(string fileName, int year, bool label, bool Overwrite, string tableName)
         {
 
             bool topLabels = true;
@@ -9563,21 +10148,21 @@ namespace Network
             if (topLabels)
             {
                 sw.Write("year,state");
-                for (int i = 0; i < mTable["Community"].Cols; ++i)
+                for (int i = 0; i < mTable[tableName].Cols; ++i)
                 {
                     sw.Write(",R" + (i + 1).ToString());
                 }
                 sw.WriteLine("");
             }
-            for (int row = 0; row < mTable["Community"].Rows; ++row)
+            for (int row = 0; row < mTable[tableName].Rows; ++row)
             {
-                //string line = year.ToString() + "," + mTable["Data"].RowLabels[row] + ",";
+                //string line = yearIndex.ToString() + "," + mTable["Data"].RowLabels[row] + ",";
                 // Yushan
-                string line = mTable["Data"].NetworkIdStr + "," + mTable["Data"].RowLabels[row] + ",";
-                for (int col = 0; col < mTable["Community"].Cols; ++col)
+                string line = mTable[tableName].ActualNetworkIdStr + "," + mTable[tableName].RowLabels[row] + ",";
+                for (int col = 0; col < mTable[tableName].Cols; ++col)
                 {
-                    line += mTable["Community"][row, col].ToString();
-                    if (col + 1 != mTable["Community"].Cols)
+                    line += mTable[tableName][row, col].ToString();
+                    if (col + 1 != mTable[tableName].Cols)
                         line += ",";
                 }
                 Application.DoEvents();
@@ -9621,9 +10206,9 @@ namespace Network
             }
             for (int row = 0; row < mTable["OverlappingCommunity"].Rows; ++row)
             {
-                //string line = year.ToString() + "," + mTable["Data"].RowLabels[row] + ",";
+                //string line = yearIndex.ToString() + "," + mTable["Data"].RowLabels[row] + ",";
                 // Yushan
-                string line = mTable["Data"] + "," + mTable["Data"].RowLabels[row] + ",";
+                string line = mTable["OverlappingCommunity"].ActualNetworkIdStr + "," + mTable["OverlappingCommunity"].RowLabels[row] + ",";
                 for (int col = 0; col < mTable["OverlappingCommunity"].Cols; ++col)
                 {
                     line += mTable["OverlappingCommunity"][row, col].ToString();
@@ -9678,9 +10263,9 @@ namespace Network
 
             for (int row = 0; row < mTable["Data"].Rows; ++row)
             {
-                //string line = year.ToString() + "," + mTable["Data"].RowLabels[row] + ",";
+                //string line = yearIndex.ToString() + "," + mTable["Data"].RowLabels[row] + ",";
                 // Yushan
-                string line = mTable["Data"].NetworkIdStr + "," + mTable["Data"].RowLabels[row] + ",";
+                string line = mTable["Data"].ActualNetworkIdStr + "," + mTable["Data"].RowLabels[row] + ",";
                 for (int col = 0; col < Blocks.Count; ++col)
                 {
                     if (Blocks[col].Contains(row))
@@ -9706,7 +10291,7 @@ namespace Network
             if (!File.Exists(fileName))
             {
                 sw = File.CreateText(fileName);
-              //  sw.WriteLine(year.ToString());
+              //  sw.WriteLine(yearIndex.ToString());
                 sw.WriteLine("Year,Node,OUTD,OND,Self-Dep,Dep Balance");
             }
             else
@@ -9715,7 +10300,7 @@ namespace Network
                 {
                     File.Delete(fileName);
                     sw = File.CreateText(fileName);
-               //     sw.WriteLine(year.ToString());
+               //     sw.WriteLine(yearIndex.ToString());
                     sw.WriteLine("Year,Node,OUTD,OND,Self-Dep,Dep Balance");
                 }
                 else
@@ -9724,16 +10309,16 @@ namespace Network
             if (!File.Exists(fileName))
             {
                 sw = File.CreateText(fileName);
-               // sw.WriteLine(year.ToString());
+               // sw.WriteLine(yearIndex.ToString());
                 sw.WriteLine("Year,Node,OUTD,OND,Self-Dep,Dep Balance");
             }
 
             for (int row = 0; row < mTable["Data"].Rows; ++row)
             {
-                //sw.WriteLine( year.ToString() + "," + mTable["Data"].RowLabels[row] + "," + mTable["NatDep"][row, 2].ToString() + "," + mTable["NatDep"][row, 3].ToString()
+                //sw.WriteLine( yearIndex.ToString() + "," + mTable["Data"].RowLabels[row] + "," + mTable["NatDep"][row, 2].ToString() + "," + mTable["NatDep"][row, 3].ToString()
                 //    + "," + mTable["NatDep"][row, 4].ToString() + "," + mTable["NatDep"][row, 5].ToString());
                 // Yushan
-                sw.WriteLine(mTable["Data"].NetworkIdStr + "," + mTable["Data"].RowLabels[row] + "," + mTable["NatDep"][row, 2].ToString() + "," + mTable["NatDep"][row, 3].ToString()
+                sw.WriteLine(mTable["Data"].ActualNetworkIdStr + "," + mTable["Data"].RowLabels[row] + "," + mTable["NatDep"][row, 2].ToString() + "," + mTable["NatDep"][row, 3].ToString()
                     + "," + mTable["NatDep"][row, 4].ToString() + "," + mTable["NatDep"][row, 5].ToString());
                 Application.DoEvents();
 
@@ -9807,9 +10392,9 @@ namespace Network
                         double r = 1.0;
                         if (m == "CBCODiag")
                             r = _cliques.GetCliqueByCliqueOverlap(row, row);
-                        //string line = year.ToString() + "," + (row + 1).ToString() + ",";
+                        //string line = yearIndex.ToString() + "," + (row + 1).ToString() + ",";
                         // Yushan
-                        string line = mTable[m].NetworkIdStr + "," + (row + 1).ToString() + ",";
+                        string line = mTable[m].ActualNetworkIdStr + "," + (row + 1).ToString() + ",";
                         for (int col = 0; col < temp; col++)
                         {
                             clique_value = _cliques.GetCliqueByCliqueOverlap(row, col) / r;
@@ -9827,9 +10412,9 @@ namespace Network
                         Application.DoEvents();
                         for (int col = 0; col < mTable[m].Cols; ++col)
                         {
-                            //string line = year.ToString() + "," + mTable[m].RowLabels[row].ToString() + ",";
+                            //string line = yearIndex.ToString() + "," + mTable[m].RowLabels[row].ToString() + ",";
                             // Yushan
-                            string line = mTable[m].NetworkIdStr + "," + mTable[m].RowLabels[row].ToString() + ",";
+                            string line = mTable[m].ActualNetworkIdStr + "," + mTable[m].RowLabels[row].ToString() + ",";
                             line += mTable[m].ColLabels[col].ToString() + "," + mTable[m][row, col].ToString();
                             sw.WriteLine(line);
                         }
@@ -9901,8 +10486,8 @@ namespace Network
             for (int col = 0; col < mTable["Data"].Cols; ++col)
             {
                 // Yushan
-                string line = mTable["Data"].NetworkIdStr + "," + mTable["Data"].ColLabels[col];
-                //string line = year.ToString() + "," + mTable["Data"].ColLabels[col];
+                string line = mTable["Data"].ActualNetworkIdStr + "," + mTable["Data"].ColLabels[col];
+                //string line = yearIndex.ToString() + "," + mTable["Data"].ColLabels[col];
                 for (int i = 0; i < _cliques.Count; ++i)
                     line += "," + _cliques[i].IntContains(col).ToString();
                 sw.WriteLine(line);
@@ -9948,7 +10533,7 @@ namespace Network
             string svcFile, bool useCohesion, MatrixComputations.TransitivityType transitivityType, bool[] options, bool Overwrite, bool zeroDiagonal, bool reachSum, int reachMatrixCount, string erpolType, double alpha, int cliqueOrder,
             bool kCliqueDiag, string selectionMethod)
         {
-           // density = GetRealDensity(density, year, "Data");
+           // density = GetRealDensity(density, yearIndex, "Data");
 
             if (inputType == "StructEquiv")
                 LoadStructEquiv(density, year, "Data");
@@ -10120,9 +10705,9 @@ namespace Network
             }
             if (commType == CommunityType.Cluster)
             {
-                //string networkID = mTable[m].NetworkId.ToString();
+                //string networkID = mTable[m].NetworkIdIndex.ToString();
                 // Yushan
-                string networkID = mTable[m].NetworkIdStr;
+                string networkID = mTable[m].ActualNetworkIdStr;
                 string value;
                 if (modularityLabels)
                     sw.WriteLine("Network ID, Iteration, Modularity Coefficient,");
@@ -10166,12 +10751,12 @@ namespace Network
                     {
                         //if (col == 0 && (m == "GlobalRandom" || m == "ConfigModel" || m == "NetworkDependenceStatistics"))
                         //{
-                        //    values[0] = mTable[m].NetworkIdStr;
+                        //    values[0] = mTable[m].ActualNetworkIdStr;
                         //    continue;
                         //}
                         if (col == 0)
                         {
-                            values[0] = mTable[m].NetworkIdStr;
+                            values[0] = mTable[m].ActualNetworkIdStr;
                             Console.WriteLine("mTable[{0:s}] real ID: {1:s}", m, values[0]);
                             continue;
                         }
@@ -10277,7 +10862,7 @@ namespace Network
                     for (int j = 0; j < totalCols; j++)
                     {
                         if (j == 0)
-                            //dataRow[0] = mTable["Data"].NetworkIdStr;
+                            //dataRow[0] = mTable["Data"].ActualNetworkIdStr;
                             dataRow[j] = matrix[i, j].ToString();
                         else
                             dataRow[j] = matrix[i, j].ToString();//>= 0? mTable[i, j].ToString() : "#N/A";
@@ -10337,7 +10922,7 @@ namespace Network
 
                 Matrix M = mTable["Temp"].GetTranspose();
 
-                // Now that we have the year loaded, make the temp sums for each entry in this year
+                // Now that we have the yearIndex loaded, make the temp sums for each entry in this yearIndex
                 for (int i = 0; i < M.Rows; ++i)
                 {
                     for (int j = 0; j < M.Cols; ++j)
@@ -10402,7 +10987,7 @@ namespace Network
                     }
                 }
 
-                // Now that we have the year loaded, make the temp sums for each entry in this year
+                // Now that we have the yearIndex loaded, make the temp sums for each entry in this yearIndex
                 for (int i = 0; i < M.Rows; ++i)
                 {
                     for (int j = 0; j < M.Cols; ++j)
@@ -10456,7 +11041,7 @@ namespace Network
 
             SESEmatrix = new Matrix(mTable["SESE"]);
 
-            return mTable["Data"].NetworkId;
+            return mTable["Data"].NetworkIdIndex;
         }
 
         public int LoadFromMultivariableDyadicFile(string fileName, int year)
@@ -10473,7 +11058,7 @@ namespace Network
 
             // Load the first variable last so it remains
             mTable["Data"] = MatrixReader.ReadMatrixFromFile(fileName, year, variableCount);
-            year = mTable["Data"].NetworkId;
+            year = mTable["Data"].NetworkIdIndex;
 
             mTable["SEC"] = new Matrix(mTable["Data"].Rows);
             mTable["SEE"] = new Matrix(mTable["Data"].Rows);
@@ -10492,7 +11077,7 @@ namespace Network
 
                 Matrix M = mTable["Data"].GetTranspose() as Matrix;
 
-                // Now that we have the year loaded, make the temp sums for each entry in this year
+                // Now that we have the yearIndex loaded, make the temp sums for each entry in this yearIndex
                 for (int i = 0; i < M.Rows; ++i)
                 {
                     for (int j = 0; j < M.Cols; ++j)
@@ -10518,7 +11103,7 @@ namespace Network
 
                 Matrix M = mTable["Data"];
 
-                // Now that we have the year loaded, make the temp sums for each entry in this year
+                // Now that we have the yearIndex loaded, make the temp sums for each entry in this yearIndex
                 for (int i = 0; i < M.Rows; ++i)
                 {
                     for (int j = 0; j < M.Cols; ++j)
@@ -10560,7 +11145,7 @@ namespace Network
         // Needs to be here because it uses the row/col labels
         public void LoadCentralityIndices(string m, int year, double sijmax, bool countMember, bool zeroDiagonal)
         {
-            mTable["Centrality"] = new Matrix(mTable["Data"].Rows, 10);
+            mTable["Centrality"] = new Matrix(mTable["Data"].Rows, 10, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
             mTable["Centrality"].ColLabels.SetLabels("Year,State,DO,DI,CO,CI,BO,BI,EO,EI");
             mTable["Centrality"].RowLabels.CopyFrom(mTable["Data"].RowLabels);
 
@@ -10612,7 +11197,7 @@ namespace Network
         }
 
         // Random data load
-        public void LoadRandom(int N, string m, bool symmetric, bool range, double pmin, double pmax, bool randomN, int randomMin, int randomMax, int randomInt)
+        public void LoadRandom(int N, string m, bool symmetric, bool range, double pmin, double pmax, bool randomN, int randomMin, int randomMax, int randomInt, int year)
         {
             if (randomN)
                 N = RNG.RandomInt((randomMax - randomMin) / randomInt) * randomInt + randomMin; 
@@ -10621,11 +11206,12 @@ namespace Network
                 mTable[m] = RandomMatrix.LoadSymmetric(N, range, pmin, pmax);
             else
                 mTable[m] = RandomMatrix.LoadNonSymmetric(N, range, pmin, pmax);
-            
+
+            mTable[m].ActualNetworkIdStr = year.ToString();
             tempDataMatrix = new Matrix(mTable[m]);
         }
 
-        public void LoadValuedRandom(int N, string m, bool symmetric, double vmin, double vmax, bool datatype, bool zerodiagonalized, bool range, double pmin, double pmax, bool randomN, int randomMin, int randomMax, int randomInt)
+        public void LoadValuedRandom(int N, string m, bool symmetric, double vmin, double vmax, bool datatype, bool zerodiagonalized, bool range, double pmin, double pmax, bool randomN, int randomMin, int randomMax, int randomInt, int year)
         {
             if (randomN)
                 N = RNG.RandomInt((randomMax - randomMin) / randomInt) * randomInt + randomMin; 
@@ -10635,6 +11221,7 @@ namespace Network
             else
                 mTable[m] = RandomMatrix.LoadValuedNonSymmetric(N,vmin,vmax,datatype,zerodiagonalized, range, pmin, pmax);
 
+            mTable[m].ActualNetworkIdStr = year.ToString();
             tempDataMatrix = mTable[m];
         }
 
@@ -10650,7 +11237,7 @@ namespace Network
             {
                 // Load the file
                 mTable["Data"] = MatrixReader.ReadMatrixFromFile(fromFile, year, skip);
-                year = mTable["Data"].NetworkId;
+                year = mTable["Data"].NetworkIdIndex;
                 if(rmvIsolates)
                     RemoveIsolates(cutoff, calcSE, maxik, year, cmin, loadCOC, cliqueOrder, kCliqueDiag);
                 // And save it
@@ -10843,27 +11430,29 @@ namespace Network
             return 0;
         }
 
-        public int LoadFromAffiliationFile(string fileName, int year)
+        public int LoadFromAffiliationFile(string fileName, int yearIndex)
         {
             Reset();
 
             // Obtain a file buffer
             BufferedFileTable.AddFile(fileName);
 
-            // New way: Read in the first line of this year to get the number of columns
+            // New way: Read in the first line of this yearIndex to get the number of columns
 
-            // Jump to the correct year
-            int actualYear = BufferedFileTable.GetFile(fileName).JumpToNetworkId(year, true);
+            // Jump to the correct yearIndex
+            int actualYearIndex = BufferedFileTable.GetFile(fileName).JumpToNetworkId(yearIndex, true);
 
             // Calculate the size of this file
-            int lines = BufferedFileTable.GetFile(fileName).CountLines(actualYear);
+            int lines = BufferedFileTable.GetFile(fileName).CountLines(actualYearIndex);
             int cols = BufferedFileTable.GetFile(fileName).ReadLine().Split(',').Length;
 
-            BufferedFileTable.GetFile(fileName).JumpToNetworkId(year, true);
+            BufferedFileTable.GetFile(fileName).JumpToNetworkId(yearIndex, true);
 
             Matrix Affil = mTable.AddMatrix("Affil", lines, cols - 2);
             mTable["Affil"].Clear();
-            mTable["Affil"].NetworkId = actualYear;
+            mTable["Affil"].NetworkIdIndex = actualYearIndex;
+            mTable["Affil"].ActualNetworkIdStr = BufferedFileTable.GetFile(fileName).NetworkRealIdList[actualYearIndex];
+
 
             for (int i = 1; i < cols - 1; ++i)
                 Affil.ColLabels[i - 1] = "R" + i.ToString();
@@ -10876,7 +11465,7 @@ namespace Network
                 string[] parts = s.Split(',');
 
                 if (parts.Length - 2 > Affil.Cols)
-                    throw new IOException("Affiliation file has too many entries for year " + actualYear.ToString());
+                    throw new IOException("Affiliation file has too many entries for year " + actualYearIndex.ToString());
 
                 // Add this row's label
                 Affil.RowLabels[line] = parts[1];
@@ -10900,7 +11489,7 @@ namespace Network
             mTable["DataEvent"] = mTable["EventOverlap"];
 
             // The two new affiliation measures
-            mTable["AffilCorrelation"] = new Matrix(mTable["Affil"].Rows);
+            mTable["AffilCorrelation"] = new Matrix(mTable["Affil"].Rows, mTable["Affil"].ActualNetworkIdStr, mTable["Affil"].NetworkIdIndex);
             mTable["AffilCorrelation"].RowLabels.CopyFrom(mTable["Affil"].RowLabels);
             mTable["AffilCorrelation"].ColLabels.CopyFrom(mTable["Affil"].RowLabels);
             for (int i = 0; i < mTable["Affil"].Rows; ++i)
@@ -10988,7 +11577,7 @@ namespace Network
             tempAffilEuclideanMatrix = new Matrix(mTable["AffilEuclidean"]);
             tempAffilEuclideanEventMatrix = new Matrix(mTable["AffilEuclideanEvent"]);
 
-            return mTable["Affil"].NetworkId;
+            return actualYearIndex;
         }
 
         public int CountVarsInMultivariableDyadicFile(string filename)
@@ -11737,8 +12326,8 @@ namespace Network
                 data.Columns.Add(parts, parts);
 
             mTable["SignedNetwork"] = new Matrix(1, labelParts.Length);
-            mTable["SignedNetwork"].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable["SignedNetwork"].NetworkId = year;
+            mTable["SignedNetwork"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable["SignedNetwork"].NetworkIdIndex = year;
             for (int col = 0; col < labelParts.Length; col++)
             {
                 mTable["SignedNetwork"].ColLabels[col] = labelParts[col];
@@ -11750,7 +12339,7 @@ namespace Network
 
             // get the Network ID of the matrix
             mTable["SignedNetwork"][0, position++] = year;
-            //mTable["SignedNetwork"][0, position++] = mTable["Data"].NetworkId;
+            //mTable["SignedNetwork"][0, position++] = mTable["Data"].NetworkIdIndex;
 
             // get the number of Nodes N of the matrix
             mTable["SignedNetwork"][0, position++] = mTable["Data"].Rows;
@@ -11779,12 +12368,12 @@ namespace Network
             string[] labels = new string[labelParts.Length];
             for (int col = 0; col < labels.Length; col++)
             {   if (col == 0)
-                    labels[col] = mTable["SignedNetwork"].NetworkIdStr;
+                    labels[col] = mTable["SignedNetwork"].ActualNetworkIdStr;
                 else
                     labels[col] = mTable["SignedNetwork"][0, col].ToString();
             }
             data.Rows.Add(labels);
-            data.Rows[0].HeaderCell.Value = mTable["SignedNetwork"].NetworkIdStr;
+            data.Rows[0].HeaderCell.Value = mTable["SignedNetwork"].ActualNetworkIdStr;
         }
 
 
@@ -11805,8 +12394,8 @@ namespace Network
 
             string[] labelParts = nc.Label.Split(',');
             mTable["Counter"] = new Matrix(1, labelParts.Length);
-            mTable["Counter"].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable["Counter"].NetworkId = year;
+            mTable["Counter"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable["Counter"].NetworkIdIndex = year;
             for (int i = 0; i < labelParts.Length; ++i)
             {
                 mTable["Counter"].ColLabels[i] = labelParts[i];
@@ -11817,12 +12406,12 @@ namespace Network
             {
                 string[] newLine = new string[data.Columns.Count];
                 Algorithms.Fill<string>(newLine, "NA");
-                //newLine[0] = year.ToString();
+                //newLine[0] = yearIndex.ToString();
                 // Yushan
-                newLine[0] = mTable["Data"].NetworkIdStr;
+                newLine[0] = mTable["Data"].ActualNetworkIdStr;
                 newLine[1] = newLine[2] = "0";
                 data.Rows.Add(newLine);
-                data.Rows[0].HeaderCell.Value = mTable["Data"].NetworkIdStr;
+                data.Rows[0].HeaderCell.Value = mTable["Data"].ActualNetworkIdStr;
                 return;
             }
 
@@ -11868,11 +12457,11 @@ namespace Network
             {
                 /*
                 if (selectionMethod == "Cliq")
-                    LoadComponents(cutoff, inputType == "StructEquiv", density, year, _minCliqueSize, reachMatrixCount, reachSum, zeroDiagonal, useCliq);
+                    LoadComponents(cutoff, inputType == "StructEquiv", density, yearIndex, _minCliqueSize, reachMatrixCount, reachSum, zeroDiagonal, useCliq);
                 else if (selectionMethod == "Bloc" || selectionMethod == "Clus")
-                    LoadbComponents(cutoff, inputType == "StructEquiv", density, year, _minCliqueSize, reachMatrixCount, reachSum, zeroDiagonal, useCliq);
+                    LoadbComponents(cutoff, inputType == "StructEquiv", density, yearIndex, _minCliqueSize, reachMatrixCount, reachSum, zeroDiagonal, useCliq);
                 else if (selectionMethod == "Comm")
-                    LoadcomComponents(cutoff, inputType == "StructEquiv", density, year, _minCliqueSize, reachMatrixCount, reachSum, zeroDiagonal, useCliq);
+                    LoadcomComponents(cutoff, inputType == "StructEquiv", density, yearIndex, _minCliqueSize, reachMatrixCount, reachSum, zeroDiagonal, useCliq);
                 */
                 LoadComponents(cutoff, inputType == "StructEquiv", density, year, _minCliqueSize, reachMatrixCount, reachSum, zeroDiagonal, useCliq);
             }
@@ -11889,8 +12478,8 @@ namespace Network
                 mTable["Counter"][0, i] = Convert.ToDouble(temp[i]);
             }
             data.Rows.Add(temp);
-            //data.Rows[0].HeaderCell.Value = year;
-            data.Rows[0].HeaderCell.Value = mTable["Data"].NetworkIdStr;
+            //data.Rows[0].HeaderCell.Value = yearIndex;
+            data.Rows[0].HeaderCell.Value = mTable["Data"].ActualNetworkIdStr;
             nc = null;
             _cliques = null;
             _blocks = null;
@@ -12229,6 +12818,19 @@ namespace Network
                 data.Rows.Add(newRow);
                 data.Rows[data.Rows.Count - 1].HeaderCell.Value = "ER1";
             }
+            mTable.AddMatrix("Components", data.RowCount, data.ColumnCount);
+            mTable["Components"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable["Components"].NetworkIdIndex = mTable["Data"].NetworkIdIndex;
+            for (int i = 0; i < data.RowCount; i++)
+            {
+                mTable["Components"].RowLabels[i] = data.Rows[i].HeaderCell.Value.ToString();
+                for (int j = 0; j < data.ColumnCount; j++) {
+                    mTable["Components"].ColLabels[j] = data.Columns[j].HeaderText;
+                    double dataVal = double.NaN;
+                    double.TryParse(data.Rows[i].Cells[j].Value.ToString(), out dataVal);
+                    mTable["Components"][i, j] = dataVal;
+                }
+            }
 
         }
 
@@ -12322,9 +12924,6 @@ namespace Network
             }
             return templist;
         }
-
-
-
 
         public void calculateCommunities(DataGridView data, CommunityType commType, int year, List<UnordererdPair<string, NetworkIO.CharacteristicType>> svc,
             List<UnordererdPair<string, NetworkIO.CharacteristicType>> dvc, List<UnordererdPair<string, NetworkIO.CharacteristicType>> attrMatrix, double cutoff, double density)
@@ -12622,16 +13221,16 @@ namespace Network
                 comm_T_coh_list.Add(T_coh);
 
             }
-           
+
+            //bbflag
             string m_name = "Community";
             ///////////////////// Preliminary Calculations finished, time to specialize //////////////////
             if (commType == CommunityType.Affil || commType == CommunityType.newAffil || commType == CommunityType.ovAffil)
             {
                 // group is the vector that produces the community affiliaton matrix
-                
                 data.Columns.Clear(); // Clear data grid and prep for affliation matrix
                 
-                mTable[m_name] = new Matrix(group.Length, comNum); // may not need
+                mTable[m_name] = new Matrix(group.Length, comNum, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr); // may not need
                 //mTable["Community"].CloneTo(mTable[m_name]);
 
                 // add the labels to the columns of the grid
@@ -12824,7 +13423,8 @@ namespace Network
                 data.Columns.Add("1", "Community Modularity");
 
                 // matrix needs comNum + 1 rows since it needs an extra row for the final q value
-                mTable[m_name] = new Matrix(q_size + 1, 1);
+                mTable[m_name] = new Matrix(q_size + 1, 1, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
+                mTable[m_name].ColLabels[0] = "Community Modularity";
                 mTable["Community"].CloneTo(mTable[m_name]); // may not need
 
                 // create the communities
@@ -12838,12 +13438,14 @@ namespace Network
                 {
                     // Generate an array to hold this row
                     newRow = mTable[m_name][row, 0].ToString();
+                    mTable[m_name].RowLabels[row] = "Comm " + row.ToString();
                     data.Rows.Add(newRow);
                     data.Rows[row].HeaderCell.Value = "Comm " + row.ToString();
                 }
                 newRow = mTable[m_name][q_size, 0].ToString();
                 data.Rows.Add(newRow);
                 data.Rows[q_size].HeaderCell.Value = "Final ";
+                mTable[m_name].RowLabels[q_size] = "Final";
             }
 
             else if (commType == CommunityType.Coefficients || commType == CommunityType.newCoefficients || commType == CommunityType.ovCoefficients)
@@ -12862,11 +13464,11 @@ namespace Network
 
                 if (true)//commType == CommunityType.Coefficients)
                 {
-                    mTable[m_name] = new Matrix(comm_SC_list.Count, 9);
+                    mTable[m_name] = new Matrix(comm_SC_list.Count, 9, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
                 }
                 else if (commType == CommunityType.newCoefficients)
                 {
-                    mTable[m_name] = new Matrix(comm_SC_list.Count, 9);
+                    mTable[m_name] = new Matrix(comm_SC_list.Count, 9, mTable["Data"].NetworkIdIndex, mTable["Data"].ActualNetworkIdStr);
                 }
                 
                 for (int i = 0; i < comm_SC_list.Count - 1; i++)
@@ -12927,8 +13529,8 @@ namespace Network
 
 
                 mTable[m_name].RowLabels[lastRow] = (lastRow + 1).ToString();
-                mTable[m_name].NetworkIdStr = mTable["Data"].NetworkIdStr;
-                mTable[m_name].NetworkId = year;
+                mTable[m_name].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+                mTable[m_name].NetworkIdIndex = year;
                 if (true)//commType == CommunityType.Coefficients)
                 {
                     mTable[m_name].ColLabels[0] = "Year";
@@ -12987,9 +13589,9 @@ namespace Network
                     string[] newRow = new string[mTable[m_name].Cols];
                     for (int col = 0; col < mTable[m_name].Cols; col++)
                     {
-                        //Change year column from index value to actual year
+                        //Change yearIndex column from index value to actual yearIndex
                         if (col == 0)
-                            newRow[col] = mTable[m_name].NetworkIdStr;
+                            newRow[col] = mTable[m_name].ActualNetworkIdStr;
                         else
                             newRow[col] = mTable[m_name][row, col].ToString();
                     }
@@ -13169,8 +13771,8 @@ namespace Network
             int colCount = labelParts.Length; // there are 6 columns in this grid
 
             Matrix lt = mTable.AddMatrix(ms, mTable["Data"].Rows, colCount);
-            mTable[ms].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable[ms].NetworkId = networkID;
+            mTable[ms].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable[ms].NetworkIdIndex = networkID;
             // Col labels
             for (int i = 0; i < colCount; i++)
                 lt.ColLabels[i] = labelParts[i];
@@ -13206,7 +13808,7 @@ namespace Network
                     // Yushan
                     else if (col == 0)
                     {
-                        newRow[col] = mTable["Data"].NetworkIdStr;
+                        newRow[col] = mTable["Data"].ActualNetworkIdStr;
                     }
                     else
                         newRow[col] = lt[row, col].ToString();
@@ -13225,8 +13827,8 @@ namespace Network
             string ms = "DyadicTransitivity";
             Triads triad = new Triads(mTable["Data"], Triads.TriadType.NonBalance);
             mTable[ms] = triad.calcDyadicTransitivity(mTable["Data"]);
-            mTable[ms].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable[ms].NetworkId = networkID;
+            mTable[ms].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable[ms].NetworkIdIndex = networkID;
         }
 
         //by Angela
@@ -13299,8 +13901,8 @@ namespace Network
             for (int i = 0; i < output.ColLabels.Length; i++)
                 data.Columns.Add(output.ColLabels[i], output.ColLabels[i]);
             // Yushan
-            mTable["PathBased"].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable["PathBased"].NetworkId = mTable["Data"].NetworkId;
+            mTable["PathBased"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable["PathBased"].NetworkIdIndex = mTable["Data"].NetworkIdIndex;
             //rows
             //output.Rows =  mTable["Data"].Rows;
             for (int i = 0; i < totalRows; i++)
@@ -13309,7 +13911,7 @@ namespace Network
                 for (int j = 0; j < totalCols; j++)
                 {
                     mTable[displayMatrix][i,j] = matrix[i,j];  
-                    dataRow[j] = j == 0? mTable["PathBased"].NetworkIdStr : matrix[i,j].ToString() ;//>= 0? mTable[i, j].ToString() : "#N/A";
+                    dataRow[j] = j == 0? mTable["PathBased"].ActualNetworkIdStr : matrix[i,j].ToString() ;//>= 0? mTable[i, j].ToString() : "#N/A";
                 }
                 data.Rows.Add(dataRow);
             }
@@ -13335,8 +13937,8 @@ namespace Network
             int colCount = 4; // there are 4 columns in this grid
 
             Matrix lt = mTable.AddMatrix(ms, mTable["Data"].Rows, colCount);
-            mTable[ms].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable[ms].NetworkId = networkID;
+            mTable[ms].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable[ms].NetworkIdIndex = networkID;
 
             // Col labels
             for (int i = 0; i < colCount; i++)
@@ -13368,7 +13970,7 @@ namespace Network
                     if (col == 1)
                         newRow[col] = mTable["Data"].RowLabels[row];
                     else if (col == 0)
-                        newRow[col] = mTable["Data"].NetworkIdStr;
+                        newRow[col] = mTable["Data"].ActualNetworkIdStr;
                     else
                         newRow[col] = lt[row, col].ToString();
                 }
@@ -13595,8 +14197,8 @@ namespace Network
         {
             // Convert overlapComm into a matrix to be able to show in GUI
             mTable.AddMatrix("OverlappingCommunity", cliqueSize, overlapComm.Count);
-            mTable["OverLappingCommunity"].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable["OverLappingCommunity"].NetworkId = mTable["Data"].NetworkId;
+            mTable["OverlappingCommunity"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable["OverlappingCommunity"].NetworkIdIndex = mTable["Data"].NetworkIdIndex;
             for (int i = 0; i < overlapComm.Count; i++)
                 for (int j = 0; j < cliqueSize; j++)
                     mTable["OverlappingCommunity"][j, i] = overlapComm[i].IntContains(j);
@@ -13683,8 +14285,8 @@ namespace Network
 
 
             Matrix Stats_vector = mTable.AddMatrix(m_name, SC_list.Count, 8);
-            mTable[m_name].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable[m_name].NetworkId = year;
+            mTable[m_name].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable[m_name].NetworkIdIndex = year;
 
             for (int i = 0; i < SC_list.Count - 1; i++)
             {
@@ -13818,8 +14420,8 @@ namespace Network
 
             data.Columns.Clear();
             Matrix output = mTable.AddMatrix(ms, 1, 4);
-            mTable[ms].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable[ms].NetworkId = year;
+            mTable[ms].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable[ms].NetworkIdIndex = year;
             output[0, 0] = year;
             output[0, 1] = chisq_score;
             output[0, 2] = df;
@@ -13841,7 +14443,7 @@ namespace Network
             {
                 if (i == 0)
                 {
-                    row[i] = mTable[ms].NetworkIdStr;
+                    row[i] = mTable[ms].ActualNetworkIdStr;
                 }
                 else
                 {
@@ -13888,7 +14490,7 @@ namespace Network
                     List<string> networkLines = new List<string>();
                     sr.ReadLine(); // clear header
 
-                    while (!sr.EndOfStream) //loading year
+                    while (!sr.EndOfStream) //loading yearIndex
                     {
                         string line = sr.ReadLine();
                         var split = line.Split(',');
@@ -13999,8 +14601,8 @@ namespace Network
                 output.ColLabels[24] = "uci( i^2)";
             }
 
-            mTable["Multiplex"].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable["Multiplex"].NetworkId = year;
+            mTable["Multiplex"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable["Multiplex"].NetworkIdIndex = year;
 
 
             output.ColLabels[0] = "Network ID";
@@ -14091,7 +14693,7 @@ namespace Network
                 {
                     //dataRow[j] = output[i, j].ToString();
                     // Yushan
-                    dataRow[j] = (j == 0)? mTable["Multiplex"].NetworkIdStr : (output[i, j] >= 0 ? output[i, j].ToString() : "#N/A");
+                    dataRow[j] = (j == 0)? mTable["Multiplex"].ActualNetworkIdStr : (output[i, j] >= 0 ? output[i, j].ToString() : "#N/A");
                 }
                 data.Rows.Add(dataRow);
             } 
@@ -14394,12 +14996,12 @@ namespace Network
                     List<string> networkLines = new List<string>();
                     sr.ReadLine(); // clear header
 
-                    while (!sr.EndOfStream) //loading year
+                    while (!sr.EndOfStream) //loading yearIndex
                     {
                         string line = sr.ReadLine();
                         var split = line.Split(',');
 
-                        if (split[0] == mTable["Data"].NetworkIdStr)
+                        if (split[0] == mTable["Data"].ActualNetworkIdStr)
                         {
                             //Console.WriteLine("split[0]: {0:s}", split[0]);
                             networkLines.Add(line);
@@ -14472,7 +15074,7 @@ namespace Network
 
             
 
-            //MultiplexProgress MP = new MultiplexProgress(order, year, fnames, LoadFrom, curFile, numCells, data, mTable);
+            //MultiplexProgress MP = new MultiplexProgress(order, yearIndex, fnames, LoadFrom, curFile, numCells, data, mTable);
             //MP.Show();
 
             /*
@@ -14498,15 +15100,15 @@ namespace Network
             if (order)
             {
                 output = mTable.AddMatrix("Multiplex", numCells, 7);
-                mTable["Multiplex"].NetworkIdStr = mTable["Data"].NetworkIdStr;
-                mTable["Multiplex"].NetworkId = year;
+                mTable["Multiplex"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+                mTable["Multiplex"].NetworkIdIndex = year;
             }
 
             else
             {
                 output = mTable.AddMatrix("Multiplex", numCells, 9);
-                mTable["Multiplex"].NetworkIdStr = mTable["Data"].NetworkIdStr;
-                mTable["Multiplex"].NetworkId = year;
+                mTable["Multiplex"].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+                mTable["Multiplex"].NetworkIdIndex = year;
                 output.ColLabels[7] = "b^2";
                 output.ColLabels[8] = "imb^2";
             }
@@ -14597,7 +15199,7 @@ namespace Network
                 for (int j = 0; j < output.Cols; j++)
                 {
                     
-                    dataRow[j] = j == 0? (mTable["Multiplex"].NetworkIdStr) : (output[i,j] >= 0? output[i, j].ToString() : "#N/A");
+                    dataRow[j] = j == 0? (mTable["Multiplex"].ActualNetworkIdStr) : (output[i,j] >= 0? output[i, j].ToString() : "#N/A");
                 }
                 data.Rows.Add(dataRow);
             }
@@ -14675,8 +15277,8 @@ namespace Network
 
             data.Columns.Clear();
             Matrix output = mTable.AddMatrix(ms, 1, (2 * indices.Count) + 4);
-            mTable[ms].NetworkIdStr = mTable["Data"].NetworkIdStr;
-            mTable[ms].NetworkId = year;
+            mTable[ms].ActualNetworkIdStr = mTable["Data"].ActualNetworkIdStr;
+            mTable[ms].NetworkIdIndex = year;
 
             output[0, 0] = year;
             output[0, 1] = df;
@@ -14711,7 +15313,7 @@ namespace Network
             string[] row = new string[output.Cols];
             for (int i = 0; i < row.Length; i++)
             {
-                row[i] = i == 0? mTable[ms].NetworkIdStr : output[i].ToString();
+                row[i] = i == 0? mTable[ms].ActualNetworkIdStr : output[i].ToString();
             }
             data.Rows.Add(row);
         }
@@ -14744,7 +15346,7 @@ namespace Network
                 Matrix tempMatrix = new Matrix(mList[n]);
                 rowLabels = new List<string>();
                 int rows_output = rows * cols;
-                ndsOutput = new Matrix(rows_output, 9, tempMatrix.NetworkId, tempMatrix.NetworkIdStr);
+                ndsOutput = new Matrix(rows_output, 9, tempMatrix.NetworkIdIndex, tempMatrix.ActualNetworkIdStr);
 
                 OTP = new Matrix(tempMatrix * tempMatrix.GetTranspose());
                 ITP = new Matrix(tempMatrix.GetTranspose() * tempMatrix);
@@ -14809,7 +15411,7 @@ namespace Network
                         tempLabel = tempMatrix.RowLabels[i] + "," + tempMatrix.ColLabels[j];
 
                         rowLabels.Add(tempLabel);
-                        ndsOutput[dummy, 0] = tempMatrix.NetworkId; // Need to convert to NetworkIdStr in output file
+                        ndsOutput[dummy, 0] = tempMatrix.NetworkIdIndex; // Need to convert to ActualNetworkIdStr in output file
                         ndsOutput[dummy, 1] = i; // Place holder for RowLabels[i]. Need to convert back to string labels
                         ndsOutput[dummy, 2] = j; // Place holder for ColLabels[j]. Same as above
                         ndsOutput[dummy, 3] = tempMatrix[i, j];
@@ -14823,7 +15425,7 @@ namespace Network
                 }
                 ndsOutput.ColLabels.SetLabels(colLabels);
                 ndsOutput.RowLabels.SetLabels(rowLabels);
-                ndsOutputTable.Add(ndsOutput.NetworkIdStr, ndsOutput);           
+                ndsOutputTable.Add(ndsOutput.ActualNetworkIdStr, ndsOutput);           
             }
             return ndsOutputTable;
         }
@@ -14849,8 +15451,8 @@ namespace Network
             for (int row = 0; row < mTable[m].Rows; ++row)
             {
                 string[] newRow = new string[mTable[m].Cols];
-                newRow[0] = mTable[m].NetworkIdStr;
-                mTable[m][row, 0] = mTable[m].NetworkId;
+                newRow[0] = mTable[m].ActualNetworkIdStr;
+                mTable[m][row, 0] = mTable[m].NetworkIdIndex;
                 // "<rowLabels[i]>,<colLabels[j]>"
                 mTable[m].RowLabels[row] = mTable[m].RowLabels[row];
                 string[] rowColLabels = mTable[m].RowLabels[row].Split(',');
@@ -15017,7 +15619,7 @@ namespace Network
             }
             // Load into mTable 
             mTable[m] = new Matrix(mRandList[netID]);
-            mTable[m].NetworkIdStr = netID;
+            mTable[m].ActualNetworkIdStr = netID;
 
             // Load data into datagrid
             data.Columns.Clear();
@@ -15211,7 +15813,7 @@ namespace Network
             }
             // Load into mTable 
             mTable[m] = new Matrix(mRandList[netID]);
-            mTable[m].NetworkIdStr = netID;
+            mTable[m].ActualNetworkIdStr = netID;
 
             // Load data into datagrid
             data.Columns.Clear();

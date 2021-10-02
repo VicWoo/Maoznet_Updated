@@ -130,7 +130,7 @@ namespace NetworkGUI.Triads
             // initialize the dt matrix with s
             Matrix dt = new Matrix(s.Rows, s.Cols);
             dt.CopyLabelsFrom(s);
-            dt.NetworkId = s.NetworkId;
+            dt.NetworkIdIndex = s.NetworkIdIndex;
 
             for (int i = 0; i < s.Rows; i++)
             {

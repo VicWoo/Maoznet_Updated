@@ -763,7 +763,7 @@ namespace Network.Matrices
             vmax = (int)modelSpec.GetColVector(modelSpec.ColLabels["Max"])[0];
             nodes = (int)modelSpec.GetColVector(modelSpec.ColLabels["Nodes"])[0]; ;
 
-            Matrix m = new Matrix(nodes, nodes, modelSpec.NetworkIdStr);
+            Matrix m = new Matrix(nodes, nodes, modelSpec.ActualNetworkIdStr);
             Algorithms.Iota(m.ColLabels, 1);
             Algorithms.Iota(m.RowLabels, 1);
 
@@ -925,7 +925,7 @@ namespace Network.Matrices
 
             foreach (Matrix m in networkSpec_data)
             {
-                net_id = m.NetworkIdStr;
+                net_id = m.ActualNetworkIdStr;
                 //nodes = networkSpec[i]["Nodes"];
                 //pos_edges = networkSpec[i]["Pos. Edges"];
                 //neg_edges = networkSpec[i]["Neg. Edges"];
@@ -964,7 +964,7 @@ namespace Network.Matrices
             Vector vmin, vmax;
             Vector deg, pos_deg, neg_deg;
             Matrix m = new Matrix(nodes, nodes);
-            m.NetworkIdStr = modelSpec.NetworkIdStr;
+            m.ActualNetworkIdStr = modelSpec.ActualNetworkIdStr;
             m.Clear();
             vmin = modelSpec.GetColVector(modelSpec.ColLabels["Min"]);
             vmax = modelSpec.GetColVector(modelSpec.ColLabels["Max"]);
@@ -1067,7 +1067,7 @@ namespace Network.Matrices
             // List<int> pos_row_pool = new List<int>();
             // List<int> neg_row_pool = new List<int>();
             Matrix m = new Matrix(nodes);
-            m.NetworkIdStr = modelSpec.NetworkIdStr;
+            m.ActualNetworkIdStr = modelSpec.ActualNetworkIdStr;
 
             vmin = modelSpec.GetColVector(modelSpec.ColLabels["Min"]);
             vmax = modelSpec.GetColVector(modelSpec.ColLabels["Max"]);
@@ -2048,7 +2048,7 @@ namespace Network.Matrices
             Dictionary<string, List<Matrix>> mRandTable = new Dictionary<string, List<Matrix>>();
             foreach (Matrix m in networkSpec_data)
             {
-                string net_ID = m.NetworkIdStr;
+                string net_ID = m.ActualNetworkIdStr;
                 //Console.WriteLine("net_ID: " + net_ID);
                 Matrix modelSpec = m;               
                 mRandTable.Add(net_ID, new List<Matrix>());

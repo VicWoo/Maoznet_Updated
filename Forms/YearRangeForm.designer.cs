@@ -40,7 +40,7 @@
             this.firstLabel.AutoSize = true;
             this.firstLabel.Location = new System.Drawing.Point(9, 10);
             this.firstLabel.Name = "firstLabel";
-            this.firstLabel.Size = new System.Drawing.Size(83, 13);
+            this.firstLabel.Size = new System.Drawing.Size(111, 17);
             this.firstLabel.TabIndex = 0;
             this.firstLabel.Text = "Save years from";
             this.firstLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
@@ -59,7 +59,7 @@
             this.secondLabel.AutoSize = true;
             this.secondLabel.Location = new System.Drawing.Point(166, 10);
             this.secondLabel.Name = "secondLabel";
-            this.secondLabel.Size = new System.Drawing.Size(16, 13);
+            this.secondLabel.Size = new System.Drawing.Size(20, 17);
             this.secondLabel.TabIndex = 2;
             this.secondLabel.Text = "to";
             // 
@@ -70,6 +70,7 @@
             this.fromText.Name = "fromText";
             this.fromText.Size = new System.Drawing.Size(57, 20);
             this.fromText.TabIndex = 3;
+            this.fromText.TextChanged += new System.EventHandler(this.fromText_TextChanged);
             // 
             // toText
             // 
@@ -78,13 +79,14 @@
             this.toText.Name = "toText";
             this.toText.Size = new System.Drawing.Size(57, 20);
             this.toText.TabIndex = 4;
+            this.toText.TextChanged += new System.EventHandler(this.toText_TextChanged);
             // 
             // cohesionCheckBox
             // 
             this.cohesionCheckBox.AutoSize = true;
             this.cohesionCheckBox.Location = new System.Drawing.Point(13, 37);
             this.cohesionCheckBox.Name = "cohesionCheckBox";
-            this.cohesionCheckBox.Size = new System.Drawing.Size(121, 17);
+            this.cohesionCheckBox.Size = new System.Drawing.Size(155, 21);
             this.cohesionCheckBox.TabIndex = 5;
             this.cohesionCheckBox.Text = "Save cohesion data";
             this.cohesionCheckBox.UseVisualStyleBackColor = true;

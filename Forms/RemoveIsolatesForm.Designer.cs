@@ -29,7 +29,6 @@ namespace NetworkGUI.Forms
         /// </summary>
         private void InitializeComponent()
         {
-            this.rmvIsolatesPrmpt = new System.Windows.Forms.Label();
             this.rmvIsolatesT = new System.Windows.Forms.RadioButton();
             this.rmvIsolatesF = new System.Windows.Forms.RadioButton();
             this.minGrpSzPrmpt = new System.Windows.Forms.Label();
@@ -37,24 +36,16 @@ namespace NetworkGUI.Forms
             this.doneBt = new System.Windows.Forms.Button();
             this.popupChkBx = new System.Windows.Forms.CheckBox();
             this.popupPrmpt = new System.Windows.Forms.Label();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
             ((System.ComponentModel.ISupportInitialize)(this.minGrpSz)).BeginInit();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // rmvIsolatesPrmpt
-            // 
-            this.rmvIsolatesPrmpt.AutoSize = true;
-            this.rmvIsolatesPrmpt.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.rmvIsolatesPrmpt.Location = new System.Drawing.Point(12, 30);
-            this.rmvIsolatesPrmpt.Name = "rmvIsolatesPrmpt";
-            this.rmvIsolatesPrmpt.Size = new System.Drawing.Size(225, 18);
-            this.rmvIsolatesPrmpt.TabIndex = 1;
-            this.rmvIsolatesPrmpt.Text = "Do you want to remove isolates?";
             // 
             // rmvIsolatesT
             // 
             this.rmvIsolatesT.AutoCheck = false;
             this.rmvIsolatesT.AutoSize = true;
-            this.rmvIsolatesT.Location = new System.Drawing.Point(260, 30);
+            this.rmvIsolatesT.Location = new System.Drawing.Point(8, 25);
             this.rmvIsolatesT.Name = "rmvIsolatesT";
             this.rmvIsolatesT.Size = new System.Drawing.Size(53, 21);
             this.rmvIsolatesT.TabIndex = 2;
@@ -67,7 +58,7 @@ namespace NetworkGUI.Forms
             // 
             this.rmvIsolatesF.AutoCheck = false;
             this.rmvIsolatesF.AutoSize = true;
-            this.rmvIsolatesF.Location = new System.Drawing.Point(260, 57);
+            this.rmvIsolatesF.Location = new System.Drawing.Point(8, 52);
             this.rmvIsolatesF.Name = "rmvIsolatesF";
             this.rmvIsolatesF.Size = new System.Drawing.Size(47, 21);
             this.rmvIsolatesF.TabIndex = 3;
@@ -80,7 +71,7 @@ namespace NetworkGUI.Forms
             // 
             this.minGrpSzPrmpt.AutoSize = true;
             this.minGrpSzPrmpt.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.minGrpSzPrmpt.Location = new System.Drawing.Point(12, 110);
+            this.minGrpSzPrmpt.Location = new System.Drawing.Point(12, 120);
             this.minGrpSzPrmpt.Name = "minGrpSzPrmpt";
             this.minGrpSzPrmpt.Size = new System.Drawing.Size(148, 18);
             this.minGrpSzPrmpt.TabIndex = 4;
@@ -88,7 +79,7 @@ namespace NetworkGUI.Forms
             // 
             // minGrpSz
             // 
-            this.minGrpSz.Location = new System.Drawing.Point(187, 110);
+            this.minGrpSz.Location = new System.Drawing.Point(187, 119);
             this.minGrpSz.Maximum = new decimal(new int[] {
             10000000,
             0,
@@ -132,33 +123,42 @@ namespace NetworkGUI.Forms
             this.popupPrmpt.TabIndex = 7;
             this.popupPrmpt.Text = "Remember my choices";
             // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.rmvIsolatesF);
+            this.groupBox1.Controls.Add(this.rmvIsolatesT);
+            this.groupBox1.Location = new System.Drawing.Point(15, 20);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(292, 87);
+            this.groupBox1.TabIndex = 8;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Do you want to remove isolates?";
+            // 
             // RemoveIsolatesForm
             // 
             this.AcceptButton = this.doneBt;
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(327, 213);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.popupPrmpt);
             this.Controls.Add(this.popupChkBx);
             this.Controls.Add(this.doneBt);
             this.Controls.Add(this.minGrpSz);
             this.Controls.Add(this.minGrpSzPrmpt);
-            this.Controls.Add(this.rmvIsolatesF);
-            this.Controls.Add(this.rmvIsolatesT);
-            this.Controls.Add(this.rmvIsolatesPrmpt);
             this.MaximumSize = new System.Drawing.Size(345, 260);
             this.MinimumSize = new System.Drawing.Size(345, 260);
             this.Name = "RemoveIsolatesForm";
             this.Text = "Remove Isolates";
             ((System.ComponentModel.ISupportInitialize)(this.minGrpSz)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-
-        private System.Windows.Forms.Label rmvIsolatesPrmpt;
         private System.Windows.Forms.RadioButton rmvIsolatesT;
         private System.Windows.Forms.RadioButton rmvIsolatesF;
         private System.Windows.Forms.Label minGrpSzPrmpt;
@@ -166,5 +166,6 @@ namespace NetworkGUI.Forms
         private System.Windows.Forms.Button doneBt;
         private System.Windows.Forms.CheckBox popupChkBx;
         private System.Windows.Forms.Label popupPrmpt;
+        private System.Windows.Forms.GroupBox groupBox1;
     }
 }

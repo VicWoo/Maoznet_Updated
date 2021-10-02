@@ -183,7 +183,6 @@ namespace NetworkGUI
             this.overlappingCommunityCharacteristicsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.overlappingCommunityToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.overlappingCommunityCoefficientsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.dichotomizedMatrixToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newDiscreteCommunitiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.communityAffiliationMatrixToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.communityDensityMatrixToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -200,6 +199,15 @@ namespace NetworkGUI
             this.newOverlappingCommunityCharacteristicsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.modularityCoefficientToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.newOverlappingCommunityCoefficientsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.louvainCommunityAlgorithmToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.louvainComAffilMatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.louvainComDensityMatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.louvainComRelativeDensityToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.louvainComCohesionMatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.louvainSepCoeffToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.louvainModCoeffToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.louvainComCoeffToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dichotomizedMatrixToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.removeIsolatesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.signedNetworkOperationsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dataMatrixToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -1079,9 +1087,10 @@ namespace NetworkGUI
             this.clustersToolStripMenuItem1,
             this.discreteCommunitiesToolStripMenuItem,
             this.overlappingCommunitiesToolStripMenuItem,
-            this.dichotomizedMatrixToolStripMenuItem,
             this.newDiscreteCommunitiesToolStripMenuItem,
             this.newOverlappingCommunitiesToolStripMenuItem,
+            this.louvainCommunityAlgorithmToolStripMenuItem,
+            this.dichotomizedMatrixToolStripMenuItem,
             this.removeIsolatesToolStripMenuItem});
             this.blockmodelsToolStripMenuItem.Name = "blockmodelsToolStripMenuItem";
             this.blockmodelsToolStripMenuItem.Size = new System.Drawing.Size(165, 24);
@@ -1542,13 +1551,6 @@ namespace NetworkGUI
             this.overlappingCommunityCoefficientsToolStripMenuItem.Text = "Overlapping Community Coefficients";
             this.overlappingCommunityCoefficientsToolStripMenuItem.Click += new System.EventHandler(this.overlappingCommunityCoefficientsToolStripMenuItem_Click);
             // 
-            // dichotomizedMatrixToolStripMenuItem
-            // 
-            this.dichotomizedMatrixToolStripMenuItem.Name = "dichotomizedMatrixToolStripMenuItem";
-            this.dichotomizedMatrixToolStripMenuItem.Size = new System.Drawing.Size(299, 26);
-            this.dichotomizedMatrixToolStripMenuItem.Text = "Dichotomized Matrix";
-            this.dichotomizedMatrixToolStripMenuItem.Click += new System.EventHandler(this.dichotomizedMatrixToolStripMenuItem_Click);
-            // 
             // newDiscreteCommunitiesToolStripMenuItem
             // 
             this.newDiscreteCommunitiesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -1677,6 +1679,77 @@ namespace NetworkGUI
             this.newOverlappingCommunityCoefficientsToolStripMenuItem.Size = new System.Drawing.Size(404, 26);
             this.newOverlappingCommunityCoefficientsToolStripMenuItem.Text = "New Overlapping Community Coefficients";
             this.newOverlappingCommunityCoefficientsToolStripMenuItem.Click += new System.EventHandler(this.newOverlappingCommunityCoefficientsToolStripMenuItem_Click);
+            // 
+            // louvainCommunityAlgorithmToolStripMenuItem
+            // 
+            this.louvainCommunityAlgorithmToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.louvainComAffilMatToolStripMenuItem,
+            this.louvainComDensityMatToolStripMenuItem,
+            this.louvainComCohesionMatToolStripMenuItem,
+            this.louvainSepCoeffToolStripMenuItem,
+            this.louvainModCoeffToolStripMenuItem,
+            this.louvainComCoeffToolStripMenuItem});
+            this.louvainCommunityAlgorithmToolStripMenuItem.Name = "louvainCommunityAlgorithmToolStripMenuItem";
+            this.louvainCommunityAlgorithmToolStripMenuItem.Size = new System.Drawing.Size(299, 26);
+            this.louvainCommunityAlgorithmToolStripMenuItem.Text = "Louvain Community Algorithm";
+            // 
+            // louvainComAffilMatToolStripMenuItem
+            // 
+            this.louvainComAffilMatToolStripMenuItem.Name = "louvainComAffilMatToolStripMenuItem";
+            this.louvainComAffilMatToolStripMenuItem.Size = new System.Drawing.Size(284, 26);
+            this.louvainComAffilMatToolStripMenuItem.Text = "Community Affiliation Matrix";
+            this.louvainComAffilMatToolStripMenuItem.Click += new System.EventHandler(this.louvainComAffilMatToolStripMenuItem_Click);
+            // 
+            // louvainComDensityMatToolStripMenuItem
+            // 
+            this.louvainComDensityMatToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.louvainComRelativeDensityToolStripMenuItem});
+            this.louvainComDensityMatToolStripMenuItem.Name = "louvainComDensityMatToolStripMenuItem";
+            this.louvainComDensityMatToolStripMenuItem.Size = new System.Drawing.Size(284, 26);
+            this.louvainComDensityMatToolStripMenuItem.Text = "Community Density Matrix";
+            this.louvainComDensityMatToolStripMenuItem.Click += new System.EventHandler(this.louvainComDensityMatToolStripMenuItem_Click);
+            // 
+            // louvainComRelativeDensityToolStripMenuItem
+            // 
+            this.louvainComRelativeDensityToolStripMenuItem.Name = "louvainComRelativeDensityToolStripMenuItem";
+            this.louvainComRelativeDensityToolStripMenuItem.Size = new System.Drawing.Size(198, 26);
+            this.louvainComRelativeDensityToolStripMenuItem.Text = "Relative Density";
+            this.louvainComRelativeDensityToolStripMenuItem.Click += new System.EventHandler(this.louvainComRelativeDensityToolStripMenuItem_Click);
+            // 
+            // louvainComCohesionMatToolStripMenuItem
+            // 
+            this.louvainComCohesionMatToolStripMenuItem.Name = "louvainComCohesionMatToolStripMenuItem";
+            this.louvainComCohesionMatToolStripMenuItem.Size = new System.Drawing.Size(284, 26);
+            this.louvainComCohesionMatToolStripMenuItem.Text = "Community Cohesion Matrix";
+            this.louvainComCohesionMatToolStripMenuItem.Click += new System.EventHandler(this.louvainComCohesionMatToolStripMenuItem_Click);
+            // 
+            // louvainSepCoeffToolStripMenuItem
+            // 
+            this.louvainSepCoeffToolStripMenuItem.Name = "louvainSepCoeffToolStripMenuItem";
+            this.louvainSepCoeffToolStripMenuItem.Size = new System.Drawing.Size(284, 26);
+            this.louvainSepCoeffToolStripMenuItem.Text = "Separation Coefficients";
+            this.louvainSepCoeffToolStripMenuItem.Click += new System.EventHandler(this.louvainSepCoeffToolStripMenuItem_Click);
+            // 
+            // louvainModCoeffToolStripMenuItem
+            // 
+            this.louvainModCoeffToolStripMenuItem.Name = "louvainModCoeffToolStripMenuItem";
+            this.louvainModCoeffToolStripMenuItem.Size = new System.Drawing.Size(284, 26);
+            this.louvainModCoeffToolStripMenuItem.Text = "Modularity Coefficient";
+            this.louvainModCoeffToolStripMenuItem.Click += new System.EventHandler(this.louvainModCoeffToolStripMenuItem_Click);
+            // 
+            // louvainComCoeffToolStripMenuItem
+            // 
+            this.louvainComCoeffToolStripMenuItem.Name = "louvainComCoeffToolStripMenuItem";
+            this.louvainComCoeffToolStripMenuItem.Size = new System.Drawing.Size(284, 26);
+            this.louvainComCoeffToolStripMenuItem.Text = "Community Coefficients";
+            this.louvainComCoeffToolStripMenuItem.Click += new System.EventHandler(this.louvainComCoeffToolStripMenuItem_Click);
+            // 
+            // dichotomizedMatrixToolStripMenuItem
+            // 
+            this.dichotomizedMatrixToolStripMenuItem.Name = "dichotomizedMatrixToolStripMenuItem";
+            this.dichotomizedMatrixToolStripMenuItem.Size = new System.Drawing.Size(299, 26);
+            this.dichotomizedMatrixToolStripMenuItem.Text = "Dichotomized Matrix";
+            this.dichotomizedMatrixToolStripMenuItem.Click += new System.EventHandler(this.dichotomizedMatrixToolStripMenuItem_Click);
             // 
             // removeIsolatesToolStripMenuItem
             // 
@@ -2240,6 +2313,14 @@ namespace NetworkGUI
         private System.Windows.Forms.ToolStripMenuItem secondOrderPathBasedNullToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem thirdOrderPathBasedNullToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem removeIsolatesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem louvainCommunityAlgorithmToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem louvainComAffilMatToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem louvainComDensityMatToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem louvainComRelativeDensityToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem louvainComCohesionMatToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem louvainModCoeffToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem louvainSepCoeffToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem louvainComCoeffToolStripMenuItem;
     }
 }
 

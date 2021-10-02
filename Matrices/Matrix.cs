@@ -10,8 +10,8 @@ namespace Network.Matrices
     {
         protected int _rows;
         protected int _cols;
-        protected int _networkId;
-        protected string _networkId_str;
+        protected int _networkIdIndex;
+        protected string _actualNetworkId_str;
         protected double[] _data;
 
         // used for outOfMemory matrices
@@ -50,13 +50,18 @@ namespace Network.Matrices
                 return;
             InitMatrix(rows, cols, networkId, networkId_str);
         }
-
         // Yushan
         public Matrix(int rows, int cols, string networkId_str) 
         {
             if (networkId_str == null)
                 return;
             InitMatrix(rows, cols, 0, networkId_str);
+        }
+        public Matrix(int rows, string networkId_str, int networkId)
+        {
+            if (networkId_str == null)
+                return;
+            InitMatrix(rows, rows, networkId, networkId_str);
         }
         public Matrix(int rows, int cols)
         {
@@ -65,6 +70,12 @@ namespace Network.Matrices
         public Matrix(int rows) 
         {
             InitMatrix(rows, rows, 0, "0");
+        }
+        public Matrix(int rows, string networkId_str)
+        {
+            if (networkId_str == null)
+                return;
+            InitMatrix(rows, rows, 0, networkId_str);
         }
         public Matrix(Matrix m)
         {
@@ -160,10 +171,10 @@ namespace Network.Matrices
                 _data.Add(0);
             */
             _standardization = StandardizationType.None;
-            _networkId = networkId;
+            _networkIdIndex = networkId;
 
             // Yushan
-            _networkId_str = networkId_str;
+            _actualNetworkId_str = networkId_str;
 
 
             SetUpAverageArrays();
@@ -266,17 +277,17 @@ namespace Network.Matrices
         }
             
 
-        public int NetworkId
+        public int NetworkIdIndex
         {
-            get { return _networkId; }
-            set { _networkId = value; }
+            get { return _networkIdIndex; }
+            set { _networkIdIndex = value; }
         }
 
         // Yushan
-        public string NetworkIdStr
+        public string ActualNetworkIdStr
         {
-            get { return _networkId_str; }
-            set { _networkId_str = value; }
+            get { return _actualNetworkId_str; }
+            set { _actualNetworkId_str = value; }
         }
         public string Name
         {
@@ -310,7 +321,8 @@ namespace Network.Matrices
         public virtual Matrix GetTranspose()
         {
             Matrix temp = new Matrix(_cols, _rows);
-
+            temp.ActualNetworkIdStr = _actualNetworkId_str;
+            temp.NetworkIdIndex = _networkIdIndex;
             temp._rowLabels.CopyFrom(_colLabels);
             temp._colLabels.CopyFrom(_rowLabels);
 
@@ -350,7 +362,7 @@ namespace Network.Matrices
             if (lhs._cols != rhs._rows)
                 throw new MatrixException("Dimensions of matrices do not match for multiplication.");
 
-            Matrix result = new Matrix(lhs._rows, rhs._cols, rhs.NetworkId, rhs.NetworkIdStr);
+            Matrix result = new Matrix(lhs._rows, rhs._cols, rhs.NetworkIdIndex, rhs.ActualNetworkIdStr);
             result.RowLabels.CopyFrom(lhs.RowLabels);
             result.ColLabels.CopyFrom(rhs.ColLabels);
             result.Clear();
@@ -706,9 +718,9 @@ namespace Network.Matrices
                     _rowSqrAvg.CopyTo(m._rowSqrAvg, 0);
                     _colSqrAvg.CopyTo(m._colSqrAvg, 0);
                     m._standardization = _standardization;
-                    m._networkId = _networkId;
+                    m._networkIdIndex = _networkIdIndex;
                     // Yushan
-                    m._networkId_str = _networkId_str;
+                    m._actualNetworkId_str = _actualNetworkId_str;
                     m._rowLabels.CopyFrom(_rowLabels);
                     m._colLabels.CopyFrom(_colLabels);
                 }
@@ -932,7 +944,7 @@ namespace Network.Matrices
         {
             if (!IsSquareMatrix)
                 throw new MatrixException("Cannot get diagonal matrix from non-square matrix.");
-            Matrix tmp = new Matrix(this.Rows);
+            Matrix tmp = new Matrix(this.Rows, this.ActualNetworkIdStr, this.NetworkIdIndex);
             tmp.Clear();
 
             for (int i = 0; i < _rows; ++i)
@@ -952,9 +964,9 @@ namespace Network.Matrices
                 tmp[i] = this[i, i];
 
             tmp.Labels.CopyFrom(_rowLabels);
-            tmp.NetworkId = NetworkId;
+            tmp.NetworkIdIndex = NetworkIdIndex;
             //Yushan
-            tmp.NetworkIdStr = NetworkIdStr;
+            tmp.ActualNetworkIdStr = ActualNetworkIdStr;
 
             return tmp;
         }

@@ -146,6 +146,12 @@
     <Compile Include="Forms\ABMProgressForm.Designer.cs">
       <DependentUpon>ABMProgressForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\LouvainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\LouvainForm.Designer.cs">
+      <DependentUpon>LouvainForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\RemoveIsolatesForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -581,6 +587,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ABMProgressForm.resx">
       <DependentUpon>ABMProgressForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\LouvainForm.resx">
+      <DependentUpon>LouvainForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\RemoveIsolatesForm.resx">
       <DependentUpon>RemoveIsolatesForm.cs</DependentUpon>

@@ -289,8 +289,8 @@ namespace NetworkGUI
                 string netIdStr = randNet.NetworkId;
                 int cols = sign ? 5 : 4;
                 Matrix tempMatrix = new Matrix(1, cols);
-                tempMatrix.NetworkId = netId++;
-                tempMatrix.NetworkIdStr = netIdStr;
+                tempMatrix.NetworkIdIndex = netId++;
+                tempMatrix.ActualNetworkIdStr = netIdStr;
                 if (sign)
                 {
                     string[] colLabels = { "Nodes", "Pos. Edges", "Neg. Edges", "Min", "Max" };
